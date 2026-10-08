@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ECE8F2">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Kristall-Echo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet">
+<style>:root{--rock:#ECE8F2;--slab:#fff;--ink:#24213B;--line:#DAD5E8;--am:#6A4BE0;--am-soft:#E3DCFB;--muted:#6E6987;--ok:#178A5E;--bad:#D23C47}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--rock);color:var(--ink);font-family:'Bricolage Grotesque',ui-rounded,system-ui,-apple-system,sans-serif;font-size:16px;line-height:1.45}
+body{padding-bottom:calc(80px + env(safe-area-inset-bottom));-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--am);outline-offset:2px}
+header{display:flex;align-items:center;gap:10px;padding:calc(12px + env(safe-area-inset-top)) 16px 8px;max-width:520px;margin:0 auto}
+h1{white-space:nowrap;margin-right:auto!important;font-size:24px;font-weight:800;letter-spacing:-.03em;margin:0;display:flex;align-items:center;gap:8px}
+h1 svg{width:26px;height:26px}
+
+#newbtn{border:0;background:var(--ink);color:#fff;border-radius:999px;padding:7px 14px;font-weight:600;font-size:14px}
+main{max-width:520px;margin:0 auto;padding:0 12px}
+h2{font-size:28px;line-height:1.1;letter-spacing:-.03em;margin:8px 0 10px;font-weight:800}
+h3{font-size:17px;margin:20px 4px 8px;font-weight:700}
+.hint{margin:4px 4px 10px;color:var(--muted);font-size:15px}.hint b{color:var(--ink)}
+.small{font-size:14px}
+.board{background:var(--slab);border-radius:20px;padding:4px;box-shadow:0 10px 30px -18px rgba(70,40,170,.55)}
+.board svg{width:100%;height:auto;display:block;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.grow{flex:1}
+.btn{min-height:46px;border-radius:14px;border:1.5px solid var(--ink);background:var(--slab);font-weight:600;padding:0 14px}
+.btn.primary{background:var(--ink);color:#fff}
+.btn:disabled{opacity:.35;cursor:default}
+.tools .btn{flex:1}
+.link{border:0;background:none;color:var(--am);font-weight:600;padding:10px 4px;text-decoration:underline;text-underline-offset:3px}
+.tray{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:12px}
+.chip{border:1.5px solid var(--line);background:var(--slab);border-radius:16px;padding:8px 2px 6px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;font-weight:600;font-size:13px;min-height:80px}
+.chip .st{font-size:12px;color:var(--muted);font-weight:400}
+.chip.on{border-color:var(--am);background:var(--am-soft);box-shadow:inset 0 0 0 1.5px var(--am)}
+.seg{display:flex;background:#DDD7EA;border-radius:14px;padding:3px;margin-top:12px}
+.seg button{flex:1;border:0;background:none;border-radius:11px;min-height:40px;font-weight:600;font-size:14px;color:var(--muted)}
+.seg button.on{background:var(--slab);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.log{list-style:none;margin:0;padding:0;background:var(--slab);border-radius:16px;overflow:hidden}
+.log li{display:flex;align-items:center;gap:10px;padding:11px 12px;border-top:1px solid #F0EDF6;font-size:15px}
+.log li:first-child{border-top:0}
+.log li.on{background:var(--am-soft)}
+.log li[data-act]{cursor:pointer}
+.no{width:24px;height:24px;border-radius:50%;background:#EFECF6;font-size:12px;font-weight:700;display:grid;place-items:center;flex:none}
+.dots{display:flex;gap:3px}
+.ct{color:var(--muted);font-size:13px;margin-right:auto}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;border:1.5px solid var(--ink)}
+.dot.none{background:repeating-linear-gradient(45deg,#fff 0 2px,#ccc 2px 4px)}
+.ok{color:var(--ok);font-weight:700}.bad{color:var(--bad);font-weight:700}
+.x{border:0;background:none;color:var(--muted);font-size:20px;line-height:1;padding:0 2px 2px;min-width:28px;min-height:28px}
+.cap{background:var(--slab);border-radius:14px;padding:10px 12px;margin-top:8px;font-size:14px}
+.result{background:var(--ink);color:#fff;border-radius:20px;padding:14px 16px;margin:4px 0 10px}
+.rl{font-size:14px;color:#CFC8F2}.rbig{font-size:24px;font-weight:800;letter-spacing:-.02em;line-height:1.2;margin:2px 0 8px}
+.rdots .dot{width:16px;height:16px;border-color:#fff;margin-right:4px}
+.hero{padding:6px 4px}
+.hero p{color:var(--muted);margin:0 0 16px}
+.mode{display:block;width:100%;text-align:left;border:1.5px solid var(--ink);background:var(--slab);border-radius:18px;padding:14px 16px;margin-bottom:10px}
+.mode b{display:block;font-size:18px}.mode span{color:var(--muted);font-size:14px}
+.stack{margin-top:8px}
+.rules{background:var(--slab);border-radius:20px;padding:6px 18px 14px}
+.rules h3{margin-left:0}.rules ul,.rules ol{padding-left:20px;margin:0}.rules li{margin:4px 0}
+.legend{display:flex;justify-content:space-between;align-items:flex-end;gap:4px;margin:12px 0 4px}
+.lg{display:flex;flex-direction:column;align-items:center;font-size:13px;font-weight:600;gap:2px}
+nav#tabs{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;gap:6px;padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:rgba(236,232,242,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--line);z-index:5}
+nav#tabs button{flex:1;max-width:170px;border:0;background:none;border-radius:12px;min-height:46px;font-weight:700;color:var(--muted)}
+nav#tabs button.on{background:var(--ink);color:#fff}
+#sheet{position:fixed;inset:0;z-index:10;display:none}
+#sheet.open{display:block}
+.back{position:absolute;inset:0;background:rgba(36,33,59,.45)}
+.panel{position:absolute;left:0;right:0;bottom:0;max-width:520px;margin:0 auto;background:var(--rock);border-radius:24px 24px 0 0;padding:6px 16px calc(14px + env(safe-area-inset-bottom));max-height:92vh;overflow:auto;animation:up .22s ease-out}
+.grab{width:40px;height:5px;border-radius:9px;background:#C9C2DC;margin:4px auto 6px}
+.panel h3{margin:8px 0}.panel h4{margin:16px 0 8px;font-size:15px}.panel h4 span{color:var(--muted);font-weight:400}
+.panel p{margin:0 0 8px;color:var(--muted)}
+.numgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.numgrid button{min-height:44px;border-radius:12px;border:1.5px solid var(--line);background:var(--slab);font-weight:700}
+.numgrid button.on{background:var(--am);border-color:var(--am);color:#fff}
+.colors{display:grid;grid-template-columns:repeat(4,1fr)}
+.cbtn{min-height:48px;border-radius:12px;border:1.5px solid var(--line);background:var(--slab);font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px}
+.cbtn.on{border-color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink);background:#fff}
+.code{font-size:34px;font-weight:800;letter-spacing:.06em;text-align:center;background:var(--slab);border-radius:16px;padding:16px;margin:8px 0;font-variant-numeric:tabular-nums}
+input#code{width:100%;font:inherit;font-size:24px;font-weight:700;letter-spacing:.05em;padding:12px 14px;border-radius:14px;border:1.5px solid var(--ink);background:#fff;margin:4px 0}
+.verdict{margin:10px 0 0;padding:12px 14px;border-radius:14px;color:#fff;font-weight:700}
+.verdict.ok{background:var(--ok)}.verdict.bad{background:var(--bad)}
+.win{font-size:26px}
+#toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translate(-50%,20px);opacity:0;background:var(--ink);color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;font-weight:600;transition:.25s;pointer-events:none;z-index:20;max-width:90vw;text-align:center}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+.anim{stroke-dasharray:1;stroke-dashoffset:1;animation:draw .9s linear forwards}
+.pulse{animation:pulse 1.6s ease-in-out infinite}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes pulse{50%{opacity:.18}}
+@keyframes up{from{transform:translateY(30px);opacity:.4}}
+@media (prefers-reduced-motion:reduce){.anim{animation:none;stroke-dashoffset:0}.pulse,.panel{animation:none}}
+</style></head>
+<body>
+<header><h1><svg viewBox="0 0 2 2"><polygon points="1,0 2,1 1,2 0,1" fill="#6A4BE0" stroke="#24213B" stroke-width=".12" stroke-linejoin="round"/><path d="M0,1H2" stroke="#fff" stroke-width=".08" opacity=".7"/></svg>Kristall-Echo</h1><button id="newbtn" data-act="newmenu">Neues Spiel</button></header>
+<main id="app"></main>
+<nav id="tabs"></nav>
+<div id="sheet"></div><div id="toast" role="status" aria-live="polite"></div>
+<script>
+const COLS=10,ROWS=8;
+const NAMES=['rot','gelb','blau','weissR','weissT'];
+const CNAMES=['rot','gelb','blau','weiss'];
+const COLOR={rot:'rot',gelb:'gelb',blau:'blau',weissR:'weiss',weissT:'weiss'};
+const TRI4=[[1,0,'SE'],[2,0,'SW'],[0,1,'SE'],[1,1,'F'],[2,1,'F'],[3,1,'SW']];
+const BASE={
+ rot:[[0,0,'SE'],[1,0,'F'],[2,0,'NW']],
+ gelb:[[0,0,'SW'],[0,1,'F'],[1,1,'SW']],
+ blau:TRI4,
+ weissR:[[0,0,'SE'],[1,0,'SW'],[0,1,'NE'],[1,1,'NW']],
+ weissT:TRI4
+};
+function lab(n){if(n<=18)return String(n);if(n<=28)return String.fromCharCode(73+(28-n));return String.fromCharCode(65+(36-n))}
+const LABEL_ORDER=[...Array.from({length:18},(_,i)=>i+1),36,35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19];
+const ROT={NW:'NE',NE:'SE',SE:'SW',SW:'NW',F:'F'},MIR={NW:'NE',NE:'NW',SW:'SE',SE:'SW',F:'F'};
+function norm(c){const mx=Math.min(...c.map(a=>a[0])),my=Math.min(...c.map(a=>a[1]));return c.map(([x,y,k])=>[x-mx,y-my,k])}
+function rotCW(c){const h=Math.max(...c.map(a=>a[1]))+1;return norm(c.map(([x,y,k])=>[h-1-y,x,ROT[k]]))}
+function mir(c){const w=Math.max(...c.map(a=>a[0]))+1;return norm(c.map(([x,y,k])=>[w-1-x,y,MIR[k]]))}
+function shape(n,o){let c=BASE[n].map(a=>a.slice());if(o>=4)c=mir(c);for(let i=0;i<o%4;i++)c=rotCW(c);return c}
+function dims(c){return [Math.max(...c.map(a=>a[0]))+1,Math.max(...c.map(a=>a[1]))+1]}
+function cellsOf(n,p){return shape(n,p.o).map(([x,y,k])=>[x+p.x,y+p.y,k])}
+function boardOf(P){const b={};for(const n of NAMES){const p=P&&P[n];if(!p)continue;for(const [x,y,k] of cellsOf(n,p))b[x+','+y]={n,k}}return b}
+function fits(P,n,p){const o={...P};delete o[n];const b=boardOf(o);return cellsOf(n,p).every(([x,y])=>x>=0&&y>=0&&x<COLS&&y<ROWS&&!b[x+','+y])}
+function clampPos(n,o,x,y){const [w,h]=dims(shape(n,o));return {x:Math.max(0,Math.min(x,COLS-w)),y:Math.max(0,Math.min(y,ROWS-h)),o}}
+const DIR={N:[0,-1],S:[0,1],E:[1,0],W:[-1,0]},OPP={N:'S',S:'N',E:'W',W:'E'};
+function entry(n){if(n<=10)return[[n-1,-1],'S'];if(n<=18)return[[COLS,n-11],'W'];if(n<=28)return[[COLS-1-(n-19),ROWS],'N'];return[[-1,ROWS-1-(n-29)],'E']}
+function labelAt(x,y){if(y===-1)return x+1;if(x===COLS)return 11+y;if(y===ROWS)return 19+(COLS-1-x);return 29+(ROWS-1-y)}
+function trace(b,n){let [pos,d]=entry(n);const pts=[[pos[0]+.5,pos[1]+.5]],hit=[],pcs=[[]];const P_=p=>{pts.push(p);pcs.push(CNAMES.filter(c=>hit.includes(c)))};
+ for(let g=0;g<1000;g++){const nx=pos[0]+DIR[d][0],ny=pos[1]+DIR[d][1];
+  if(nx<0||ny<0||nx>=COLS||ny>=ROWS){P_([nx+.5,ny+.5]);return{out:labelAt(nx,ny),colors:CNAMES.filter(c=>hit.includes(c)),pts,pcs}}
+  const c=b[nx+','+ny];
+  if(!c){pos=[nx,ny];P_([nx+.5,ny+.5]);continue}
+  if(!hit.includes(COLOR[c.n]))hit.push(COLOR[c.n]);
+  const side=OPP[d];
+  if(c.k==='F'||c.k.includes(side)){P_([(pos[0]+nx)/2+.5,(pos[1]+ny)/2+.5]);d=OPP[d];
+   {const pc=b[pos[0]+','+pos[1]];if(pc&&pc.k!=='F'){d=mirrorD(pc.k,d)}P_([pos[0]+.5,pos[1]+.5]);}
+   if(pos[0]<0||pos[1]<0||pos[0]>=COLS||pos[1]>=ROWS){return{out:labelAt(pos[0],pos[1]),colors:CNAMES.filter(c=>hit.includes(c)),pts,pcs}}
+   continue}
+  d=mirrorD(c.k,d);
+  pos=[nx,ny];P_([nx+.5,ny+.5]);
+ }}
+function mirrorD(k,d){const back=(k==='SW'||k==='NE');return back?{E:'S',S:'E',W:'N',N:'W'}[d]:{E:'N',N:'E',W:'S',S:'W'}[d]}
+function rand(n){return Math.floor(Math.random()*n)}
+function randomLayout(){for(let t=0;t<500;t++){const P={};let ok=true;for(const n of NAMES){let done=false;for(let i=0;i<80;i++){const o=rand(8);const [w,h]=dims(shape(n,o));const p={x:rand(COLS-w+1),y:rand(ROWS-h+1),o};if(fits(P,n,p)){P[n]=p;done=true;break}}if(!done){ok=false;break}}if(ok)return P}}
+function keyOf(n,p){return cellsOf(n,p).map(a=>a.join(',')).sort().join(';')}
+function same(a,b){return NAMES.every(n=>a[n]&&b[n]&&keyOf(n,a[n])===keyOf(n,b[n]))}
+function complete(P){return NAMES.every(n=>P&&P[n])}
+function encode(P){return NAMES.map(n=>`${P[n].x}${P[n].y}${P[n].o}`).join(' ')}
+function decode(s){const d=(s||'').replace(/\D/g,'');if(d.length!==15)return null;const P={};
+ for(let i=0;i<5;i++){const x=+d[i*3],y=+d[i*3+1],o=+d[i*3+2];if(o>7)return null;const n=NAMES[i],p={x,y,o};if(!fits(P,n,p))return null;P[n]=p}return P}
+
+const LBL={rot:'Rot',gelb:'Gelb',blau:'Blau',weiss:'Weiß'};
+const FILL={rot:'#E5484D',gelb:'#F5C518',blau:'#2F7BEA',weiss:'#FFFFFF'};
+const INK='#24213B',AM='#6A4BE0';
+const KEY='kristall-echo-v2';
+let mem=null;
+const store={get(){try{return JSON.parse(localStorage.getItem(KEY))}catch(e){return mem}},set(v){mem=v;try{localStorage.setItem(KEY,JSON.stringify(v))}catch(e){}}};
+function fresh(mode){return{mode,me:{pieces:{},locked:false,answered:[]},opp:{guess:{},marks:{},log:[],fails:0,solved:false,revealed:false},secret:mode==='solo'?randomLayout():null}}
+let S=store.get()||{mode:null};
+const ui={tab:S.mode==='duo'?'me':'opp',sel:null,tool:'piece',hl:null,reveal:false,last:null,anim:false,po:{me:{},opp:{}}};
+function save(){store.set(S)}
+const $=s=>document.querySelector(s);
+const colorText=c=>c.length?c.map(x=>LBL[x]).join(' + '):'farblos';
+const dots=c=>c.length?c.map(x=>`<i class="dot" style="background:${FILL[x]}"></i>`).join(''):'<i class="dot none"></i>';
+
+/* ---------- SVG ---------- */
+const CORN={NW:[0,0],NE:[1,0],SW:[0,1],SE:[1,1]};
+function polyOf(k){if(k==='F')return[[0,0],[1,0],[1,1],[0,1]];const a=CORN[k];return[a,[1-a[0],a[1]],[a[0],1-a[1]]]}
+function pieceSVG(n,cells,o={}){let f='',ed={};
+ for(const [x,y,k] of cells){const p=polyOf(k).map(([a,b])=>[x+a,y+b]);
+  f+=`<polygon points="${p.map(q=>q.join(',')).join(' ')}" fill="${FILL[COLOR[n]]}" stroke="${FILL[COLOR[n]]}" stroke-width=".03"/>`;
+  p.forEach((q,i)=>{const r=p[(i+1)%p.length];const kk=[q.join(','),r.join(',')].sort().join('|');ed[kk]=(ed[kk]||0)+1})}
+ let e='';for(const [kk,c] of Object.entries(ed))if(c===1){const [a,b]=kk.split('|');e+=`M${a}L${b}`}
+ if(o.ghost)return`<path d="${e}" fill="none" stroke="${INK}" stroke-width=".08" stroke-dasharray=".18 .12" opacity=".8"/>`;
+ return`<g>${o.sel?`<path d="${e}" fill="none" stroke="${AM}" stroke-width=".34" stroke-linejoin="round" opacity=".45" class="pulse"/>`:''}${f}<path d="${e}" fill="none" stroke="${INK}" stroke-width=".07" stroke-linejoin="round" stroke-linecap="round"/></g>`}
+const MIX={'':'#C4BDDC',rot:'#E5484D',gelb:'#F5C518',blau:'#2F7BEA','rot,gelb':'#F28C28','rot,blau':'#8E44AD','gelb,blau':'#2EAD5B','rot,gelb,blau':'#3A3550'};
+function mixColor(c){const w=c.includes('weiss');const base=c.filter(x=>x!=='weiss').join(',');if(!w)return MIX[base];if(!base)return '#FFFFFF';
+ const h=MIX[base];const n=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));return '#'+n.map(v=>Math.round(v+(255-v)*.5).toString(16).padStart(2,'0')).join('')}
+function raySVG(r,anim){if(!r||!r.pts||r.pts.length<2)return'';const p=r.pts.map(a=>a.slice()),pc=r.pcs||p.map(()=>[]);
+ const mid=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2];p[0]=mid(p[0],p[1]);p[p.length-1]=mid(p[p.length-1],p[p.length-2]);
+ // lane offset: shift every segment a little to the right of its travel direction, so out- and return paths sit side by side
+ {const O=.12,q=p.map(a=>a.slice()),nrm=(a,b)=>{const dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy)||1;return[-dy/l*O,dx/l*O]};
+  for(let i=0;i<p.length;i++){const n1=i>0?nrm(p[i-1],p[i]):null,n2=i<p.length-1?nrm(p[i],p[i+1]):null;
+   const n=n1&&n2?[n1[0]+n2[0],n1[1]+n2[1]]:(n1||n2);
+   // perpendicular turn: sum is the mitre; straight: halve; reversal: sum is 0 (U-turn)
+   const straight=n1&&n2&&Math.abs(n1[0]-n2[0])<1e-9&&Math.abs(n1[1]-n2[1])<1e-9;
+   q[i]=[p[i][0]+(straight?n[0]/2:n[0]),p[i][1]+(straight?n[1]/2:n[1])]}
+  for(let i=0;i<p.length;i++)p[i]=q[i]}
+ // group segments by colour state of their start point
+ const runs=[];for(let i=0;i<p.length-1;i++){const k=pc[i].join(',');const L=Math.hypot(p[i+1][0]-p[i][0],p[i+1][1]-p[i][1]);
+  if(runs.length&&runs[runs.length-1].k===k){const R=runs[runs.length-1];R.pts.push(p[i+1]);R.len+=L}else runs.push({k,c:pc[i],pts:[p[i],p[i+1]],len:L})}
+ const total=runs.reduce((s,R)=>s+R.len,0)||1,DUR=1.1;let cum=0,halo='',casing='',core='';
+ for(const R of runs){const d='M'+R.pts.map(a=>a.join(',')).join('L');const col=mixColor(R.c);
+  const st=anim?` class="anim seg" style="animation-duration:${(R.len/total*DUR).toFixed(3)}s;animation-delay:${(cum/total*DUR).toFixed(3)}s"`:'';cum+=R.len;
+  halo+=`<path d="${d}" pathLength="1"${st} fill="none" stroke="${col}" stroke-width=".4" stroke-linejoin="round" stroke-linecap="round" opacity=".25"/>`;
+  casing+=`<path d="${d}" pathLength="1"${st} fill="none" stroke="${INK}" stroke-width=".18" stroke-linejoin="round" stroke-linecap="round"/>`;
+  core+=`<path d="${d}" pathLength="1"${st} fill="none" stroke="${col}" stroke-width=".1" stroke-linejoin="round" stroke-linecap="round"/>`}
+ return halo+casing+core+`<circle cx="${p[0][0]}" cy="${p[0][1]}" r=".17" fill="${INK}"/><circle cx="${p[0][0]}" cy="${p[0][1]}" r=".1" fill="${mixColor([])}"/>`}
+function boardSVG(o){
+ let s=`<svg viewBox="-1 -1 12 10" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Spielfeld">`;
+ s+=`<rect x="0" y="0" width="10" height="8" fill="#FBFAFE"/>`;
+ let g='';for(let i=1;i<COLS;i++)g+=`M${i},0V8`;for(let j=1;j<ROWS;j++)g+=`M0,${j}H10`;
+ s+=`<path d="${g}" stroke="#DCD7EA" stroke-width=".035"/>`;
+ if(o.marks)for(const k of Object.keys(o.marks)){const [x,y]=k.split(',').map(Number);s+=`<path d="M${x+.36},${y+.36}L${x+.64},${y+.64}M${x+.64},${y+.36}L${x+.36},${y+.64}" stroke="#A39DBB" stroke-width=".07" stroke-linecap="round"/>`}
+ if(o.pieces)for(const n of NAMES){const p=o.pieces[n];if(p)s+=pieceSVG(n,cellsOf(n,p),{sel:o.sel===n})}
+ if(o.ghost)for(const n of NAMES){const p=o.ghost[n];if(p)s+=pieceSVG(n,cellsOf(n,p),{ghost:true})}
+ if(o.ray)s+=raySVG(o.ray,o.anim);
+ if(o.cover)s+=`<g class="cover"><rect x="0" y="0" width="10" height="8" fill="#2E2852"/>
+  <path d="M0,8L3.2,3.6L5,5.4L7.4,1.8L10,6V8Z" fill="#3A3366"/><path d="M3.2,3.6L4.1,8M7.4,1.8L6.6,8" stroke="#4A4280" stroke-width=".05"/>
+  <text x="5" y="3.7" text-anchor="middle" font-size=".62" font-weight="700" fill="#fff">Verdeckt</text>
+  <text x="5" y="4.5" text-anchor="middle" font-size=".36" fill="#CFC8F2">Tippe den Punkt am Rand an</text></g>`;
+ if(o.cells)for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++)s+=`<rect data-cell="${x},${y}" x="${x}" y="${y}" width="1" height="1" fill="transparent" pointer-events="fill"/>`;
+ s+=`<rect x="0" y="0" width="10" height="8" fill="none" stroke="${INK}" stroke-width=".08" rx=".05"/>`;
+ for(let n=1;n<=36;n++){const [[ex,ey]]=entry(n);const cx=ex+.5,cy=ey+.5;const st=(o.labels&&o.labels[n])||'';
+  if(st==='hl')s+=`<circle cx="${cx}" cy="${cy}" r=".44" fill="${AM}"/>`;
+  else if(st==='used')s+=`<circle cx="${cx}" cy="${cy}" r=".4" fill="#E3DCFB"/>`;
+  s+=`<text x="${cx}" y="${cy+.15}" text-anchor="middle" font-size=".42" font-weight="700" fill="${st==='hl'?'#fff':st==='used'?AM:'#6E6987'}" pointer-events="none">${lab(n)}</text>`;
+  s+=`<rect data-label="${n}" x="${ex}" y="${ey}" width="1" height="1" fill="transparent" pointer-events="fill"/>`}
+ return s+'</svg>'}
+function miniSVG(n,o,u=12){const c=shape(n,o);const [w,h]=dims(c);return`<svg viewBox="-.15 -.15 ${w+.3} ${h+.3}" style="width:${(w+.3)*u}px;height:${(h+.3)*u}px">${pieceSVG(n,c)}</svg>`}
+
+/* ---------- Views ---------- */
+function tray(ctx){const P=ctx==='me'?S.me.pieces:S.opp.guess;
+ const chips=NAMES.map(n=>{const o=P[n]?P[n].o:(ui.po[ctx][n]||0);const on=ui.sel===n;
+  return`<button class="chip${on?' on':''}" data-act="pick" data-n="${n}" aria-pressed="${on}">${miniSVG(n,o)}<span>${LBL[COLOR[n]]}</span><span class="st">${P[n]?'liegt':'—'}</span></button>`}).join('');
+ const has=ui.sel!=null,placed=has&&P[ui.sel];
+ return`<div class="tray">${chips}</div>
+ <div class="row tools"><button class="btn" data-act="rot" ${has?'':'disabled'}>Drehen</button><button class="btn" data-act="mir" ${has?'':'disabled'}>Spiegeln</button><button class="btn" data-act="del" ${placed?'':'disabled'}>Wegnehmen</button></div>`}
+
+function viewStart(){return`<section class="hero">
+ <h2>Licht rein, Farbe raus.</h2>
+ <p>Versteckt fünf Kristalle. Schickt Lichtstrahlen ins Feld des anderen. Aus Ausgang und Farben findet ihr heraus, wo alles liegt.</p>
+ <button class="mode" data-act="new" data-mode="duo"><b>Gegeneinander</b><span>Jeder auf seinem Handy. Ihr sagt euch Fragen und Antworten.</span></button>
+ <button class="mode" data-act="new" data-mode="solo"><b>Solo gegen das Handy</b><span>Das Handy versteckt, du suchst. Gut zum Reinkommen.</span></button>
+ <button class="link" data-act="tab" data-tab="rules">Erst die Regeln lesen</button></section>`}
+
+function viewMe(){const M=S.me;
+ if(!M.locked){const n=NAMES.filter(x=>M.pieces[x]).length;
+  return`<p class="hint">Versteck deine 5 Kristalle: unten einen wählen, dann aufs Feld tippen.</p>
+  <div class="board" data-ctx="me">${boardSVG({pieces:M.pieces,sel:ui.sel,cells:true})}</div>
+  ${tray('me')}
+  <div class="row"><button class="btn" data-act="random">Zufällig verteilen</button><button class="btn primary grow" data-act="lock" ${n===5?'':'disabled'}>Verdecken (${n}/5)</button></div>`}
+ const labels={};M.answered.forEach(a=>{labels[a.n]='used';labels[a.out]='used'});if(ui.last){labels[ui.last.n]='hl';labels[ui.last.out]='hl'}
+ const res=ui.last?`<div class="result"><div class="rl">Start ${lab(ui.last.n)}. Sag:</div><div class="rbig">„Raus bei ${lab(ui.last.out)}${ui.last.out===ui.last.n?' (zurück)':''} – ${colorText(ui.last.colors)}.“</div><div class="rdots">${dots(ui.last.colors)}</div></div>`
+  :`<p class="hint">Dein Gegenüber nennt einen Punkt. Tippe ihn am Rand an, das Handy verfolgt den Strahl für dich.</p>`;
+ const list=M.answered.length?`<h3>Schon beantwortet</h3><ul class="log">${M.answered.map((a,i)=>`<li><span class="no">${M.answered.length-i}</span><span>${lab(a.n)} ↔ ${lab(a.out)}</span><span class="dots">${dots(a.colors)}</span><span class="ct">${colorText(a.colors)}</span></li>`).join('')}</ul>`:'';
+ return`${res}
+ <div class="board" data-ctx="me">${boardSVG({pieces:M.pieces,cover:!ui.reveal,labels,ray:ui.reveal&&ui.last?ui.last:null,anim:ui.anim})}</div>
+ <div class="row"><button class="btn" data-act="reveal">${ui.reveal?'Verdecken':'Ansehen'}</button><button class="btn primary grow" data-act="verify">Lösung prüfen</button></div>
+ ${list}
+ <div class="row"><button class="link" data-act="unlock">Kristalle neu legen</button></div>`}
+
+function consistency(e){if(!complete(S.opp.guess))return null;const r=trace(boardOf(S.opp.guess),e.n);return{ok:r.out===e.out&&r.colors.join()===e.colors.join(),r}}
+function viewOpp(){const O=S.opp,solo=S.mode==='solo';
+ const labels={};O.log.forEach(e=>{labels[e.n]='used';labels[e.out]='used'});
+ let ray=null,cap='';
+ if(ui.hl!=null&&O.log[ui.hl]){const e=O.log[ui.hl];labels[e.n]='hl';labels[e.out]='hl';
+  const r=trace(boardOf(O.guess),e.n);ray=r;const ok=r.out===e.out&&r.colors.join()===e.colors.join();
+  cap=`<div class="cap"><b>#${ui.hl+1}: ${lab(e.n)} raus bei ${lab(e.out)}, ${colorText(e.colors)}.</b> Deine Vermutung ergibt: raus bei ${lab(r.out)}, ${colorText(r.colors)}. <span class="${ok?'ok':'bad'}">${ok?'Passt.':'Passt nicht.'}</span></div>`}
+ const head=solo?`<p class="hint">${O.solved?'Gelöst! ':''}Tippe einen Punkt am Rand an, um einen Strahl zu schicken. <b>${O.log.length} Fragen</b>${O.fails?`, ${O.fails} Fehlversuch${O.fails>1?'e':''}`:''}.</p>`
+  :`<p class="hint">Tippe den Punkt am Rand an, den du gefragt hast, und trag die Antwort ein.</p>`;
+ const seg=`<div class="seg" role="tablist"><button class="${ui.tool==='piece'?'on':''}" data-act="tool" data-tool="piece">Kristalle vermuten</button><button class="${ui.tool==='mark'?'on':''}" data-act="tool" data-tool="mark">Leer markieren</button></div>`;
+ const all=complete(O.guess);
+ const list=O.log.length?`<h3>Antworten${all?' – mit deiner Vermutung verglichen':''}</h3><ul class="log">${O.log.map((e,i)=>({e,i})).reverse().map(({e,i})=>{const c=consistency(e);
+   return`<li class="${ui.hl===i?'on':''}" data-act="hl" data-i="${i}"><span class="no">${i+1}</span><span>${lab(e.n)} ↔ ${lab(e.out)}</span><span class="dots">${dots(e.colors)}</span><span class="ct">${colorText(e.colors)}</span>${c?`<span class="${c.ok?'ok':'bad'}">${c.ok?'✓':'✗'}</span>`:''}${solo?'':`<button class="x" data-act="rm" data-i="${i}" aria-label="Eintrag löschen">×</button>`}</li>`}).join('')}</ul>`:'';
+ const solveBtn=solo&&O.solved?`<button class="btn primary grow" data-act="new" data-mode="solo">Nächstes Rätsel</button>`
+  :`<button class="btn primary grow" data-act="solve" ${all?'':'disabled'}>Lösung prüfen${all?'':' (5 Kristalle legen)'}</button>`;
+ return`${head}
+ <div class="board" data-ctx="opp">${boardSVG({pieces:O.guess,sel:ui.tool==='piece'?ui.sel:null,marks:O.marks,labels,ray,anim:ui.anim,cells:true,ghost:solo&&(O.revealed||O.solved)?S.secret:null})}</div>
+ ${cap}${seg}${ui.tool==='piece'?tray('opp'):'<p class="hint small">Tippe Kästchen an, in denen sicher nichts liegt.</p>'}
+ <div class="row">${solveBtn}</div>
+ ${list}
+ ${solo&&!O.solved&&!O.revealed?'<div class="row"><button class="link" data-act="giveup">Aufgeben und Lösung zeigen</button></div>':''}`}
+
+function viewRules(){const leg=NAMES.map(n=>`<span class="lg">${miniSVG(n,0,11)}${LBL[COLOR[n]]}</span>`).join('');
+ return`<article class="rules">
+ <h2>So geht's</h2>
+ <p>Jeder versteckt 5 Kristalle. Ihr schickt abwechselnd Lichtstrahlen ins Feld des anderen. Die Antwort verrät, <b>wo</b> der Strahl rauskommt und <b>welche Farben</b> er unterwegs abbekommen hat. Wer zuerst alle 5 Kristalle exakt richtig hat, gewinnt.</p>
+ <div class="legend">${leg}</div>
+ <h3>Ein Zug</h3>
+ <ol><li>Du nennst einen Punkt vom Rand, z.&nbsp;B. „7“ oder „C“.</li><li>Dein Gegenüber tippt sie bei <b>Mein Feld</b> an. Das Handy verfolgt den Strahl und zeigt die Antwort.</li><li>Du tippst bei <b>Gegner</b> denselben Punkt an und trägst Ausgang und Farben ein.</li></ol>
+ <h3>Wie der Strahl läuft</h3>
+ <ul><li>Geradeaus von Kästchen zu Kästchen.</li><li>Schräge Kante: biegt um 90° ab.</li><li>Gerade Kante: prallt zurück.</li><li>Jeder Kristall, an dem er abprallt, färbt ihn.</li><li>Ohne Kontakt kommt er farblos raus.</li><li>Auf dem Feld färbt sich die Linie nach jedem Abprallen in die bisherige Mischfarbe.</li></ul>
+ <h3>Lösen</h3>
+ <p>Leg deine Vermutung im Gegner-Feld und tippe <b>Lösung prüfen</b>. Du bekommst einen Code. Dein Gegenüber gibt ihn bei <b>Mein Feld → Lösung prüfen</b> ein und sieht sofort, ob er stimmt. Falsch geraten heißt: 2 Züge aussetzen.</p>
+ <h3>Tipps</h3>
+ <ul><li>Ein Weg gilt in beide Richtungen: Wenn 3 bei C rauskommt, kommt C bei 3 raus. Spar dir die Frage.</li><li>Sobald deine 5 Kristalle liegen, zeigt die Liste mit ✓ und ✗, welche Antworten zu deiner Vermutung passen. Tipp eine Antwort an, um den Strahl zu sehen.</li><li>Alles wird auf dem Handy gespeichert. Du kannst die Seite schließen und später weiterspielen.</li></ul>
+ </article>`}
+
+function render(){
+ const tabs=S.mode==='duo'?[['me','Mein Feld'],['opp','Gegner'],['rules','Regeln']]:S.mode==='solo'?[['opp','Suchen'],['rules','Regeln']]:[['start','Start'],['rules','Regeln']];
+ if(!tabs.some(t=>t[0]===ui.tab))ui.tab=tabs[0][0];
+ $('#tabs').innerHTML=tabs.map(([k,l])=>`<button class="${ui.tab===k?'on':''}" data-act="tab" data-tab="${k}">${l}</button>`).join('');
+ 
+ $('#newbtn').style.visibility=S.mode?'visible':'hidden';
+ const v=ui.tab==='rules'?viewRules():!S.mode?viewStart():ui.tab==='me'?viewMe():viewOpp();
+ $('#app').innerHTML=v;ui.anim=false}
+
+/* ---------- Sheets & toast ---------- */
+let tt;function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('show'),2600)}
+function sheet(html){$('#toast').classList.remove('show');$('#sheet').innerHTML=`<div class="back" data-act="close"></div><div class="panel" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div>`;$('#sheet').classList.add('open')}
+function close(){$('#sheet').classList.remove('open');$('#sheet').innerHTML=''}
+let ask=null;
+function askSheet(){const a=ask;
+ sheet(`<h3>Start ${lab(a.n)}: wo kam er raus?</h3>
+ <div class="numgrid">${LABEL_ORDER.map(k=>`<button class="${a.out===k?'on':''}" data-act="aout" data-k="${k}">${lab(k)}</button>`).join('')}</div>
+ <h4>Welche Farben? <span>(keine = farblos)</span></h4>
+ <div class="row colors">${CNAMES.map(n=>`<button class="cbtn${a.colors.includes(n)?' on':''}" data-act="acol" data-n="${n}"><i class="dot" style="background:${FILL[n]}"></i>${LBL[n]}</button>`).join('')}</div>
+ <div class="row"><button class="btn" data-act="close">Abbrechen</button><button class="btn primary grow" data-act="asave" ${a.out?'':'disabled'}>${a.out?`Speichern: raus bei ${lab(a.out)}, ${colorText(CNAMES.filter(n=>a.colors.includes(n)))}`:'Ausgang wählen'}</button></div>`)}
+
+/* ---------- Actions ---------- */
+function P(ctx){return ctx==='me'?S.me.pieces:S.opp.guess}
+function known(n){const i=S.opp.log.findIndex(e=>e.n===n||e.out===n);return i}
+function onLabel(ctx,n){
+ if(ctx==='me'){if(!S.me.locked){toast('Erst Kristalle legen und verdecken');return}
+  const r=trace(boardOf(S.me.pieces),n);ui.last={n,...r};S.me.answered.unshift({n,out:r.out,colors:r.colors});ui.anim=true;save();render();window.scrollTo({top:0,behavior:'smooth'});return}
+ const i=known(n);if(i>=0){const e=S.opp.log[i];ui.hl=i;render();toast(`Schon bekannt (#${i+1}): ${lab(e.n)} und ${lab(e.out)} sind verbunden`);return}
+ if(S.mode==='solo'){if(S.opp.solved||S.opp.revealed)return;const r=trace(boardOf(S.secret),n);S.opp.log.push({n,out:r.out,colors:r.colors});ui.hl=S.opp.log.length-1;ui.anim=true;save();render();toast(`Raus bei ${lab(r.out)} – ${colorText(r.colors)}`);return}
+ ask={n,out:null,colors:[]};askSheet()}
+function onCell(ctx,x,y){const Pc=P(ctx);const b=boardOf(Pc);const at=b[x+','+y];
+ if(ctx==='opp'&&ui.tool==='mark'){if(at){toast('Da liegt deine Vermutung');return}const k=x+','+y;if(S.opp.marks[k])delete S.opp.marks[k];else S.opp.marks[k]=1;save();render();return}
+ if(at&&at.n!==ui.sel){ui.sel=at.n;render();return}
+ if(at&&at.n===ui.sel){ui.sel=null;render();return}
+ if(!ui.sel){toast('Wähle unten erst einen Kristall');return}
+ const n=ui.sel;const o=Pc[n]?Pc[n].o:(ui.po[ctx][n]||0);const [w,h]=dims(shape(n,o));
+ const p=clampPos(n,o,x-Math.floor((w-1)/2),y-Math.floor((h-1)/2));
+ if(!fits(Pc,n,p)){toast('Da ist kein Platz');return}
+ Pc[n]=p;if(ctx==='opp')for(const [cx,cy] of cellsOf(n,p))delete S.opp.marks[cx+','+cy];save();render()}
+function transform(ctx,f){const n=ui.sel;if(!n)return;const Pc=P(ctx);
+ if(!Pc[n]){ui.po[ctx][n]=f(ui.po[ctx][n]||0);render();return}
+ const no=f(Pc[n].o);const p=clampPos(n,no,Pc[n].x,Pc[n].y);if(!fits(Pc,n,p)){toast('Kein Platz dafür – erst verschieben');return}Pc[n]=p;save();render()}
+const rotO=o=>(o%4+1)%4+(o>=4?4:0),mirO=o=>(o+4)%8;
+function ctxNow(){return ui.tab==='me'?'me':'opp'}
+
+document.addEventListener('click',ev=>{
+ const lab=ev.target.closest('[data-label]'),cell=ev.target.closest('[data-cell]');
+ if(lab||cell){const ctx=ev.target.closest('.board').dataset.ctx;if(lab)onLabel(ctx,+lab.dataset.label);else{const [x,y]=cell.dataset.cell.split(',').map(Number);onCell(ctx,x,y)}return}
+ const t=ev.target.closest('[data-act]');if(!t)return;const a=t.dataset.act;
+ switch(a){
+ case'tab':ui.tab=t.dataset.tab==='start'?'opp':t.dataset.tab;ui.sel=null;render();window.scrollTo(0,0);break;
+ case'new':{const m=t.dataset.mode;const busy=S.mode&&(S.opp.log.length||S.me.answered.length)&&!(S.mode==='solo'&&S.opp.solved);
+  if(busy&&!t.dataset.ok){sheet(`<h3>Neues Spiel starten?</h3><p>Das aktuelle Spiel wird gelöscht.</p><div class="row"><button class="btn" data-act="close">Weiterspielen</button><button class="btn primary grow" data-act="new" data-mode="${m}" data-ok="1">Ja, neu starten</button></div>`);break}
+  S=fresh(m);Object.assign(ui,{tab:m==='duo'?'me':'opp',sel:null,tool:'piece',hl:null,reveal:false,last:null,po:{me:{},opp:{}}});save();close();render();window.scrollTo(0,0);break}
+ case'newmenu':sheet(`<h3>Neues Spiel</h3><div class="stack"><button class="mode" data-act="new" data-mode="duo"><b>Gegeneinander</b><span>Jeder auf seinem Handy.</span></button><button class="mode" data-act="new" data-mode="solo"><b>Solo gegen das Handy</b><span>Das Handy versteckt, du suchst.</span></button></div><div class="row"><button class="btn grow" data-act="close">Abbrechen</button></div>`);break;
+ case'pick':ui.sel=ui.sel===t.dataset.n?null:t.dataset.n;render();break;
+ case'rot':transform(ctxNow(),rotO);break;
+ case'mir':transform(ctxNow(),mirO);break;
+ case'del':{const Pc=P(ctxNow());if(ui.sel&&Pc[ui.sel]){ui.po[ctxNow()][ui.sel]=Pc[ui.sel].o;delete Pc[ui.sel];save();render()}break}
+ case'random':S.me.pieces=randomLayout();ui.sel=null;save();render();break;
+ case'lock':S.me.locked=true;ui.sel=null;ui.reveal=false;ui.last=null;save();render();window.scrollTo(0,0);toast('Verdeckt. Viel Spaß!');break;
+ case'unlock':if(!t.dataset.ok&&S.me.answered.length){sheet(`<h3>Kristalle neu legen?</h3><p>Du hast schon ${S.me.answered.length} Fragen beantwortet. Wenn du umlegst, stimmen die alten Antworten nicht mehr. Das geht nur bei einem neuen Spiel fair.</p><div class="row"><button class="btn" data-act="close">Abbrechen</button><button class="btn primary grow" data-act="unlock" data-ok="1">Trotzdem neu legen</button></div>`);break}
+  S.me.locked=false;S.me.answered=[];ui.last=null;close();save();render();break;
+ case'reveal':ui.reveal=!ui.reveal;render();break;
+ case'tool':ui.tool=t.dataset.tool;render();break;
+ case'hl':if(ev.target.closest('.x'))break;{const i=+t.dataset.i;ui.hl=ui.hl===i?null:i;ui.anim=ui.hl!=null;render();window.scrollTo({top:0,behavior:'smooth'})}break;
+ case'rm':{const i=+t.dataset.i;S.opp.log.splice(i,1);ui.hl=null;save();render();toast('Eintrag gelöscht')}break;
+ case'aout':ask.out=+t.dataset.k;askSheet();break;
+ case'acol':{const n=t.dataset.n;ask.colors=ask.colors.includes(n)?ask.colors.filter(x=>x!==n):[...ask.colors,n];askSheet()}break;
+ case'asave':S.opp.log.push({n:ask.n,out:ask.out,colors:CNAMES.filter(n=>ask.colors.includes(n))});ui.hl=S.opp.log.length-1;ui.anim=true;save();close();render();break;
+ case'solve':{if(!complete(S.opp.guess))break;
+  if(S.mode==='solo'){if(same(S.opp.guess,S.secret)){S.opp.solved=true;ui.hl=null;save();render();sheet(`<h3 class="win">Gefunden!</h3><p>Mit <b>${S.opp.log.length} Fragen</b>${S.opp.fails?` und ${S.opp.fails} Fehlversuch${S.opp.fails>1?'en':''}`:''}. Unter 12 Fragen ist richtig stark.</p><div class="row"><button class="btn" data-act="close">Ansehen</button><button class="btn primary grow" data-act="new" data-mode="solo">Nächstes Rätsel</button></div>`)}
+   else{S.opp.fails++;save();render();toast('Stimmt noch nicht. Schau dir die ✗ in der Liste an.')}break}
+  sheet(`<h3>Dein Lösungs-Code</h3><p>Sag oder schick ihn deinem Gegenüber. Es gibt ihn bei <b>Mein Feld → Lösung prüfen</b> ein.</p><div class="code">${encode(S.opp.guess)}</div><div class="row"><button class="btn grow" data-act="copy" data-c="${encode(S.opp.guess)}">Kopieren</button><button class="btn primary grow" data-act="close">Fertig</button></div>`);break}
+ case'copy':navigator.clipboard&&navigator.clipboard.writeText(t.dataset.c).then(()=>toast('Kopiert'),()=>toast('Kopieren ging nicht'));break;
+ case'verify':sheet(`<h3>Lösung prüfen</h3><p>Gib den 15-stelligen Code deines Gegenübers ein.</p><input id="code" inputmode="numeric" autocomplete="off" placeholder="z. B. 120 510 650 641 233"><div id="vres"></div><div class="row"><button class="btn" data-act="close">Schließen</button><button class="btn primary grow" data-act="vcheck">Prüfen</button></div>`);setTimeout(()=>$('#code')&&$('#code').focus(),50);break;
+ case'vcheck':{const G=decode($('#code').value);const el=$('#vres');
+  if(!G){el.innerHTML='<div class="verdict bad">Code ungültig. Er hat 15 Ziffern.</div>';break}
+  const ok=same(G,S.me.pieces);el.innerHTML=ok?'<div class="verdict ok">Stimmt! Dein Gegenüber hat gewonnen.</div>':'<div class="verdict bad">Stimmt nicht. 2 Züge aussetzen.</div>';break}
+ case'giveup':if(!t.dataset.ok){sheet(`<h3>Lösung zeigen?</h3><p>Die Kristalle erscheinen gestrichelt auf deinem Feld.</p><div class="row"><button class="btn" data-act="close">Weitersuchen</button><button class="btn primary grow" data-act="giveup" data-ok="1">Zeigen</button></div>`);break}
+  S.opp.revealed=true;save();close();render();break;
+ case'close':close();break;
+ }});
+render();
+
+</script></body></html>
