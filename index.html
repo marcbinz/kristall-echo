@@ -92,6 +92,15 @@ input#code{width:100%;font:inherit;font-size:24px;font-weight:700;letter-spacing
 @keyframes pulse{50%{opacity:.18}}
 @keyframes up{from{transform:translateY(30px);opacity:.4}}
 @media (prefers-reduced-motion:reduce){.anim{animation:none;stroke-dashoffset:0}.pulse,.panel{animation:none}}
+.opt{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;border:1.5px solid var(--line);background:var(--slab);border-radius:14px;padding:10px 14px;margin-bottom:8px;min-height:56px}
+.opt b{display:block;font-size:15px}.opt small{color:var(--muted);font-size:13px}
+.opt .sw{flex:none;width:44px;height:26px;border-radius:99px;background:#D3CDE3;position:relative;transition:.2s}
+.opt .sw::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:.2s}
+.opt.on{border-color:var(--am)}.opt.on .sw{background:var(--am)}.opt.on .sw::after{left:21px}
+.btn.wide{width:100%;margin-top:8px}.btn.sel{background:var(--ink);color:#fff}
+.warn{color:var(--bad)!important;font-weight:600}
+.panel .small{font-size:13px}
+.tray{grid-template-columns:repeat(5,1fr)}
 </style></head>
 <body>
 <header><h1><svg viewBox="0 0 2 2"><polygon points="1,0 2,1 1,2 0,1" fill="#6A4BE0" stroke="#24213B" stroke-width=".12" stroke-linejoin="round"/><path d="M0,1H2" stroke="#fff" stroke-width=".08" opacity=".7"/></svg>Kristall-Echo</h1><button id="newbtn" data-act="newmenu">Neues Spiel</button></header>
@@ -100,18 +109,21 @@ input#code{width:100%;font:inherit;font-size:24px;font-weight:700;letter-spacing
 <div id="sheet"></div><div id="toast" role="status" aria-live="polite"></div>
 <script>
 const COLS=10,ROWS=8;
-const NAMES=['rot','gelb','blau','weissR','weissT'];
-const CNAMES=['rot','gelb','blau','weiss'];
-const COLOR={rot:'rot',gelb:'gelb',blau:'blau',weissR:'weiss',weissT:'weiss'};
 const TRI4=[[1,0,'SE'],[2,0,'SW'],[0,1,'SE'],[1,1,'F'],[2,1,'F'],[3,1,'SW']];
-const BASE={
- rot:[[0,0,'SE'],[1,0,'F'],[2,0,'NW']],
- gelb:[[0,0,'SW'],[0,1,'F'],[1,1,'SW']],
- blau:TRI4,
- weissR:[[0,0,'SE'],[1,0,'SW'],[0,1,'NE'],[1,1,'NW']],
- weissT:TRI4
-};
-function lab(n){if(n<=18)return String(n);if(n<=28)return String.fromCharCode(73+(28-n));return String.fromCharCode(65+(36-n))}
+const TRI2=[[0,0,'SW'],[0,1,'F'],[1,1,'SW']];
+const TRI1=[[0,0,'SE'],[1,0,'SW']]; // kleines Dreieck, 2 breit, 1 hoch
+const RAUTE3=[[0,0,'SE'],[1,0,'F'],[2,0,'NW']];
+const BASE={rot:RAUTE3,gelb:TRI2,blau:TRI4,weissR:[[0,0,'SE'],[1,0,'SW'],[0,1,'NE'],[1,1,'NW']],weissT:TRI4,
+ trans:TRI1,schwarz:TRI1};
+const COLOR={rot:'rot',gelb:'gelb',blau:'blau',weissR:'weiss',weissT:'weiss',trans:'trans',schwarz:'schwarz'};
+const DEFAULT_OPTS={color:'orig',mirror:false,scan:false,trans:false,schwarz:false};
+let OPTS={...DEFAULT_OPTS},NAMES=[],TINT=[];
+function applyOpts(o){OPTS={...DEFAULT_OPTS,...(o||{})};
+ NAMES=['rot','gelb','blau','weissR','weissT',...(OPTS.trans?['trans']:[]),...(OPTS.schwarz?['schwarz']:[])];
+ TINT=OPTS.color==='orig'?['rot','gelb','blau','weiss']:['rot','gelb','blau']}
+applyOpts();
+function lab(n){if(n===0)return'–';if(n<=18)return String(n);if(n<=28)return String.fromCharCode(73+(28-n));return String.fromCharCode(65+(36-n))}
+function cellName(x,y){return String.fromCharCode(65+y)+(x+1)}
 const LABEL_ORDER=[...Array.from({length:18},(_,i)=>i+1),36,35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19];
 const ROT={NW:'NE',NE:'SE',SE:'SW',SW:'NW',F:'F'},MIR={NW:'NE',NE:'NW',SW:'SE',SE:'SW',F:'F'};
 function norm(c){const mx=Math.min(...c.map(a=>a[0])),my=Math.min(...c.map(a=>a[1]));return c.map(([x,y,k])=>[x-mx,y-my,k])}
@@ -121,52 +133,87 @@ function shape(n,o){let c=BASE[n].map(a=>a.slice());if(o>=4)c=mir(c);for(let i=0
 function dims(c){return [Math.max(...c.map(a=>a[0]))+1,Math.max(...c.map(a=>a[1]))+1]}
 function cellsOf(n,p){return shape(n,p.o).map(([x,y,k])=>[x+p.x,y+p.y,k])}
 function boardOf(P){const b={};for(const n of NAMES){const p=P&&P[n];if(!p)continue;for(const [x,y,k] of cellsOf(n,p))b[x+','+y]={n,k}}return b}
-function fits(P,n,p){const o={...P};delete o[n];const b=boardOf(o);return cellsOf(n,p).every(([x,y])=>x>=0&&y>=0&&x<COLS&&y<ROWS&&!b[x+','+y])}
+const CORN={NW:[0,0],NE:[1,0],SW:[0,1],SE:[1,1]};
+function polyOf(k){if(k==='F')return[[0,0],[1,0],[1,1],[0,1]];const a=CORN[k];return[a,[1-a[0],a[1]],[a[0],1-a[1]]]}
+// outer edges of a piece as unit segments
+function edgesOf(cells){const ed={};for(const [x,y,k] of cells){const p=polyOf(k).map(([a,b])=>[x+a,y+b]);
+ p.forEach((q,i)=>{const r=p[(i+1)%p.length];const kk=[q.join(','),r.join(',')].sort().join('|');ed[kk]=(ed[kk]||0)+1})}
+ return Object.keys(ed).filter(k=>ed[k]===1)}
+// null = ok, otherwise reason
+function whyNot(P,n,p){const cells=cellsOf(n,p);
+ if(!cells.every(([x,y])=>x>=0&&y>=0&&x<COLS&&y<ROWS))return'out';
+ const o={...P};delete o[n];const b=boardOf(o);
+ if(cells.some(([x,y])=>b[x+','+y]))return'overlap';
+ const mine=new Set(edgesOf(cells));
+ for(const m of NAMES){if(m===n||!o[m])continue;if(edgesOf(cellsOf(m,o[m])).some(e=>mine.has(e)))return'touch'}
+ return null}
+function fits(P,n,p){return !whyNot(P,n,p)}
 function clampPos(n,o,x,y){const [w,h]=dims(shape(n,o));return {x:Math.max(0,Math.min(x,COLS-w)),y:Math.max(0,Math.min(y,ROWS-h)),o}}
 const DIR={N:[0,-1],S:[0,1],E:[1,0],W:[-1,0]},OPP={N:'S',S:'N',E:'W',W:'E'};
 function entry(n){if(n<=10)return[[n-1,-1],'S'];if(n<=18)return[[COLS,n-11],'W'];if(n<=28)return[[COLS-1-(n-19),ROWS],'N'];return[[-1,ROWS-1-(n-29)],'E']}
 function labelAt(x,y){if(y===-1)return x+1;if(x===COLS)return 11+y;if(y===ROWS)return 19+(COLS-1-x);return 29+(ROWS-1-y)}
-function trace(b,n){let [pos,d]=entry(n);const pts=[[pos[0]+.5,pos[1]+.5]],hit=[],pcs=[[]];const P_=p=>{pts.push(p);pcs.push(CNAMES.filter(c=>hit.includes(c)))};
+function mirrorD(k,d){const back=(k==='SW'||k==='NE');return back?{E:'S',S:'E',W:'N',N:'W'}[d]:{E:'N',N:'E',W:'S',S:'W'}[d]}
+// out=0 means absorbed
+function trace(b,n){let [pos,d]=entry(n);const pts=[[pos[0]+.5,pos[1]+.5]],hit=[],ids=new Set(),pcs=[[]];
+ const cur=()=>TINT.filter(c=>hit.includes(c));const P_=p=>{pts.push(p);pcs.push(cur())};
+ const done=out=>({out,colors:out===0?[]:cur(),pts,pcs,ids});
  for(let g=0;g<1000;g++){const nx=pos[0]+DIR[d][0],ny=pos[1]+DIR[d][1];
-  if(nx<0||ny<0||nx>=COLS||ny>=ROWS){P_([nx+.5,ny+.5]);return{out:labelAt(nx,ny),colors:CNAMES.filter(c=>hit.includes(c)),pts,pcs}}
+  if(nx<0||ny<0||nx>=COLS||ny>=ROWS){P_([nx+.5,ny+.5]);return done(labelAt(nx,ny))}
   const c=b[nx+','+ny];
   if(!c){pos=[nx,ny];P_([nx+.5,ny+.5]);continue}
+  ids.add(c.n);
+  if(COLOR[c.n]==='schwarz'){P_([(pos[0]+nx)/2+.5,(pos[1]+ny)/2+.5]);return done(0)}
   if(!hit.includes(COLOR[c.n]))hit.push(COLOR[c.n]);
   const side=OPP[d];
   if(c.k==='F'||c.k.includes(side)){P_([(pos[0]+nx)/2+.5,(pos[1]+ny)/2+.5]);d=OPP[d];
    {const pc=b[pos[0]+','+pos[1]];if(pc&&pc.k!=='F'){d=mirrorD(pc.k,d)}P_([pos[0]+.5,pos[1]+.5]);}
-   if(pos[0]<0||pos[1]<0||pos[0]>=COLS||pos[1]>=ROWS){return{out:labelAt(pos[0],pos[1]),colors:CNAMES.filter(c=>hit.includes(c)),pts,pcs}}
+   if(pos[0]<0||pos[1]<0||pos[0]>=COLS||pos[1]>=ROWS)return done(labelAt(pos[0],pos[1]));
    continue}
-  d=mirrorD(c.k,d);
-  pos=[nx,ny];P_([nx+.5,ny+.5]);
+  d=mirrorD(c.k,d);pos=[nx,ny];P_([nx+.5,ny+.5]);
  }}
-function mirrorD(k,d){const back=(k==='SW'||k==='NE');return back?{E:'S',S:'E',W:'N',N:'W'}[d]:{E:'N',N:'E',W:'S',S:'W'}[d]}
+function unreachable(P){const b=boardOf(P),seen=new Set();for(let n=1;n<=36;n++)for(const i of trace(b,n).ids)seen.add(i);return NAMES.filter(n=>P[n]&&!seen.has(n))}
+function scanCell(P,x,y){const c=boardOf(P)[x+','+y];return c?COLOR[c.n]:'leer'}
 function rand(n){return Math.floor(Math.random()*n)}
-function randomLayout(){for(let t=0;t<500;t++){const P={};let ok=true;for(const n of NAMES){let done=false;for(let i=0;i<80;i++){const o=rand(8);const [w,h]=dims(shape(n,o));const p={x:rand(COLS-w+1),y:rand(ROWS-h+1),o};if(fits(P,n,p)){P[n]=p;done=true;break}}if(!done){ok=false;break}}if(ok)return P}}
-function keyOf(n,p){return cellsOf(n,p).map(a=>a.join(',')).sort().join(';')}
+function randomLayout(){const no=OPTS.mirror?8:4;
+ for(let t=0;t<2000;t++){const P={};let ok=true;
+  for(const n of NAMES){let done=false;for(let i=0;i<120;i++){const o=rand(no);const [w,h]=dims(shape(n,o));const p={x:rand(COLS-w+1),y:rand(ROWS-h+1),o};if(fits(P,n,p)){P[n]=p;done=true;break}}if(!done){ok=false;break}}
+  if(ok&&!unreachable(P).length)return P}}
+function keyOf(n,p){if(n==='schwarz')return p.x+','+p.y; // nur Position zählt
+ return cellsOf(n,p).map(a=>a.join(',')).sort().join(';')}
 function same(a,b){return NAMES.every(n=>a[n]&&b[n]&&keyOf(n,a[n])===keyOf(n,b[n]))}
 function complete(P){return NAMES.every(n=>P&&P[n])}
 function encode(P){return NAMES.map(n=>`${P[n].x}${P[n].y}${P[n].o}`).join(' ')}
-function decode(s){const d=(s||'').replace(/\D/g,'');if(d.length!==15)return null;const P={};
- for(let i=0;i<5;i++){const x=+d[i*3],y=+d[i*3+1],o=+d[i*3+2];if(o>7)return null;const n=NAMES[i],p={x,y,o};if(!fits(P,n,p))return null;P[n]=p}return P}
+function decode(s){const d=(s||'').replace(/\D/g,'');if(d.length!==NAMES.length*3)return null;const P={};
+ for(let i=0;i<NAMES.length;i++){const x=+d[i*3],y=+d[i*3+1],o=+d[i*3+2];if(o>7)return null;const n=NAMES[i],p={x,y,o};if(whyNot(P,n,p)==='out'||whyNot(P,n,p)==='overlap')return null;P[n]=p}return P}
 
-const LBL={rot:'Rot',gelb:'Gelb',blau:'Blau',weiss:'Weiß'};
-const FILL={rot:'#E5484D',gelb:'#F5C518',blau:'#2F7BEA',weiss:'#FFFFFF'};
+const LBL={rot:'Rot',gelb:'Gelb',blau:'Blau',weiss:'Weiß',trans:'Transparent',schwarz:'Schwarz'};
+const SHORT={...LBL,trans:'Transp.'};
+const FILL={rot:'#E5484D',gelb:'#F5C518',blau:'#2F7BEA',weiss:'#FFFFFF',trans:'#CDEFF5',schwarz:'#2B2838'};
+const VALNAME={leer:'leer',...LBL};
 const INK='#24213B',AM='#6A4BE0';
-const KEY='kristall-echo-v2';
+const KEY='kristall-echo-v2',OKEY='kristall-echo-opts';
 let mem=null;
-const store={get(){try{return JSON.parse(localStorage.getItem(KEY))}catch(e){return mem}},set(v){mem=v;try{localStorage.setItem(KEY,JSON.stringify(v))}catch(e){}}};
-function fresh(mode){return{mode,me:{pieces:{},locked:false,answered:[]},opp:{guess:{},marks:{},log:[],fails:0,solved:false,revealed:false},secret:mode==='solo'?randomLayout():null}}
+const store={get(k=KEY){try{return JSON.parse(localStorage.getItem(k))}catch(e){return k===KEY?mem:null}},set(v,k=KEY){if(k===KEY)mem=v;try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function fresh(mode,opts){applyOpts(opts);return{mode,opts:{...OPTS},me:{pieces:{},locked:false,answered:[]},opp:{guess:{},marks:{},log:[],fails:0,solved:false,revealed:false},secret:mode==='solo'?randomLayout():null}}
 let S=store.get()||{mode:null};
-const ui={tab:S.mode==='duo'?'me':'opp',sel:null,tool:'piece',hl:null,reveal:false,last:null,anim:false,po:{me:{},opp:{}}};
+// Migration alter Spielstände (vor den Optionen): Hausregel + Spiegeln wie bisher
+if(S.mode&&!S.opts)S.opts={color:'house',mirror:true,scan:false,trans:false,schwarz:false};
+applyOpts(S.opts);
+const ui={tab:S.mode==='duo'?'me':'opp',sel:null,tool:'piece',hl:null,reveal:false,last:null,anim:false,po:{me:{},opp:{}},setup:null};
 function save(){store.set(S)}
 const $=s=>document.querySelector(s);
-const colorText=c=>c.length?c.map(x=>LBL[x]).join(' + '):'farblos';
-const dots=c=>c.length?c.map(x=>`<i class="dot" style="background:${FILL[x]}"></i>`).join(''):'<i class="dot none"></i>';
+const MIXNAME={'':'farblos',rot:'Rot',gelb:'Gelb',blau:'Blau','rot,gelb':'Orange','rot,blau':'Lila','gelb,blau':'Grün','rot,gelb,blau':'Schwarz',
+ weiss:'Weiß','rot,weiss':'Rosa','gelb,weiss':'Hellgelb','blau,weiss':'Hellblau','rot,gelb,weiss':'Hellorange','rot,blau,weiss':'Helllila','gelb,blau,weiss':'Hellgrün','rot,gelb,blau,weiss':'Grau'};
+const BASEMIX=[[],['rot'],['gelb'],['blau'],['rot','gelb'],['rot','blau'],['gelb','blau'],['rot','gelb','blau']];
+function mixes(){return OPTS.color==='orig'?[...BASEMIX,...BASEMIX.map(m=>[...m,'weiss'])]:BASEMIX}
+const colorText=c=>MIXNAME[c.filter(x=>TINT.includes(x)).join(',')]||'?';
+const dots=c=>c.length?`<i class="dot" style="background:${mixColor(c)}"></i>`:'<i class="dot none"></i>';
+const ans=(out,c)=>out===0?'absorbiert':`raus bei ${lab(out)}, ${colorText(c)}`;
+const vdot=v=>v==='leer'?'<i class="dot none"></i>':`<i class="dot" style="background:${FILL[v]}"></i>`;
+const plural=(n,a,b)=>n===1?a:b;
+function optSummary(o=OPTS){const t=[o.color==='orig'?'Original-Farben':'Weiß färbt nicht'];if(o.mirror)t.push('Spiegeln');if(o.scan)t.push('Direkter Scan');if(o.trans)t.push('Transparent');if(o.schwarz)t.push('Schwarz');return t.join(', ')}
 
 /* ---------- SVG ---------- */
-const CORN={NW:[0,0],NE:[1,0],SW:[0,1],SE:[1,1]};
-function polyOf(k){if(k==='F')return[[0,0],[1,0],[1,1],[0,1]];const a=CORN[k];return[a,[1-a[0],a[1]],[a[0],1-a[1]]]}
 function pieceSVG(n,cells,o={}){let f='',ed={};
  for(const [x,y,k] of cells){const p=polyOf(k).map(([a,b])=>[x+a,y+b]);
   f+=`<polygon points="${p.map(q=>q.join(',')).join(' ')}" fill="${FILL[COLOR[n]]}" stroke="${FILL[COLOR[n]]}" stroke-width=".03"/>`;
@@ -178,7 +225,7 @@ const MIX={'':'#C4BDDC',rot:'#E5484D',gelb:'#F5C518',blau:'#2F7BEA','rot,gelb':'
 function mixColor(c){const w=c.includes('weiss');const base=c.filter(x=>x!=='weiss').join(',');if(!w)return MIX[base];if(!base)return '#FFFFFF';
  const h=MIX[base];const n=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));return '#'+n.map(v=>Math.round(v+(255-v)*.5).toString(16).padStart(2,'0')).join('')}
 function raySVG(r,anim){if(!r||!r.pts||r.pts.length<2)return'';const p=r.pts.map(a=>a.slice()),pc=r.pcs||p.map(()=>[]);
- const mid=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2];p[0]=mid(p[0],p[1]);p[p.length-1]=mid(p[p.length-1],p[p.length-2]);
+ const mid=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2];p[0]=mid(p[0],p[1]);if(r.out!==0)p[p.length-1]=mid(p[p.length-1],p[p.length-2]);
  // lane offset: shift every segment a little to the right of its travel direction, so out- and return paths sit side by side
  {const O=.12,q=p.map(a=>a.slice()),nrm=(a,b)=>{const dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy)||1;return[-dy/l*O,dx/l*O]};
   for(let i=0;i<p.length;i++){const n1=i>0?nrm(p[i-1],p[i]):null,n2=i<p.length-1?nrm(p[i],p[i+1]):null;
@@ -196,20 +243,25 @@ function raySVG(r,anim){if(!r||!r.pts||r.pts.length<2)return'';const p=r.pts.map
   halo+=`<path d="${d}" pathLength="1"${st} fill="none" stroke="${col}" stroke-width=".4" stroke-linejoin="round" stroke-linecap="round" opacity=".25"/>`;
   casing+=`<path d="${d}" pathLength="1"${st} fill="none" stroke="${INK}" stroke-width=".18" stroke-linejoin="round" stroke-linecap="round"/>`;
   core+=`<path d="${d}" pathLength="1"${st} fill="none" stroke="${col}" stroke-width=".1" stroke-linejoin="round" stroke-linecap="round"/>`}
- return halo+casing+core+`<circle cx="${p[0][0]}" cy="${p[0][1]}" r=".17" fill="${INK}"/><circle cx="${p[0][0]}" cy="${p[0][1]}" r=".1" fill="${mixColor([])}"/>`}
+ const end=p[p.length-1],ab=r.out===0?`<circle cx="${end[0]}" cy="${end[1]}" r=".2" fill="${INK}"/><path d="M${end[0]-.1},${end[1]-.1}L${end[0]+.1},${end[1]+.1}M${end[0]+.1},${end[1]-.1}L${end[0]-.1},${end[1]+.1}" stroke="#fff" stroke-width=".06"/>`:'';
+ return halo+casing+core+ab+`<circle cx="${p[0][0]}" cy="${p[0][1]}" r=".17" fill="${INK}"/><circle cx="${p[0][0]}" cy="${p[0][1]}" r=".1" fill="${mixColor([])}"/>`}
 function boardSVG(o){
- let s=`<svg viewBox="-1 -1 12 10" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Spielfeld">`;
+ let s2='',svgS='';let s=`<svg viewBox="-1 -1 12 10" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Spielfeld">`;
  s+=`<rect x="0" y="0" width="10" height="8" fill="#FBFAFE"/>`;
  let g='';for(let i=1;i<COLS;i++)g+=`M${i},0V8`;for(let j=1;j<ROWS;j++)g+=`M0,${j}H10`;
  s+=`<path d="${g}" stroke="#DCD7EA" stroke-width=".035"/>`;
  if(o.marks)for(const k of Object.keys(o.marks)){const [x,y]=k.split(',').map(Number);s+=`<path d="M${x+.36},${y+.36}L${x+.64},${y+.64}M${x+.64},${y+.36}L${x+.36},${y+.64}" stroke="#A39DBB" stroke-width=".07" stroke-linecap="round"/>`}
+ if(o.scans)for(const s of o.scans){const [x,y]=s.scan;s.val==='leer'
+   ?(svgS=`<circle cx="${x+.5}" cy="${y+.5}" r=".16" fill="none" stroke="#A39DBB" stroke-width=".06"/>`)
+   :(svgS=`<circle cx="${x+.5}" cy="${y+.5}" r=".2" fill="${FILL[s.val]}" stroke="${INK}" stroke-width=".05"/>`);s2+=svgS}
  if(o.pieces)for(const n of NAMES){const p=o.pieces[n];if(p)s+=pieceSVG(n,cellsOf(n,p),{sel:o.sel===n})}
  if(o.ghost)for(const n of NAMES){const p=o.ghost[n];if(p)s+=pieceSVG(n,cellsOf(n,p),{ghost:true})}
- if(o.ray)s+=raySVG(o.ray,o.anim);
+ s+=s2;if(o.ray)s+=raySVG(o.ray,o.anim);
+ if(o.hlCell)s+=`<rect x="${o.hlCell[0]+.04}" y="${o.hlCell[1]+.04}" width=".92" height=".92" fill="none" stroke="${AM}" stroke-width=".1" rx=".08"/>`;
  if(o.cover)s+=`<g class="cover"><rect x="0" y="0" width="10" height="8" fill="#2E2852"/>
   <path d="M0,8L3.2,3.6L5,5.4L7.4,1.8L10,6V8Z" fill="#3A3366"/><path d="M3.2,3.6L4.1,8M7.4,1.8L6.6,8" stroke="#4A4280" stroke-width=".05"/>
   <text x="5" y="3.7" text-anchor="middle" font-size=".62" font-weight="700" fill="#fff">Verdeckt</text>
-  <text x="5" y="4.5" text-anchor="middle" font-size=".36" fill="#CFC8F2">Tippe den Punkt am Rand an</text></g>`;
+  <text x="5" y="4.5" text-anchor="middle" font-size=".36" fill="#CFC8F2">${o.coverHint||'Tippe den Punkt am Rand an'}</text></g>`;
  if(o.cells)for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++)s+=`<rect data-cell="${x},${y}" x="${x}" y="${y}" width="1" height="1" fill="transparent" pointer-events="fill"/>`;
  s+=`<rect x="0" y="0" width="10" height="8" fill="none" stroke="${INK}" stroke-width=".08" rx=".05"/>`;
  for(let n=1;n<=36;n++){const [[ex,ey]]=entry(n);const cx=ex+.5,cy=ey+.5;const st=(o.labels&&o.labels[n])||'';
@@ -223,150 +275,206 @@ function miniSVG(n,o,u=12){const c=shape(n,o);const [w,h]=dims(c);return`<svg vi
 /* ---------- Views ---------- */
 function tray(ctx){const P=ctx==='me'?S.me.pieces:S.opp.guess;
  const chips=NAMES.map(n=>{const o=P[n]?P[n].o:(ui.po[ctx][n]||0);const on=ui.sel===n;
-  return`<button class="chip${on?' on':''}" data-act="pick" data-n="${n}" aria-pressed="${on}">${miniSVG(n,o)}<span>${LBL[COLOR[n]]}</span><span class="st">${P[n]?'liegt':'—'}</span></button>`}).join('');
+  return`<button class="chip${on?' on':''}" data-act="pick" data-n="${n}" aria-pressed="${on}">${miniSVG(n,o)}<span>${SHORT[COLOR[n]]}</span><span class="st">${P[n]?'liegt':'—'}</span></button>`}).join('');
  const has=ui.sel!=null,placed=has&&P[ui.sel];
  return`<div class="tray">${chips}</div>
- <div class="row tools"><button class="btn" data-act="rot" ${has?'':'disabled'}>Drehen</button><button class="btn" data-act="mir" ${has?'':'disabled'}>Spiegeln</button><button class="btn" data-act="del" ${placed?'':'disabled'}>Wegnehmen</button></div>`}
+ <div class="row tools"><button class="btn" data-act="rot" ${has?'':'disabled'}>Drehen</button>${OPTS.mirror?`<button class="btn" data-act="mir" ${has?'':'disabled'}>Spiegeln</button>`:''}<button class="btn" data-act="del" ${placed?'':'disabled'}>Wegnehmen</button></div>`}
 
 function viewStart(){return`<section class="hero">
  <h2>Licht rein, Farbe raus.</h2>
- <p>Versteckt fünf Kristalle. Schickt Lichtstrahlen ins Feld des anderen. Aus Ausgang und Farben findet ihr heraus, wo alles liegt.</p>
- <button class="mode" data-act="new" data-mode="duo"><b>Gegeneinander</b><span>Jeder auf seinem Handy. Ihr sagt euch Fragen und Antworten.</span></button>
- <button class="mode" data-act="new" data-mode="solo"><b>Solo gegen das Handy</b><span>Das Handy versteckt, du suchst. Gut zum Reinkommen.</span></button>
+ <p>Versteckt eure Kristalle. Schickt Lichtstrahlen ins Feld des anderen. Aus Ausgang und Farbe findet ihr heraus, wo alles liegt.</p>
+ <button class="mode" data-act="setup" data-mode="duo"><b>Gegeneinander</b><span>Jeder auf seinem Handy. Ihr sagt euch Fragen und Antworten.</span></button>
+ <button class="mode" data-act="setup" data-mode="solo"><b>Solo gegen das Handy</b><span>Das Handy versteckt, du suchst. Gut zum Reinkommen.</span></button>
  <button class="link" data-act="tab" data-tab="rules">Erst die Regeln lesen</button></section>`}
 
+function logRow(e,num,extra=''){
+ if(e.scan)return`<span class="no">${num}</span><span>Feld ${cellName(...e.scan)}</span><span class="dots">${vdot(e.val)}</span><span class="ct">${VALNAME[e.val]}</span>${extra}`;
+ if(e.out===0)return`<span class="no">${num}</span><span>${lab(e.n)}</span><span class="dots"><i class="dot" style="background:${INK}"></i></span><span class="ct">absorbiert</span>${extra}`;
+ return`<span class="no">${num}</span><span>${lab(e.n)} ↔ ${lab(e.out)}</span><span class="dots">${dots(e.colors)}</span><span class="ct">${colorText(e.colors)}</span>${extra}`}
+
 function viewMe(){const M=S.me;
- if(!M.locked){const n=NAMES.filter(x=>M.pieces[x]).length;
-  return`<p class="hint">Versteck deine 5 Kristalle: unten einen wählen, dann aufs Feld tippen.</p>
+ if(!M.locked){const n=NAMES.filter(x=>M.pieces[x]).length,N=NAMES.length;
+  return`<p class="hint">Versteck deine ${N} Kristalle: unten einen wählen, dann aufs Feld tippen. Steine dürfen sich nur an Ecken berühren.</p>
   <div class="board" data-ctx="me">${boardSVG({pieces:M.pieces,sel:ui.sel,cells:true})}</div>
   ${tray('me')}
-  <div class="row"><button class="btn" data-act="random">Zufällig verteilen</button><button class="btn primary grow" data-act="lock" ${n===5?'':'disabled'}>Verdecken (${n}/5)</button></div>`}
- const labels={};M.answered.forEach(a=>{labels[a.n]='used';labels[a.out]='used'});if(ui.last){labels[ui.last.n]='hl';labels[ui.last.out]='hl'}
- const res=ui.last?`<div class="result"><div class="rl">Start ${lab(ui.last.n)}. Sag:</div><div class="rbig">„Raus bei ${lab(ui.last.out)}${ui.last.out===ui.last.n?' (zurück)':''} – ${colorText(ui.last.colors)}.“</div><div class="rdots">${dots(ui.last.colors)}</div></div>`
-  :`<p class="hint">Dein Gegenüber nennt einen Punkt. Tippe ihn am Rand an, das Handy verfolgt den Strahl für dich.</p>`;
- const list=M.answered.length?`<h3>Schon beantwortet</h3><ul class="log">${M.answered.map((a,i)=>`<li><span class="no">${M.answered.length-i}</span><span>${lab(a.n)} ↔ ${lab(a.out)}</span><span class="dots">${dots(a.colors)}</span><span class="ct">${colorText(a.colors)}</span></li>`).join('')}</ul>`:'';
+  <div class="row"><button class="btn" data-act="random">Zufällig verteilen</button><button class="btn primary grow" data-act="lock" ${n===N?'':'disabled'}>Verdecken (${n}/${N})</button></div>
+  <p class="hint small">Optionen: ${optSummary()}</p>`}
+ const labels={};M.answered.forEach(a=>{if(!a.scan){labels[a.n]='used';if(a.out)labels[a.out]='used'}});
+ const L=ui.last;if(L&&!L.scan){labels[L.n]='hl';if(L.out)labels[L.out]='hl'}
+ let res;
+ if(L&&L.scan)res=`<div class="result"><div class="rl">Scan ${cellName(...L.scan)}. Sag:</div><div class="rbig">„Feld ${cellName(...L.scan)}: ${VALNAME[L.val]}.“</div><div class="rdots">${vdot(L.val)}</div></div>`;
+ else if(L)res=`<div class="result"><div class="rl">Start ${lab(L.n)}. Sag:</div><div class="rbig">${L.out===0?'„Absorbiert.“':`„Raus bei ${lab(L.out)}${L.out===L.n?' (zurück)':''} – ${colorText(L.colors)}.“`}</div><div class="rdots">${L.out===0?'':dots(L.colors)}</div></div>`;
+ else res=`<p class="hint">Dein Gegenüber nennt einen Punkt am Rand${OPTS.scan?' oder ein Feld wie C3':''}. Tipp ihn an, das Handy rechnet die Antwort aus.</p>`;
+ const list=M.answered.length?`<h3>Schon beantwortet</h3><ul class="log">${M.answered.map((a,i)=>`<li>${logRow(a,M.answered.length-i)}</li>`).join('')}</ul>`:'';
  return`${res}
- <div class="board" data-ctx="me">${boardSVG({pieces:M.pieces,cover:!ui.reveal,labels,ray:ui.reveal&&ui.last?ui.last:null,anim:ui.anim})}</div>
+ <div class="board" data-ctx="me">${boardSVG({pieces:M.pieces,cover:!ui.reveal,coverHint:OPTS.scan?'Punkt am Rand oder Feld antippen':null,labels,cells:OPTS.scan,hlCell:ui.reveal&&L&&L.scan?L.scan:null,ray:ui.reveal&&L&&!L.scan?L:null,anim:ui.anim})}</div>
  <div class="row"><button class="btn" data-act="reveal">${ui.reveal?'Verdecken':'Ansehen'}</button><button class="btn primary grow" data-act="verify">Lösung prüfen</button></div>
  ${list}
+ <p class="hint small">Optionen: ${optSummary()}</p>
  <div class="row"><button class="link" data-act="unlock">Kristalle neu legen</button></div>`}
 
-function consistency(e){if(!complete(S.opp.guess))return null;const r=trace(boardOf(S.opp.guess),e.n);return{ok:r.out===e.out&&r.colors.join()===e.colors.join(),r}}
-function viewOpp(){const O=S.opp,solo=S.mode==='solo';
- const labels={};O.log.forEach(e=>{labels[e.n]='used';labels[e.out]='used'});
- let ray=null,cap='';
- if(ui.hl!=null&&O.log[ui.hl]){const e=O.log[ui.hl];labels[e.n]='hl';labels[e.out]='hl';
-  const r=trace(boardOf(O.guess),e.n);ray=r;const ok=r.out===e.out&&r.colors.join()===e.colors.join();
-  cap=`<div class="cap"><b>#${ui.hl+1}: ${lab(e.n)} raus bei ${lab(e.out)}, ${colorText(e.colors)}.</b> Deine Vermutung ergibt: raus bei ${lab(r.out)}, ${colorText(r.colors)}. <span class="${ok?'ok':'bad'}">${ok?'Passt.':'Passt nicht.'}</span></div>`}
- const head=solo?`<p class="hint">${O.solved?'Gelöst! ':''}Tippe einen Punkt am Rand an, um einen Strahl zu schicken. <b>${O.log.length} Fragen</b>${O.fails?`, ${O.fails} Fehlversuch${O.fails>1?'e':''}`:''}.</p>`
+function checkEntry(e,G){if(e.scan)return{ok:scanCell(G,...e.scan)===e.val,val:scanCell(G,...e.scan)};
+ const r=trace(boardOf(G),e.n);return{ok:r.out===e.out&&r.colors.join()===e.colors.join(),r}}
+function viewOpp(){const O=S.opp,solo=S.mode==='solo',N=NAMES.length;
+ const labels={};O.log.forEach(e=>{if(!e.scan){labels[e.n]='used';if(e.out)labels[e.out]='used'}});
+ let ray=null,cap='',hlCell=null;
+ if(ui.hl!=null&&O.log[ui.hl]){const e=O.log[ui.hl],c=checkEntry(e,O.guess);
+  if(e.scan){hlCell=e.scan;cap=`<div class="cap"><b>#${ui.hl+1}: Feld ${cellName(...e.scan)} ist ${VALNAME[e.val]}.</b> Bei deiner Vermutung: ${VALNAME[c.val]}. <span class="${c.ok?'ok':'bad'}">${c.ok?'Passt.':'Passt nicht.'}</span></div>`}
+  else{labels[e.n]='hl';if(e.out)labels[e.out]='hl';ray=c.r;
+   cap=`<div class="cap"><b>#${ui.hl+1}: ${lab(e.n)} ${ans(e.out,e.colors)}.</b> Deine Vermutung ergibt: ${ans(c.r.out,c.r.colors)}. <span class="${c.ok?'ok':'bad'}">${c.ok?'Passt.':'Passt nicht.'}</span></div>`}}
+ const n=O.log.length;
+ const head=solo?`<p class="hint">${O.solved?'Gelöst! ':''}Tippe einen Punkt am Rand an${OPTS.scan?' oder scanne ein Feld':''}. <b>${n} ${plural(n,'Frage','Fragen')}</b>${O.fails?`, ${O.fails} ${plural(O.fails,'Fehlversuch','Fehlversuche')}`:''}.</p>`
   :`<p class="hint">Tippe den Punkt am Rand an, den du gefragt hast, und trag die Antwort ein.</p>`;
- const seg=`<div class="seg" role="tablist"><button class="${ui.tool==='piece'?'on':''}" data-act="tool" data-tool="piece">Kristalle vermuten</button><button class="${ui.tool==='mark'?'on':''}" data-act="tool" data-tool="mark">Leer markieren</button></div>`;
+ const tools=[['piece','Vermuten'],['mark','Leer markieren'],...(OPTS.scan?[['scan','Feld scannen']]:[])];
+ if(!tools.some(t=>t[0]===ui.tool))ui.tool='piece';
+ const seg=`<div class="seg">${tools.map(([k,l])=>`<button class="${ui.tool===k?'on':''}" data-act="tool" data-tool="${k}">${l}</button>`).join('')}</div>`;
+ const toolBody=ui.tool==='piece'?tray('opp'):ui.tool==='mark'?'<p class="hint small">Tippe Kästchen an, in denen sicher nichts liegt.</p>':'<p class="hint small">Tippe das Feld an, das du scannen willst (z. B. C3). Das zählt als dein Zug.</p>';
  const all=complete(O.guess);
- const list=O.log.length?`<h3>Antworten${all?' – mit deiner Vermutung verglichen':''}</h3><ul class="log">${O.log.map((e,i)=>({e,i})).reverse().map(({e,i})=>{const c=consistency(e);
-   return`<li class="${ui.hl===i?'on':''}" data-act="hl" data-i="${i}"><span class="no">${i+1}</span><span>${lab(e.n)} ↔ ${lab(e.out)}</span><span class="dots">${dots(e.colors)}</span><span class="ct">${colorText(e.colors)}</span>${c?`<span class="${c.ok?'ok':'bad'}">${c.ok?'✓':'✗'}</span>`:''}${solo?'':`<button class="x" data-act="rm" data-i="${i}" aria-label="Eintrag löschen">×</button>`}</li>`}).join('')}</ul>`:'';
+ const list=n?`<h3>Antworten${all?' – mit deiner Vermutung verglichen':''}</h3><ul class="log">${O.log.map((e,i)=>({e,i})).reverse().map(({e,i})=>{const c=all?checkEntry(e,O.guess):null;
+   const extra=(c?`<span class="${c.ok?'ok':'bad'}">${c.ok?'✓':'✗'}</span>`:'')+(solo?'':`<button class="x" data-act="rm" data-i="${i}" aria-label="Eintrag löschen">×</button>`);
+   return`<li class="${ui.hl===i?'on':''}" data-act="hl" data-i="${i}">${logRow(e,i+1,extra)}</li>`}).join('')}</ul>`:'';
  const solveBtn=solo&&O.solved?`<button class="btn primary grow" data-act="new" data-mode="solo">Nächstes Rätsel</button>`
-  :`<button class="btn primary grow" data-act="solve" ${all?'':'disabled'}>Lösung prüfen${all?'':' (5 Kristalle legen)'}</button>`;
+  :`<button class="btn primary grow" data-act="solve" ${all?'':'disabled'}>Lösung prüfen${all?'':` (${N} Kristalle legen)`}</button>`;
  return`${head}
- <div class="board" data-ctx="opp">${boardSVG({pieces:O.guess,sel:ui.tool==='piece'?ui.sel:null,marks:O.marks,labels,ray,anim:ui.anim,cells:true,ghost:solo&&(O.revealed||O.solved)?S.secret:null})}</div>
- ${cap}${seg}${ui.tool==='piece'?tray('opp'):'<p class="hint small">Tippe Kästchen an, in denen sicher nichts liegt.</p>'}
+ <div class="board" data-ctx="opp">${boardSVG({pieces:O.guess,sel:ui.tool==='piece'?ui.sel:null,marks:O.marks,scans:O.log.filter(e=>e.scan),hlCell,labels,ray,anim:ui.anim,cells:true,ghost:solo&&(O.revealed||O.solved)?S.secret:null})}</div>
+ ${cap}${seg}${toolBody}
  <div class="row">${solveBtn}</div>
  ${list}
+ <p class="hint small">Optionen: ${optSummary()}</p>
  ${solo&&!O.solved&&!O.revealed?'<div class="row"><button class="link" data-act="giveup">Aufgeben und Lösung zeigen</button></div>':''}`}
 
-function viewRules(){const leg=NAMES.map(n=>`<span class="lg">${miniSVG(n,0,11)}${LBL[COLOR[n]]}</span>`).join('');
+function viewRules(){const N=NAMES.length;const leg=NAMES.map(n=>`<span class="lg">${miniSVG(n,0,11)}${SHORT[COLOR[n]]}</span>`).join('');
+ const colorRule=OPTS.color==='orig'
+  ?'<li>Jeder farbige Stein färbt ihn, auch Weiß. Farben mischen sich: Rot+Gelb = Orange, Rot+Blau = Lila, Gelb+Blau = Grün, alle drei = Schwarz. Mit Weiß wird es hell: Rosa, Hellgelb, Hellblau, Hellorange, Helllila, Hellgrün, Grau. Nur Weiß ergibt Weiß.</li>'
+  :'<li>Rot, Gelb und Blau färben ihn, Weiß lenkt nur ab. Farben mischen sich: Rot+Gelb = Orange, Rot+Blau = Lila, Gelb+Blau = Grün, alle drei = Schwarz.</li>';
  return`<article class="rules">
  <h2>So geht's</h2>
- <p>Jeder versteckt 5 Kristalle. Ihr schickt abwechselnd Lichtstrahlen ins Feld des anderen. Die Antwort verrät, <b>wo</b> der Strahl rauskommt und <b>welche Farben</b> er unterwegs abbekommen hat. Wer zuerst alle 5 Kristalle exakt richtig hat, gewinnt.</p>
+ <p>Jeder versteckt ${N} Kristalle. Ihr fragt abwechselnd. Die Antwort verrät, <b>wo</b> der Strahl rauskommt und in <b>welcher Farbe</b>. Wer zuerst alle Kristalle exakt richtig hat, gewinnt.</p>
  <div class="legend">${leg}</div>
+ <p class="small">Aktive Optionen: ${optSummary()}</p>
+ <h3>Kristalle legen</h3>
+ <ul><li>Ecken liegen auf den Kreuzungspunkten, nichts liegt schräg oder ragt über den Rand.</li><li>Zwei Steine dürfen sich nie an einer Kante berühren. Ecke an Kante ist erlaubt.</li><li>Jeder Stein muss von mindestens einem Strahl erreichbar sein. Das prüft die App beim Verdecken.</li><li>${OPTS.mirror?'Drehen und Spiegeln sind erlaubt.':'Nur drehen, nicht spiegeln (wie beim echten Stein, der nur eine Oberseite hat).'}</li></ul>
  <h3>Ein Zug</h3>
- <ol><li>Du nennst einen Punkt vom Rand, z.&nbsp;B. „7“ oder „C“.</li><li>Dein Gegenüber tippt sie bei <b>Mein Feld</b> an. Das Handy verfolgt den Strahl und zeigt die Antwort.</li><li>Du tippst bei <b>Gegner</b> denselben Punkt an und trägst Ausgang und Farben ein.</li></ol>
+ <ol><li>Du nennst einen Punkt vom Rand, z.&nbsp;B. „7“ oder „C“${OPTS.scan?', oder ein Feld wie „C3“ (direkter Scan)':''}.</li><li>Dein Gegenüber tippt ihn bei <b>Mein Feld</b> an. Das Handy rechnet und zeigt die Antwort.</li><li>Du tippst bei <b>Gegner</b> dasselbe an und trägst die Antwort ein.</li></ol>
  <h3>Wie der Strahl läuft</h3>
- <ul><li>Geradeaus von Kästchen zu Kästchen.</li><li>Schräge Kante: biegt um 90° ab.</li><li>Gerade Kante: prallt zurück.</li><li>Jeder Kristall, an dem er abprallt, färbt ihn.</li><li>Ohne Kontakt kommt er farblos raus.</li><li>Auf dem Feld färbt sich die Linie nach jedem Abprallen in die bisherige Mischfarbe.</li></ul>
+ <ul><li>Geradeaus von Kästchen zu Kästchen.</li><li>Schräge Kante: biegt um 90° ab. Gerade Kante: prallt zurück.</li>${colorRule}<li>Jede Farbe zählt nur einmal. Ohne Kontakt bleibt er farblos.</li>${OPTS.trans?'<li><b>Transparent</b> lenkt ab, färbt aber nicht.</li>':''}${OPTS.schwarz?'<li><b>Schwarz</b> schluckt den Strahl. Antwort: „absorbiert“. Beim Lösen zählt beim schwarzen Stein nur die Position, nicht die Drehung.</li>':''}</ul>
+ ${OPTS.scan?'<h3>Direkter Scan</h3><p>Statt eines Strahls fragst du nach einem Feld, z.&nbsp;B. „C3“. Die Antwort ist die Farbe des Steins dort oder „leer“.</p>':''}
  <h3>Lösen</h3>
- <p>Leg deine Vermutung im Gegner-Feld und tippe <b>Lösung prüfen</b>. Du bekommst einen Code. Dein Gegenüber gibt ihn bei <b>Mein Feld → Lösung prüfen</b> ein und sieht sofort, ob er stimmt. Falsch geraten heißt: 2 Züge aussetzen.</p>
+ <p>Leg deine Vermutung im Gegner-Feld und tippe <b>Lösung prüfen</b>. Du bekommst einen Code. Dein Gegenüber gibt ihn bei <b>Mein Feld → Lösung prüfen</b> ein. Nach Originalregel gilt: richtig = gewonnen, falsch = verloren.</p>
  <h3>Tipps</h3>
- <ul><li>Ein Weg gilt in beide Richtungen: Wenn 3 bei C rauskommt, kommt C bei 3 raus. Spar dir die Frage.</li><li>Sobald deine 5 Kristalle liegen, zeigt die Liste mit ✓ und ✗, welche Antworten zu deiner Vermutung passen. Tipp eine Antwort an, um den Strahl zu sehen.</li><li>Alles wird auf dem Handy gespeichert. Du kannst die Seite schließen und später weiterspielen.</li></ul>
+ <ul><li>Ein Weg gilt in beide Richtungen: Wenn 3 bei C rauskommt, kommt C bei 3 raus.</li><li>Sobald alle deine Kristalle liegen, zeigt die Liste mit ✓ und ✗, welche Antworten zu deiner Vermutung passen.</li><li>Stellt auf beiden Handys dieselben Optionen ein, sonst passen Antworten und Codes nicht.</li></ul>
  </article>`}
 
 function render(){
  const tabs=S.mode==='duo'?[['me','Mein Feld'],['opp','Gegner'],['rules','Regeln']]:S.mode==='solo'?[['opp','Suchen'],['rules','Regeln']]:[['start','Start'],['rules','Regeln']];
  if(!tabs.some(t=>t[0]===ui.tab))ui.tab=tabs[0][0];
  $('#tabs').innerHTML=tabs.map(([k,l])=>`<button class="${ui.tab===k?'on':''}" data-act="tab" data-tab="${k}">${l}</button>`).join('');
- 
  $('#newbtn').style.visibility=S.mode?'visible':'hidden';
  const v=ui.tab==='rules'?viewRules():!S.mode?viewStart():ui.tab==='me'?viewMe():viewOpp();
  $('#app').innerHTML=v;ui.anim=false}
 
 /* ---------- Sheets & toast ---------- */
-let tt;function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('show'),2600)}
+let tt;function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('show'),2800)}
 function sheet(html){$('#toast').classList.remove('show');$('#sheet').innerHTML=`<div class="back" data-act="close"></div><div class="panel" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div>`;$('#sheet').classList.add('open')}
 function close(){$('#sheet').classList.remove('open');$('#sheet').innerHTML=''}
+function setupSheet(){const u=ui.setup,o=u.opts;const busy=S.mode&&(S.opp.log.length||S.me.answered.length)&&!(S.mode==='solo'&&S.opp.solved);
+ const tg=(k,t,d)=>`<button class="opt${o[k]?' on':''}" data-act="sopt" data-k="${k}" role="switch" aria-checked="${!!o[k]}"><span><b>${t}</b><small>${d}</small></span><i class="sw"></i></button>`;
+ sheet(`<h3>${u.mode==='duo'?'Gegeneinander':'Solo'}: Optionen</h3>
+ <h4>Farben</h4>
+ <div class="seg"><button class="${o.color==='orig'?'on':''}" data-act="scol" data-v="orig">Standard (helle Töne)</button><button class="${o.color==='house'?'on':''}" data-act="scol" data-v="house">Weiß färbt nicht</button></div>
+ <h4>Dazunehmen</h4>
+ ${tg('mirror','Spiegeln erlaubt','Steine dürfen auch gewendet werden.')}
+ ${tg('scan','Direkter Scan','Statt eines Strahls ein Feld wie C3 abfragen.')}
+ ${tg('trans','Stein „Transparent“','Lenkt ab, färbt nicht.')}
+ ${tg('schwarz','Stein „Schwarz“','Schluckt den Strahl: „absorbiert“.')}
+ ${u.mode==='duo'?'<p class="small">Stellt auf beiden Handys dasselbe ein.</p>':''}${busy?'<p class="small warn">Das laufende Spiel wird beendet.</p>':''}
+ <div class="row"><button class="btn" data-act="close">Abbrechen</button><button class="btn primary grow" data-act="start">Spiel starten</button></div>`)}
 let ask=null;
-function askSheet(){const a=ask;
+function askSheet(){const a=ask;const ab=a.out===0;
  sheet(`<h3>Start ${lab(a.n)}: wo kam er raus?</h3>
  <div class="numgrid">${LABEL_ORDER.map(k=>`<button class="${a.out===k?'on':''}" data-act="aout" data-k="${k}">${lab(k)}</button>`).join('')}</div>
- <h4>Welche Farben? <span>(keine = farblos)</span></h4>
- <div class="row colors">${CNAMES.map(n=>`<button class="cbtn${a.colors.includes(n)?' on':''}" data-act="acol" data-n="${n}"><i class="dot" style="background:${FILL[n]}"></i>${LBL[n]}</button>`).join('')}</div>
- <div class="row"><button class="btn" data-act="close">Abbrechen</button><button class="btn primary grow" data-act="asave" ${a.out?'':'disabled'}>${a.out?`Speichern: raus bei ${lab(a.out)}, ${colorText(CNAMES.filter(n=>a.colors.includes(n)))}`:'Ausgang wählen'}</button></div>`)}
+ ${OPTS.schwarz?`<button class="btn wide${ab?' sel':''}" data-act="aout" data-k="0">Absorbiert</button>`:''}
+ ${ab?'':`<h4>Welche Farbe kam raus?</h4>
+ <div class="row colors">${mixes().map((m,i)=>`<button class="cbtn${a.colors&&a.colors.join()===m.join()?' on':''}" data-act="acol" data-i="${i}">${dots(m)}${colorText(m)}</button>`).join('')}</div>`}
+ <div class="row"><button class="btn" data-act="close">Abbrechen</button><button class="btn primary grow" data-act="asave" ${a.out!=null&&(ab||a.colors)?'':'disabled'}>${a.out==null?'Ausgang wählen':ab?'Speichern: absorbiert':!a.colors?'Farbe wählen':`Speichern: ${lab(a.out)}, ${colorText(a.colors)}`}</button></div>`)}
+let scanAsk=null;
+function scanSheet(){const s=scanAsk;const vals=['leer','rot','gelb','blau','weiss',...(OPTS.trans?['trans']:[]),...(OPTS.schwarz?['schwarz']:[])];
+ sheet(`<h3>Scan ${cellName(...s.cell)}: was ist dort?</h3>
+ <div class="row colors">${vals.map(v=>`<button class="cbtn${s.val===v?' on':''}" data-act="sval" data-v="${v}">${vdot(v)}${SHORT[v]||'leer'}</button>`).join('')}</div>
+ <div class="row"><button class="btn" data-act="close">Abbrechen</button><button class="btn primary grow" data-act="ssave" ${s.val?'':'disabled'}>${s.val?`Speichern: ${VALNAME[s.val]}`:'Antwort wählen'}</button></div>`)}
 
 /* ---------- Actions ---------- */
 function P(ctx){return ctx==='me'?S.me.pieces:S.opp.guess}
-function known(n){const i=S.opp.log.findIndex(e=>e.n===n||e.out===n);return i}
+function known(n){return S.opp.log.findIndex(e=>!e.scan&&(e.n===n||e.out===n))}
+const WHY={out:'Da ist kein Platz',overlap:'Da liegt schon ein Stein',touch:'Steine dürfen sich nicht an einer Kante berühren (Ecken sind okay)'};
 function onLabel(ctx,n){
  if(ctx==='me'){if(!S.me.locked){toast('Erst Kristalle legen und verdecken');return}
   const r=trace(boardOf(S.me.pieces),n);ui.last={n,...r};S.me.answered.unshift({n,out:r.out,colors:r.colors});ui.anim=true;save();render();window.scrollTo({top:0,behavior:'smooth'});return}
- const i=known(n);if(i>=0){const e=S.opp.log[i];ui.hl=i;render();toast(`Schon bekannt (#${i+1}): ${lab(e.n)} und ${lab(e.out)} sind verbunden`);return}
- if(S.mode==='solo'){if(S.opp.solved||S.opp.revealed)return;const r=trace(boardOf(S.secret),n);S.opp.log.push({n,out:r.out,colors:r.colors});ui.hl=S.opp.log.length-1;ui.anim=true;save();render();toast(`Raus bei ${lab(r.out)} – ${colorText(r.colors)}`);return}
- ask={n,out:null,colors:[]};askSheet()}
-function onCell(ctx,x,y){const Pc=P(ctx);const b=boardOf(Pc);const at=b[x+','+y];
+ const i=known(n);if(i>=0){const e=S.opp.log[i];ui.hl=i;render();toast(e.out===0?`Schon gefragt (#${i+1}): ${lab(e.n)} wurde absorbiert`:`Schon bekannt (#${i+1}): ${lab(e.n)} und ${lab(e.out)} sind verbunden`);return}
+ if(S.mode==='solo'){if(S.opp.solved||S.opp.revealed)return;const r=trace(boardOf(S.secret),n);S.opp.log.push({n,out:r.out,colors:r.colors});ui.hl=S.opp.log.length-1;ui.anim=true;save();render();toast(r.out===0?'Absorbiert':`Raus bei ${lab(r.out)} – ${colorText(r.colors)}`);return}
+ ask={n,out:null,colors:null};askSheet()}
+function onScan(x,y){const i=S.opp.log.findIndex(e=>e.scan&&e.scan[0]===x&&e.scan[1]===y);
+ if(i>=0){ui.hl=i;render();toast(`Schon gescannt (#${i+1})`);return}
+ if(S.mode==='solo'){if(S.opp.solved||S.opp.revealed)return;const v=scanCell(S.secret,x,y);S.opp.log.push({scan:[x,y],val:v});ui.hl=S.opp.log.length-1;save();render();toast(`Feld ${cellName(x,y)}: ${VALNAME[v]}`);return}
+ scanAsk={cell:[x,y],val:null};scanSheet()}
+function onCell(ctx,x,y){
+ if(ctx==='me'&&S.me.locked){if(!OPTS.scan)return;const v=scanCell(S.me.pieces,x,y);ui.last={scan:[x,y],val:v};S.me.answered.unshift({scan:[x,y],val:v});save();render();window.scrollTo({top:0,behavior:'smooth'});return}
+ if(ctx==='opp'&&ui.tool==='scan'){onScan(x,y);return}
+ const Pc=P(ctx);const b=boardOf(Pc);const at=b[x+','+y];
  if(ctx==='opp'&&ui.tool==='mark'){if(at){toast('Da liegt deine Vermutung');return}const k=x+','+y;if(S.opp.marks[k])delete S.opp.marks[k];else S.opp.marks[k]=1;save();render();return}
  if(at&&at.n!==ui.sel){ui.sel=at.n;render();return}
  if(at&&at.n===ui.sel){ui.sel=null;render();return}
  if(!ui.sel){toast('Wähle unten erst einen Kristall');return}
  const n=ui.sel;const o=Pc[n]?Pc[n].o:(ui.po[ctx][n]||0);const [w,h]=dims(shape(n,o));
  const p=clampPos(n,o,x-Math.floor((w-1)/2),y-Math.floor((h-1)/2));
- if(!fits(Pc,n,p)){toast('Da ist kein Platz');return}
+ const why=whyNot(Pc,n,p);if(why){toast(WHY[why]);return}
  Pc[n]=p;if(ctx==='opp')for(const [cx,cy] of cellsOf(n,p))delete S.opp.marks[cx+','+cy];save();render()}
 function transform(ctx,f){const n=ui.sel;if(!n)return;const Pc=P(ctx);
  if(!Pc[n]){ui.po[ctx][n]=f(ui.po[ctx][n]||0);render();return}
- const no=f(Pc[n].o);const p=clampPos(n,no,Pc[n].x,Pc[n].y);if(!fits(Pc,n,p)){toast('Kein Platz dafür – erst verschieben');return}Pc[n]=p;save();render()}
+ const no=f(Pc[n].o);const p=clampPos(n,no,Pc[n].x,Pc[n].y);const why=whyNot(Pc,n,p);if(why){toast(why==='touch'?WHY.touch:'Kein Platz dafür – erst verschieben');return}Pc[n]=p;save();render()}
 const rotO=o=>(o%4+1)%4+(o>=4?4:0),mirO=o=>(o+4)%8;
 function ctxNow(){return ui.tab==='me'?'me':'opp'}
+function startGame(m,opts){store.set(opts,OKEY);S=fresh(m,opts);Object.assign(ui,{tab:m==='duo'?'me':'opp',sel:null,tool:'piece',hl:null,reveal:false,last:null,po:{me:{},opp:{}}});save();close();render();window.scrollTo(0,0)}
 
 document.addEventListener('click',ev=>{
- const lab=ev.target.closest('[data-label]'),cell=ev.target.closest('[data-cell]');
- if(lab||cell){const ctx=ev.target.closest('.board').dataset.ctx;if(lab)onLabel(ctx,+lab.dataset.label);else{const [x,y]=cell.dataset.cell.split(',').map(Number);onCell(ctx,x,y)}return}
+ const labEl=ev.target.closest('[data-label]'),cell=ev.target.closest('[data-cell]');
+ if(labEl||cell){const ctx=ev.target.closest('.board').dataset.ctx;if(labEl)onLabel(ctx,+labEl.dataset.label);else{const [x,y]=cell.dataset.cell.split(',').map(Number);onCell(ctx,x,y)}return}
  const t=ev.target.closest('[data-act]');if(!t)return;const a=t.dataset.act;
  switch(a){
  case'tab':ui.tab=t.dataset.tab==='start'?'opp':t.dataset.tab;ui.sel=null;render();window.scrollTo(0,0);break;
- case'new':{const m=t.dataset.mode;const busy=S.mode&&(S.opp.log.length||S.me.answered.length)&&!(S.mode==='solo'&&S.opp.solved);
-  if(busy&&!t.dataset.ok){sheet(`<h3>Neues Spiel starten?</h3><p>Das aktuelle Spiel wird gelöscht.</p><div class="row"><button class="btn" data-act="close">Weiterspielen</button><button class="btn primary grow" data-act="new" data-mode="${m}" data-ok="1">Ja, neu starten</button></div>`);break}
-  S=fresh(m);Object.assign(ui,{tab:m==='duo'?'me':'opp',sel:null,tool:'piece',hl:null,reveal:false,last:null,po:{me:{},opp:{}}});save();close();render();window.scrollTo(0,0);break}
- case'newmenu':sheet(`<h3>Neues Spiel</h3><div class="stack"><button class="mode" data-act="new" data-mode="duo"><b>Gegeneinander</b><span>Jeder auf seinem Handy.</span></button><button class="mode" data-act="new" data-mode="solo"><b>Solo gegen das Handy</b><span>Das Handy versteckt, du suchst.</span></button></div><div class="row"><button class="btn grow" data-act="close">Abbrechen</button></div>`);break;
+ case'setup':ui.setup={mode:t.dataset.mode,opts:{...DEFAULT_OPTS,...(store.get(OKEY)||{})}};setupSheet();break;
+ case'scol':ui.setup.opts.color=t.dataset.v;setupSheet();break;
+ case'sopt':{const k=t.dataset.k;ui.setup.opts[k]=!ui.setup.opts[k];setupSheet()}break;
+ case'start':startGame(ui.setup.mode,ui.setup.opts);break;
+ case'new':startGame(t.dataset.mode,S.opts||DEFAULT_OPTS);break;
+ case'newmenu':sheet(`<h3>Neues Spiel</h3><div class="stack"><button class="mode" data-act="setup" data-mode="duo"><b>Gegeneinander</b><span>Jeder auf seinem Handy.</span></button><button class="mode" data-act="setup" data-mode="solo"><b>Solo gegen das Handy</b><span>Das Handy versteckt, du suchst.</span></button></div><div class="row"><button class="btn grow" data-act="close">Abbrechen</button></div>`);break;
  case'pick':ui.sel=ui.sel===t.dataset.n?null:t.dataset.n;render();break;
  case'rot':transform(ctxNow(),rotO);break;
  case'mir':transform(ctxNow(),mirO);break;
  case'del':{const Pc=P(ctxNow());if(ui.sel&&Pc[ui.sel]){ui.po[ctxNow()][ui.sel]=Pc[ui.sel].o;delete Pc[ui.sel];save();render()}break}
- case'random':S.me.pieces=randomLayout();ui.sel=null;save();render();break;
- case'lock':S.me.locked=true;ui.sel=null;ui.reveal=false;ui.last=null;save();render();window.scrollTo(0,0);toast('Verdeckt. Viel Spaß!');break;
- case'unlock':if(!t.dataset.ok&&S.me.answered.length){sheet(`<h3>Kristalle neu legen?</h3><p>Du hast schon ${S.me.answered.length} Fragen beantwortet. Wenn du umlegst, stimmen die alten Antworten nicht mehr. Das geht nur bei einem neuen Spiel fair.</p><div class="row"><button class="btn" data-act="close">Abbrechen</button><button class="btn primary grow" data-act="unlock" data-ok="1">Trotzdem neu legen</button></div>`);break}
+ case'random':{const R=randomLayout();if(!R){toast('Keine passende Verteilung gefunden – nochmal tippen');break}S.me.pieces=R;ui.sel=null;save();render()}break;
+ case'lock':{const u=unreachable(S.me.pieces);if(u.length){ui.sel=u[0];render();toast(`${u.map(n=>LBL[COLOR[n]]).join(', ')}: von keinem Strahl erreichbar. Bitte anders legen.`);break}
+  S.me.locked=true;ui.sel=null;ui.reveal=false;ui.last=null;save();render();window.scrollTo(0,0);toast('Verdeckt. Viel Spaß!')}break;
+ case'unlock':if(!t.dataset.ok&&S.me.answered.length){sheet(`<h3>Kristalle neu legen?</h3><p>Du hast schon ${S.me.answered.length} Fragen beantwortet. Wenn du umlegst, stimmen die alten Antworten nicht mehr.</p><div class="row"><button class="btn" data-act="close">Abbrechen</button><button class="btn primary grow" data-act="unlock" data-ok="1">Trotzdem neu legen</button></div>`);break}
   S.me.locked=false;S.me.answered=[];ui.last=null;close();save();render();break;
  case'reveal':ui.reveal=!ui.reveal;render();break;
  case'tool':ui.tool=t.dataset.tool;render();break;
  case'hl':if(ev.target.closest('.x'))break;{const i=+t.dataset.i;ui.hl=ui.hl===i?null:i;ui.anim=ui.hl!=null;render();window.scrollTo({top:0,behavior:'smooth'})}break;
  case'rm':{const i=+t.dataset.i;S.opp.log.splice(i,1);ui.hl=null;save();render();toast('Eintrag gelöscht')}break;
- case'aout':ask.out=+t.dataset.k;askSheet();break;
- case'acol':{const n=t.dataset.n;ask.colors=ask.colors.includes(n)?ask.colors.filter(x=>x!==n):[...ask.colors,n];askSheet()}break;
- case'asave':S.opp.log.push({n:ask.n,out:ask.out,colors:CNAMES.filter(n=>ask.colors.includes(n))});ui.hl=S.opp.log.length-1;ui.anim=true;save();close();render();break;
+ case'aout':ask.out=+t.dataset.k;if(ask.out===0)ask.colors=[];else if(ask.colors&&!ask.colors.length&&ask.wasAb)ask.colors=null;ask.wasAb=ask.out===0;askSheet();break;
+ case'acol':ask.colors=mixes()[+t.dataset.i].slice();askSheet();break;
+ case'asave':S.opp.log.push({n:ask.n,out:ask.out,colors:ask.out===0?[]:ask.colors.slice()});ui.hl=S.opp.log.length-1;ui.anim=true;save();close();render();break;
+ case'sval':scanAsk.val=t.dataset.v;scanSheet();break;
+ case'ssave':S.opp.log.push({scan:scanAsk.cell,val:scanAsk.val});ui.hl=S.opp.log.length-1;save();close();render();break;
  case'solve':{if(!complete(S.opp.guess))break;
-  if(S.mode==='solo'){if(same(S.opp.guess,S.secret)){S.opp.solved=true;ui.hl=null;save();render();sheet(`<h3 class="win">Gefunden!</h3><p>Mit <b>${S.opp.log.length} Fragen</b>${S.opp.fails?` und ${S.opp.fails} Fehlversuch${S.opp.fails>1?'en':''}`:''}. Unter 12 Fragen ist richtig stark.</p><div class="row"><button class="btn" data-act="close">Ansehen</button><button class="btn primary grow" data-act="new" data-mode="solo">Nächstes Rätsel</button></div>`)}
+  if(S.mode==='solo'){if(same(S.opp.guess,S.secret)){S.opp.solved=true;ui.hl=null;save();render();const q=S.opp.log.length;sheet(`<h3 class="win">Gefunden!</h3><p>Mit <b>${q} ${plural(q,'Frage','Fragen')}</b>${S.opp.fails?` und ${S.opp.fails} ${plural(S.opp.fails,'Fehlversuch','Fehlversuchen')}`:''}.</p><div class="row"><button class="btn" data-act="close">Ansehen</button><button class="btn primary grow" data-act="new" data-mode="solo">Nächstes Rätsel</button></div>`)}
    else{S.opp.fails++;save();render();toast('Stimmt noch nicht. Schau dir die ✗ in der Liste an.')}break}
   sheet(`<h3>Dein Lösungs-Code</h3><p>Sag oder schick ihn deinem Gegenüber. Es gibt ihn bei <b>Mein Feld → Lösung prüfen</b> ein.</p><div class="code">${encode(S.opp.guess)}</div><div class="row"><button class="btn grow" data-act="copy" data-c="${encode(S.opp.guess)}">Kopieren</button><button class="btn primary grow" data-act="close">Fertig</button></div>`);break}
  case'copy':navigator.clipboard&&navigator.clipboard.writeText(t.dataset.c).then(()=>toast('Kopiert'),()=>toast('Kopieren ging nicht'));break;
- case'verify':sheet(`<h3>Lösung prüfen</h3><p>Gib den 15-stelligen Code deines Gegenübers ein.</p><input id="code" inputmode="numeric" autocomplete="off" placeholder="z. B. 120 510 650 641 233"><div id="vres"></div><div class="row"><button class="btn" data-act="close">Schließen</button><button class="btn primary grow" data-act="vcheck">Prüfen</button></div>`);setTimeout(()=>$('#code')&&$('#code').focus(),50);break;
+ case'verify':sheet(`<h3>Lösung prüfen</h3><p>Gib den ${NAMES.length*3}-stelligen Code deines Gegenübers ein.</p><input id="code" inputmode="numeric" autocomplete="off" placeholder="${NAMES.map(()=>'000').join(' ')}"><div id="vres"></div><div class="row"><button class="btn" data-act="close">Schließen</button><button class="btn primary grow" data-act="vcheck">Prüfen</button></div>`);setTimeout(()=>$('#code')&&$('#code').focus(),50);break;
  case'vcheck':{const G=decode($('#code').value);const el=$('#vres');
-  if(!G){el.innerHTML='<div class="verdict bad">Code ungültig. Er hat 15 Ziffern.</div>';break}
-  const ok=same(G,S.me.pieces);el.innerHTML=ok?'<div class="verdict ok">Stimmt! Dein Gegenüber hat gewonnen.</div>':'<div class="verdict bad">Stimmt nicht. 2 Züge aussetzen.</div>';break}
+  if(!G){el.innerHTML=`<div class="verdict bad">Code ungültig. Er hat ${NAMES.length*3} Ziffern. Habt ihr dieselben Optionen?</div>`;break}
+  const ok=same(G,S.me.pieces);el.innerHTML=ok?'<div class="verdict ok">Stimmt! Dein Gegenüber hat gewonnen.</div>':'<div class="verdict bad">Stimmt nicht. Nach Originalregel hat dein Gegenüber damit verloren.</div>';break}
  case'giveup':if(!t.dataset.ok){sheet(`<h3>Lösung zeigen?</h3><p>Die Kristalle erscheinen gestrichelt auf deinem Feld.</p><div class="row"><button class="btn" data-act="close">Weitersuchen</button><button class="btn primary grow" data-act="giveup" data-ok="1">Zeigen</button></div>`);break}
   S.opp.revealed=true;save();close();render();break;
  case'close':close();break;
