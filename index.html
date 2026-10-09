@@ -117,13 +117,18 @@ input#code{width:100%;font:inherit;font-size:24px;font-weight:700;letter-spacing
 html.standalone header{padding-top:calc(env(safe-area-inset-top) + 24px)}
 .board,.chip{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
 @media (display-mode: standalone){
- nav#tabs{padding-bottom:max(6px,calc(env(safe-area-inset-bottom) - 20px))}
- body{padding-bottom:calc(52px + max(6px,calc(env(safe-area-inset-bottom) - 20px)))}
- #toast{bottom:calc(60px + max(6px,calc(env(safe-area-inset-bottom) - 20px)))}}
-html.standalone nav#tabs{padding-bottom:max(6px,calc(env(safe-area-inset-bottom) - 20px))}
-html.standalone body{padding-bottom:calc(52px + max(6px,calc(env(safe-area-inset-bottom) - 20px)))}
-html.standalone #toast{bottom:calc(60px + max(6px,calc(env(safe-area-inset-bottom) - 20px)))}
+ nav#tabs{padding-bottom:max(6px,calc(env(safe-area-inset-bottom) - 8px))}
+ body{padding-bottom:calc(52px + max(6px,calc(env(safe-area-inset-bottom) - 8px)))}
+ #toast{bottom:calc(60px + max(6px,calc(env(safe-area-inset-bottom) - 8px)))}}
+html.standalone nav#tabs{padding-bottom:max(6px,calc(env(safe-area-inset-bottom) - 8px))}
+html.standalone body{padding-bottom:calc(52px + max(6px,calc(env(safe-area-inset-bottom) - 8px)))}
+html.standalone #toast{bottom:calc(60px + max(6px,calc(env(safe-area-inset-bottom) - 8px)))}
 .chip{touch-action:none}
+.tray{display:flex;flex-wrap:wrap;gap:6px}
+.tray .chip{flex:1 1 calc((100% - (var(--per) - 1) * 6px) / var(--per));min-width:0}
+.btngrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.btngrid>.btn{width:100%;min-width:0;padding:0 8px}
+.btngrid>:last-child:nth-child(odd){grid-column:1/-1}
 </style></head>
 <body>
 <header><h1><svg viewBox="0 0 2 2"><polygon points="1,0 2,1 1,2 0,1" fill="#6A4BE0" stroke="#24213B" stroke-width=".12" stroke-linejoin="round"/><path d="M0,1H2" stroke="#fff" stroke-width=".08" opacity=".7"/></svg>Kristall-Echo</h1><button id="themebtn" data-act="theme" aria-label="Design"></button><button id="newbtn" data-act="newmenu">Neues Spiel</button></header>
@@ -314,12 +319,13 @@ function boardSVG(o){
 function miniSVG(n,o,u=12){const c=shape(n,o);const [w,h]=dims(c);return`<svg viewBox="-.15 -.15 ${w+.3} ${h+.3}" style="width:${(w+.3)*u}px;height:${(h+.3)*u}px">${pieceSVG(n,c)}</svg>`}
 
 /* ---------- Views ---------- */
-function tray(ctx){const P=ctx==='me'?S.me.pieces:S.opp.guess;
+function tray(ctx,extra=''){const P=ctx==='me'?S.me.pieces:S.opp.guess;
  const chips=NAMES.map(n=>{const o=P[n]?P[n].o:(ui.po[ctx][n]||0);const on=ui.sel===n;
   return`<button class="chip${on?' on':''}" data-act="pick" data-n="${n}" aria-pressed="${on}">${miniSVG(n,o)}<span>${SHORT[COLOR[n]]}</span><span class="st">${P[n]?'liegt':'—'}</span></button>`}).join('');
  const has=ui.sel!=null,placed=has&&P[ui.sel];
- return`<div class="tray">${chips}</div>
- <div class="row tools"><button class="btn" data-act="rot" ${has?'':'disabled'}>Drehen</button>${OPTS.mirror?`<button class="btn" data-act="mir" ${has?'':'disabled'}>Spiegeln</button>`:''}<button class="btn" data-act="del" ${placed?'':'disabled'}>Wegnehmen</button></div>`}
+ const per=NAMES.length<=5?NAMES.length:Math.ceil(NAMES.length/2);
+ return`<div class="tray" style="--per:${per}">${chips}</div>
+ <div class="btngrid"><button class="btn" data-act="rot" ${has?'':'disabled'}>Drehen</button>${OPTS.mirror?`<button class="btn" data-act="mir" ${has?'':'disabled'}>Spiegeln</button>`:''}<button class="btn" data-act="del" ${placed?'':'disabled'}>Wegnehmen</button>${extra}</div>`}
 
 function viewStart(){return`<section class="hero">
  <h2>Licht rein, Farbe raus.</h2>
@@ -337,8 +343,7 @@ function viewMe(){const M=S.me;
  if(!M.locked){const n=NAMES.filter(x=>M.pieces[x]).length,N=NAMES.length;
   return`<p class="hint">Versteck deine ${N} Kristalle: aufs Feld ziehen oder antippen und dann aufs Feld tippen. Steine dürfen sich nur an Ecken berühren.</p>
   <div class="board" data-ctx="me">${boardSVG({ctx:'me',pieces:M.pieces,sel:ui.sel,cells:true})}</div>
-  ${tray('me')}
-  <div class="row"><button class="btn" data-act="random">Zufällig verteilen</button><button class="btn primary grow" data-act="lock" ${n===N?'':'disabled'}>Verdecken (${n}/${N})</button></div>
+  ${tray('me',`<button class="btn" data-act="random">Zufällig verteilen</button><button class="btn primary" data-act="lock" ${n===N?'':'disabled'}>Verdecken (${n}/${N})</button>`)}
   <p class="hint small">Optionen: ${optSummary()}</p>`}
  const labels={};M.answered.forEach(a=>{if(!a.scan){labels[a.n]='used';if(a.out)labels[a.out]='used'}});
  const L=ui.last;if(L&&!L.scan){labels[L.n]='hl';if(L.out)labels[L.out]='hl'}
@@ -416,7 +421,10 @@ function render(){
 
 /* ---------- Sheets & toast ---------- */
 let tt;function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('show'),2800)}
-function sheet(html){$('#toast').classList.remove('show');$('#sheet').innerHTML=`<div class="back" data-act="close"></div><div class="panel" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div>`;$('#sheet').classList.add('open')}
+function sheet(html){$('#toast').classList.remove('show');const w=$('#sheet');const pnl=w.classList.contains('open')&&w.querySelector('.panel');
+ // Schon offen: nur den Inhalt tauschen, damit das Blatt nicht neu hereinanimiert und die Scrollposition bleibt
+ if(pnl){const st=pnl.scrollTop;pnl.innerHTML=`<div class="grab"></div>${html}`;pnl.scrollTop=st;return}
+ w.innerHTML=`<div class="back" data-act="close"></div><div class="panel" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div>`;w.classList.add('open')}
 function close(){$('#sheet').classList.remove('open');$('#sheet').innerHTML=''}
 function setupSheet(){const u=ui.setup,o=u.opts;const busy=S.mode&&(S.opp.log.length||S.me.answered.length)&&!(S.mode==='solo'&&S.opp.solved);
  const tg=(k,t,d)=>`<button class="opt${o[k]?' on':''}" data-act="sopt" data-k="${k}" role="switch" aria-checked="${!!o[k]}"><span><b>${t}</b><small>${d}</small></span><i class="sw"></i></button>`;
