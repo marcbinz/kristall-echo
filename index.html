@@ -175,6 +175,30 @@ table.days td{padding:9px 12px;border-top:1px solid var(--rowline)}
 table.days td.best{font-weight:800;color:var(--am)}
 table.days td.best::after{content:' 🏆';font-size:12px}
 .dopts{color:var(--am);font-weight:600}
+.stonepick{align-items:center}.stonepick .chev,.chev{font-size:26px;color:var(--muted);line-height:1}
+.minis{display:flex;flex-wrap:wrap;align-items:flex-end;gap:4px;margin-top:6px}
+.shead{display:flex;align-items:center;gap:8px}.shead h3{margin:8px 0}
+.back-btn{border:0;background:var(--slab);color:var(--ink);width:36px;height:36px;border-radius:50%;font-size:26px;line-height:1;padding:0 0 3px;box-shadow:inset 0 0 0 1.5px var(--line)}
+.presets{display:flex;flex-direction:column;gap:8px}
+.preset{display:block;width:100%;text-align:left;border:1.5px solid var(--line);background:var(--slab);border-radius:14px;padding:10px 14px}
+.preset b{display:block;font-size:15px}.preset small{color:var(--muted);font-size:13px}
+.preset.on{border-color:var(--am);box-shadow:inset 0 0 0 1.5px var(--am);background:var(--am-soft)}
+.budget{position:sticky;top:-6px;z-index:2;background:var(--rock);padding:12px 0 8px;margin-top:8px;display:flex;align-items:center;gap:10px}
+.budget .bar{flex:1;height:10px;border-radius:99px;background:var(--seg);overflow:hidden}
+.budget .bar i{display:block;height:100%;background:var(--am);border-radius:99px;transition:width .2s}
+.budget.full .bar i{background:var(--bad)}
+.budget span{font-size:14px;white-space:nowrap}
+.shrow{margin:10px 0}
+.shlab{font-weight:700;font-size:14px;margin:0 2px 6px}.shlab small{font-weight:400;color:var(--muted);margin-left:6px}
+.cgrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.ccard{position:relative;display:grid;place-items:center;min-height:52px;border:1.5px solid var(--line);background:var(--slab);border-radius:12px;cursor:pointer;-webkit-user-select:none;user-select:none}
+.ccard.on{border-color:var(--am);background:var(--am-soft)}
+.ccard.dis{opacity:.35}
+.ccard .cnt{position:absolute;top:-7px;right:-5px;min-width:20px;height:20px;border-radius:99px;background:var(--am);color:#fff;font-size:12px;font-weight:800;display:grid;place-items:center;padding:0 5px}
+.ccard .csub{position:absolute;bottom:-7px;left:-5px;width:22px;height:22px;border-radius:50%;background:var(--pri-bg);color:var(--pri-fg);font-size:16px;font-weight:800;display:grid;place-items:center;line-height:1}
+/* Nirgends versehentlich Text markieren – außer im Code-Eingabefeld */
+*{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
 </style></head>
 <body>
 <header><h1><svg viewBox="0 0 2 2"><polygon points="1,0 2,1 1,2 0,1" fill="#6A4BE0" stroke="#24213B" stroke-width=".12" stroke-linejoin="round"/><path d="M0,1H2" stroke="#fff" stroke-width=".08" opacity=".7"/></svg>Kristall-Echo</h1><button id="themebtn" data-act="theme" aria-label="Design"></button><button id="newbtn" data-act="newmenu">Neues Spiel</button></header>
@@ -188,20 +212,54 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 </script>
 <script>
 const COLS=10,ROWS=8;
-const TRI4=[[1,0,'SE'],[2,0,'SW'],[0,1,'SE'],[1,1,'F'],[2,1,'F'],[3,1,'SW']];
-const TRI2=[[0,0,'SW'],[0,1,'F'],[1,1,'SW']];
-const TRI1=[[0,0,'SE'],[1,0,'SW']]; // kleines Dreieck, 2 breit, 1 hoch
-const RAUTE3=[[0,0,'SE'],[1,0,'F'],[2,0,'NW']];
-const BASE={rot:RAUTE3,gelb:TRI2,blau:TRI4,weissR:[[0,0,'SE'],[1,0,'SW'],[0,1,'NE'],[1,1,'NW']],weissT:TRI4,
- trans:TRI1,schwarz:TRI1};
-const COLOR={rot:'rot',gelb:'gelb',blau:'blau',weissR:'weiss',weissT:'weiss',trans:'trans',schwarz:'schwarz'};
-const DEFAULT_OPTS={color:'orig',mirror:false,touch:false,noscan:false,trans:false,schwarz:false,helper:false};
+// ---- Formen (aus ganzen und halben Kästchen) ----
+const SHAPES={
+ raute3:{name:'Raute',cells:[[0,0,'SE'],[1,0,'F'],[2,0,'NW']]},
+ tri2:{name:'Dreieck klein',cells:[[0,0,'SW'],[0,1,'F'],[1,1,'SW']]},
+ tri4:{name:'Dreieck groß',cells:[[1,0,'SE'],[2,0,'SW'],[0,1,'SE'],[1,1,'F'],[2,1,'F'],[3,1,'SW']]},
+ dia2:{name:'Diamant',cells:[[0,0,'SE'],[1,0,'SW'],[0,1,'NE'],[1,1,'NW']]},
+ tri1:{name:'Spitze',cells:[[0,0,'SE'],[1,0,'SW']]},
+ sq1:{name:'Quadrat',cells:[[0,0,'F']]},
+ trap3:{name:'Trapez',cells:[[0,0,'SE'],[1,0,'F'],[2,0,'SW']]},
+ sand2:{name:'Sanduhr',cells:[[0,0,'NE'],[1,0,'NW'],[0,1,'SE'],[1,1,'SW']]},
+ raute2:{name:'Raute klein',cells:[[0,0,'SE'],[1,0,'NW']]},
+ pfeil2:{name:'Pfeil',cells:[[0,0,'NE'],[1,0,'SW'],[0,1,'SE'],[1,1,'NW']]},
+ hex4:{name:'Sechseck',cells:[[0,0,'SE'],[1,0,'F'],[2,0,'SW'],[0,1,'NE'],[1,1,'F'],[2,1,'NW']]},
+ blitz3:{name:'Blitz',cells:[[0,0,'SE'],[1,0,'F'],[1,1,'F'],[2,1,'NW']]},
+};
+const SHAPE_ORDER=Object.keys(SHAPES);
+const STONE_COLORS=['rot','gelb','blau','weiss','trans','schwarz'];
+const MAX_BLOCKS=20; // ein Viertel des Felds
+function shapeArea(s){return SHAPES[s].cells.reduce((a,c)=>a+(c[2]==='F'?1:.5),0)}
+const ST=(id,shape,color)=>({id,shape,color});
+const STD=[ST('rot','raute3','rot'),ST('gelb','tri2','gelb'),ST('blau','tri4','blau'),ST('weissR','dia2','weiss'),ST('weissT','tri4','weiss')];
+const XT=ST('trans','tri1','trans'),XB=ST('schwarz','tri1','schwarz');
+const PRESETS={
+ std:{name:'Standard',desc:'Die 5 Steine aus dem Original',stones:STD},
+ std_t:{name:'Standard + Transparent',desc:'Mit dem farblosen Ablenker',stones:[...STD,XT]},
+ std_b:{name:'Standard + Schwarz',desc:'Mit dem Strahl-Schlucker',stones:[...STD,XB]},
+ std_tb:{name:'Standard + beide',desc:'Transparent und Schwarz',stones:[...STD,XT,XB]},
+ easy:{name:'Einsteiger',desc:'Nur 3 Steine, gut zum Lernen',stones:[ST('rot','raute3','rot'),ST('gelb','tri2','gelb'),ST('blau','tri4','blau')]},
+ geo:{name:'Geometrie',desc:'Sanduhr, Trapez, kleine Raute, Quadrat',stones:[ST('g2-rot','sand2','rot'),ST('g2-gelb','trap3','gelb'),ST('g2-blauR','raute2','blau'),ST('g2-blauT','tri4','blau'),ST('g2-weissQ','sq1','weiss'),ST('g2-weissD','dia2','weiss')]},
+ max:{name:'Profi',desc:'Standard plus Trapez, Quadrat, Transparent, Schwarz',stones:[...STD,ST('x-gelb','trap3','gelb'),ST('x-schwarz','sq1','schwarz'),XT]},
+};
+// Eigene Auswahl: {"shape|color":anzahl} -> Steinliste in fester Reihenfolge
+function customStones(c){const out=[];for(const sh of SHAPE_ORDER)for(const col of STONE_COLORS){const k=sh+'|'+col,n=(c&&c[k])||0;for(let i=0;i<n;i++)out.push(ST(`${sh}-${col}-${i}`,sh,col))}return out}
+function stonesOf(o){if(o.preset==='custom')return customStones(o.custom);
+ if(!o.preset&&(o.trans||o.schwarz))return PRESETS[o.trans&&o.schwarz?'std_tb':o.trans?'std_t':'std_b'].stones; // alte Spielstände
+ return(PRESETS[o.preset]||PRESETS.std).stones}
+function blocksOf(stones){return stones.reduce((a,s)=>a+shapeArea(s.shape),0)}
+const BASE={},COLOR={},SHAPE_OF={};
+const DEFAULT_OPTS={color:'orig',mirror:false,touch:false,noscan:false,preset:'std',custom:null,helper:false};
 
-let OPTS={...DEFAULT_OPTS},NAMES=[],TINT=[];
-function applyOpts(o){OPTS={...DEFAULT_OPTS,...(o||{})};OPTS.scan=!OPTS.noscan; // Direkter Scan ist Standard
-
- NAMES=['rot','gelb','blau','weissR','weissT',...(OPTS.trans?['trans']:[]),...(OPTS.schwarz?['schwarz']:[])];
+let OPTS={...DEFAULT_OPTS},NAMES=[],TINT=[],STONES=[];
+function applyOpts(o){OPTS={...DEFAULT_OPTS,...(o||{})};if(o&&!o.preset&&(o.trans||o.schwarz))OPTS.preset=null;OPTS.scan=!OPTS.noscan; // Direkter Scan ist Standard
+ STONES=stonesOf(OPTS);for(const k in BASE){delete BASE[k];delete COLOR[k];delete SHAPE_OF[k]}
+ for(const s of STONES){BASE[s.id]=SHAPES[s.shape].cells;COLOR[s.id]=s.color;SHAPE_OF[s.id]=s.shape}
+ NAMES=STONES.map(s=>s.id);
  TINT=OPTS.color==='orig'?['rot','gelb','blau','weiss']:['rot','gelb','blau']}
+function hasColor(c){return STONES.some(s=>s.color===c)}
+function stoneSig(o=OPTS){if(o.preset&&o.preset!=='custom')return o.preset;return stonesOf(o).map(s=>SHAPE_ORDER.indexOf(s.shape).toString(36)+STONE_COLORS.indexOf(s.color)).join('')}
 applyOpts();
 function lab(n){if(n===0)return'–';if(n<=18)return String(n);if(n<=28)return String.fromCharCode(73+(28-n));return String.fromCharCode(65+(36-n))}
 function cellName(x,y){return String.fromCharCode(65+y)+(x+1)}
@@ -261,10 +319,12 @@ function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a
 function hashStr(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
 // Tagesrätsel: Optionen aus dem Datum gewürfelt – zufällig, aber für alle gleich. Logik-Hilfe bleibt aus (fair).
 function dailyOpts(date){const r=mulberry32(hashStr('KE-opts-'+date));
- return{...DEFAULT_OPTS,color:r()<.65?'orig':'house',mirror:r()<.3,touch:r()<.3,noscan:r()<.2,trans:r()<.35,schwarz:r()<.35,helper:false}}
+ const o={...DEFAULT_OPTS,color:r()<.65?'orig':'house',mirror:r()<.3,touch:r()<.3,noscan:r()<.2,helper:false};
+ const p=r(),W=[['std',.3],['std_t',.15],['std_b',.15],['std_tb',.1],['geo',.18],['max',.12]];let acc=0;o.preset='std';for(const [k,w] of W){acc+=w;if(p<acc){o.preset=k;break}}
+ return o}
 function seededLayout(seed){const old=RNG;RNG=mulberry32(hashStr(seed));try{return randomLayout()}finally{RNG=old}}
 // Logik-Hilfe: nur sichere Schlüsse
-function colorlessDeflectors(){return OPTS.color==='house'||OPTS.trans}
+function colorlessDeflectors(){return OPTS.color==='house'||hasColor('trans')}
 function sureEmpty(log){const s=new Set();const straight=!colorlessDeflectors();
  for(const e of log){
   if(e.scan){if(e.val==='leer')s.add(e.scan.join(','));continue}
@@ -338,12 +398,13 @@ const dots=c=>c.length?`<i class="dot" style="background:${mixColor(c)}"></i>`:'
 const ans=(out,c)=>out===0?'absorbiert':`raus bei ${lab(out)}, ${colorText(c)}`;
 const vdot=v=>v==='leer'?'<i class="dot none"></i>':`<i class="dot" style="background:${FILL[v]}"></i>`;
 const plural=(n,a,b)=>n===1?a:b;
-function optSummary(o=OPTS){const t=[o.color==='orig'?'Original-Farben':'Weiß färbt nicht'];if(o.mirror)t.push('Spiegeln');if(o.touch)t.push('Kantenkontakt');if(o.helper)t.push('Logik-Hilfe');if(!o.scan)t.push('Ohne Scan');if(o.trans)t.push('Transparent');if(o.schwarz)t.push('Schwarz');return t.join(', ')}
+function presetName(o){if(o.preset==='custom')return'Eigene Auswahl';const k=o.preset||(o.trans&&o.schwarz?'std_tb':o.trans?'std_t':o.schwarz?'std_b':'std');return(PRESETS[k]||PRESETS.std).name}
+function optSummary(o=OPTS){const t=[o.color==='orig'?'Original-Farben':'Weiß färbt nicht'];if(o.mirror)t.push('Spiegeln');if(o.touch)t.push('Kantenkontakt');if(o.helper)t.push('Logik-Hilfe');if(o.scan===false||o.noscan)t.push('Ohne Scan');const p=presetName(o);if(p!=='Standard')t.push('Steine: '+p);return t.join(', ')}
 
 /* ---------- SVG ---------- */
-function pieceSVG(n,cells,o={}){let f='',ed={};
+function pieceSVG(n,cells,o={}){let f='',ed={};const col=o.color||COLOR[n];
  for(const [x,y,k] of cells){const p=polyOf(k).map(([a,b])=>[x+a,y+b]);
-  f+=`<polygon points="${p.map(q=>q.join(',')).join(' ')}" fill="${fillOf(COLOR[n])}" stroke="${fillOf(COLOR[n])}" stroke-width=".03"/>`;
+  f+=`<polygon points="${p.map(q=>q.join(',')).join(' ')}" fill="${fillOf(col)}" stroke="${fillOf(col)}" stroke-width=".03"/>`;
   p.forEach((q,i)=>{const r=p[(i+1)%p.length];const kk=[q.join(','),r.join(',')].sort().join('|');ed[kk]=(ed[kk]||0)+1})}
  let e='';for(const [kk,c] of Object.entries(ed))if(c===1){const [a,b]=kk.split('|');e+=`M${a}L${b}`}
  if(o.ghost)return`<path d="${e}" fill="none" stroke="${T.outline}" stroke-width=".08" stroke-dasharray=".18 .12" opacity=".8"/>`;
@@ -399,6 +460,7 @@ function boardSVG(o){
   s+=`<rect data-label="${n}" x="${ex}" y="${ey}" width="1" height="1" fill="transparent" pointer-events="fill"/>`}
  if(ui.drag&&ui.drag.ctx===o.ctx)s+=`<g id="snapG" pointer-events="none"></g><g id="dragG" pointer-events="none"></g>`;
  return s+'</svg>'}
+function miniShapeSVG(sh,color,u=10){const c=SHAPES[sh].cells;const [w,h]=dims(c);return`<svg viewBox="-.15 -.15 ${w+.3} ${h+.3}" style="width:${(w+.3)*u}px;height:${(h+.3)*u}px">${pieceSVG(null,c,{color})}</svg>`}
 function miniSVG(n,o,u=12){const c=shape(n,o);const [w,h]=dims(c);return`<svg viewBox="-.15 -.15 ${w+.3} ${h+.3}" style="width:${(w+.3)*u}px;height:${(h+.3)*u}px">${pieceSVG(n,c)}</svg>`}
 
 /* ---------- Views ---------- */
@@ -406,7 +468,7 @@ function tray(ctx,extra=''){const P=ctx==='me'?S.me.pieces:S.opp.guess;
  const chips=NAMES.map(n=>{const o=P[n]?P[n].o:(ui.po[ctx][n]||0);const on=ui.sel===n;
   return`<button class="chip${on?' on':''}" data-act="pick" data-n="${n}" aria-pressed="${on}">${miniSVG(n,o)}<span>${SHORT[COLOR[n]]}</span><span class="st">${P[n]?'liegt':'—'}</span></button>`}).join('');
  const has=ui.sel!=null,placed=has&&P[ui.sel];
- const per=NAMES.length<=5?NAMES.length:Math.ceil(NAMES.length/2);
+ const rows=Math.ceil(NAMES.length/5)||1,per=Math.ceil(NAMES.length/rows);
  return`<div class="tray" style="--per:${per}">${chips}</div>
  <div class="btngrid"><button class="btn" data-act="rot" ${has?'':'disabled'}>Drehen</button>${OPTS.mirror?`<button class="btn" data-act="mir" ${has?'':'disabled'}>Spiegeln</button>`:''}<button class="btn" data-act="del" ${placed?'':'disabled'}>Wegnehmen</button>${extra}</div>`}
 
@@ -495,7 +557,7 @@ function viewRules(){const N=NAMES.length;const leg=NAMES.map(n=>`<span class="l
  <h3>Ein Zug</h3>
  <ol><li>Du nennst einen Punkt vom Rand, z.&nbsp;B. „7“ oder „C“${OPTS.scan?', oder ein Feld wie „C3“ (direkter Scan)':''}.</li><li>Dein Gegenüber tippt ihn bei <b>Mein Feld</b> an. Das Handy rechnet und zeigt die Antwort.</li><li>Du tippst bei <b>Gegner</b> dasselbe an und trägst die Antwort ein.</li></ol>
  <h3>Wie der Strahl läuft</h3>
- <ul><li>Geradeaus von Kästchen zu Kästchen.</li><li>Schräge Kante: biegt um 90° ab. Gerade Kante: prallt zurück.</li>${colorRule}<li>Jede Farbe zählt nur einmal. Ohne Kontakt bleibt er farblos.</li>${OPTS.trans?'<li><b>Transparent</b> lenkt ab, färbt aber nicht.</li>':''}${OPTS.schwarz?'<li><b>Schwarz</b> schluckt den Strahl. Antwort: „absorbiert“. Beim Lösen zählt beim schwarzen Stein nur die Position, nicht die Drehung.</li>':''}</ul>
+ <ul><li>Geradeaus von Kästchen zu Kästchen.</li><li>Schräge Kante: biegt um 90° ab. Gerade Kante: prallt zurück.</li>${colorRule}<li>Jede Farbe zählt nur einmal. Ohne Kontakt bleibt er farblos.</li>${hasColor('trans')?'<li><b>Transparent</b> lenkt ab, färbt aber nicht.</li>':''}${hasColor('schwarz')?'<li><b>Schwarz</b> schluckt den Strahl. Antwort: „absorbiert“. Beim Lösen zählt beim schwarzen Stein nur die Position, nicht die Drehung.</li>':''}</ul>
  ${OPTS.scan?'<h3>Direkter Scan</h3><p>Statt eines Strahls fragst du nach einem Feld, z.&nbsp;B. „C3“. Die Antwort ist die Farbe des Steins dort oder „leer“.</p>':''}
  <h3>Lösen</h3>
  <p>Leg deine Vermutung im Gegner-Feld und tippe <b>Lösung prüfen</b>. Du bekommst einen QR-Code. Dein Gegenüber scannt ihn bei <b>Mein Feld → Lösung prüfen</b>. Der Zahlencode darunter funktioniert genauso, z.&nbsp;B. per Nachricht. Nach Originalregel gilt: richtig = gewonnen, falsch = verloren.</p>
@@ -527,30 +589,47 @@ function sheet(html){$('#toast').classList.remove('show');const w=$('#sheet');co
  if(pnl){const st=pnl.scrollTop;pnl.innerHTML=`<div class="grab"></div>${html}`;pnl.scrollTop=st;return}
  lockScroll();w.innerHTML=`<div class="back" data-act="close"></div><div class="panel" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div>`;w.classList.add('open')}
 function close(){stopScan();$('#sheet').classList.remove('open');$('#sheet').innerHTML='';unlockScroll()}
-function setupSheet(){const u=ui.setup,o=u.opts;const busy=S.mode&&(S.opp.log.length||S.me.answered.length)&&!(isSolo()&&(S.opp.solved||S.opp.revealed));
+function setupSheet(){const u=ui.setup,o=u.opts;if(u.view==='stones')return stonesSheet();
+ const busy=S.mode&&(S.opp.log.length||S.me.answered.length)&&!(isSolo()&&(S.opp.solved||S.opp.revealed));
  const tg=(k,t,d)=>`<button class="opt${o[k]?' on':''}" data-act="sopt" data-k="${k}" role="switch" aria-checked="${!!o[k]}"><span><b>${t}</b><small>${d}</small></span><i class="sw"></i></button>`;
+ const st=stonesOf(o);
  sheet(`<h3>${u.mode==='duo'?'Gegeneinander':'Solo'}: Optionen</h3>
+ <h4>Steine</h4>
+ <button class="opt stonepick" data-act="stones"><span><b>${presetName(o)}</b><small>${st.length} ${plural(st.length,'Stein','Steine')} · ${blocksOf(st)} Blöcke</small><span class="minis">${st.map(s=>miniShapeSVG(s.shape,s.color,6)).join('')}</span></span><span class="chev">›</span></button>
  <h4>Farben</h4>
  <div class="seg"><button class="${o.color==='orig'?'on':''}" data-act="scol" data-v="orig">Standard (helle Töne)</button><button class="${o.color==='house'?'on':''}" data-act="scol" data-v="house">Weiß färbt nicht</button></div>
- <h4>Dazunehmen</h4>
+ <h4>Regeln</h4>
  ${tg('mirror','Spiegeln erlaubt','Steine dürfen auch gewendet werden.')}
  ${tg('touch','Kanten dürfen sich berühren','Steine dürfen direkt aneinanderliegen.')}
  ${tg('helper','Logik-Hilfe','Schraffiert Felder, die nach den Antworten sicher leer sind.')}
  ${tg('noscan','Ohne direkten Scan','Nur Strahlen, keine Feldabfragen wie C3.')}
- ${tg('trans','Stein „Transparent“','Lenkt ab, färbt nicht.')}
- ${tg('schwarz','Stein „Schwarz“','Schluckt den Strahl: „absorbiert“.')}
  ${u.mode==='duo'?'<p class="small">Stellt auf beiden Handys dasselbe ein.</p>':''}${busy?'<p class="small warn">Das laufende Spiel wird beendet.</p>':''}
  <div class="row"><button class="btn" data-act="close">Abbrechen</button><button class="btn primary grow" data-act="start">Spiel starten</button></div>`)}
+function countsOf(stones){const c={};for(const s of stones){const k=s.shape+'|'+s.color;c[k]=(c[k]||0)+1}return c}
+function stonesSheet(){const o=ui.setup.opts;const cur=o.preset||'std';
+ const card=(k,p)=>`<button class="preset${cur===k?' on':''}" data-act="preset" data-k="${k}"><span class="pt"><b>${p.name}</b><small>${p.desc} · ${blocksOf(p.stones)} Blöcke</small></span><span class="minis">${p.stones.map(s=>miniShapeSVG(s.shape,s.color,6)).join('')}</span></button>`;
+ let builder='';
+ if(cur==='custom'){const c=o.custom||{};const used=blocksOf(customStones(c));const pct=Math.min(100,used/MAX_BLOCKS*100);
+  builder=`<div class="budget${used>=MAX_BLOCKS?' full':''}"><div class="bar"><i style="width:${pct}%"></i></div><span><b>${used}</b> / ${MAX_BLOCKS} Blöcke</span></div>
+  ${SHAPE_ORDER.map(sh=>{const a=shapeArea(sh);return`<div class="shrow"><div class="shlab">${SHAPES[sh].name}<small>${a} ${plural(a,'Block','Blöcke')}</small></div><div class="cgrid">${STONE_COLORS.map(col=>{const k=sh+'|'+col,n=c[k]||0,blocked=used+a>MAX_BLOCKS;
+   return`<div class="ccard${n?' on':''}${blocked&&!n?' dis':''}" data-act="cadd" data-k="${k}" role="button" aria-label="${SHAPES[sh].name} ${LBL[col]}: ${n}">${miniShapeSVG(sh,col,Math.min(9,40/dims(SHAPES[sh].cells)[0]))}${n?`<span class="cnt">${n}</span><span class="csub" data-act="csub" data-k="${k}" aria-label="weniger">−</span>`:''}</div>`}).join('')}</div></div>`}).join('')}
+  <div class="row"><button class="link" data-act="cclear">Alle entfernen</button></div>`}
+ sheet(`<div class="shead"><button class="back-btn" data-act="sback" aria-label="Zurück">‹</button><h3>Steine</h3></div>
+ <div class="presets">${Object.entries(PRESETS).map(([k,p])=>card(k,p)).join('')}
+ <button class="preset${cur==='custom'?' on':''}" data-act="preset" data-k="custom"><span class="pt"><b>Eigene Auswahl</b><small>Formen und Farben frei kombinieren, bis ${MAX_BLOCKS} Blöcke</small></span></button></div>
+ ${builder}
+ <div class="row"><button class="btn primary grow" data-act="sback">Fertig</button></div>`)}
+
 let ask=null;
 function askSheet(){const a=ask;const ab=a.out===0;
  sheet(`<h3>Start ${lab(a.n)}: wo kam er raus?</h3>
  <div class="numgrid">${LABEL_ORDER.map(k=>`<button class="${a.out===k?'on':''}" data-act="aout" data-k="${k}">${lab(k)}</button>`).join('')}</div>
- ${OPTS.schwarz?`<button class="btn wide${ab?' sel':''}" data-act="aout" data-k="0">Absorbiert</button>`:''}
+ ${hasColor('schwarz')?`<button class="btn wide${ab?' sel':''}" data-act="aout" data-k="0">Absorbiert</button>`:''}
  ${ab?'':`<h4>Welche Farbe kam raus?</h4>
  <div class="row colors">${mixes().map((m,i)=>`<button class="cbtn${a.colors&&a.colors.join()===m.join()?' on':''}" data-act="acol" data-i="${i}">${dots(m)}<span>${colorText(m)}</span></button>`).join('')}</div>`}
  <div class="row"><button class="btn" data-act="close">Abbrechen</button><button class="btn primary grow" data-act="asave" ${a.out!=null&&(ab||a.colors)?'':'disabled'}>${a.out==null?'Ausgang wählen':ab?'Speichern: absorbiert':!a.colors?'Farbe wählen':`Speichern: ${lab(a.out)}, ${colorText(a.colors)}`}</button></div>`)}
 let scanAsk=null;
-function scanSheet(){const s=scanAsk;const vals=['leer','rot','gelb','blau','weiss',...(OPTS.trans?['trans']:[]),...(OPTS.schwarz?['schwarz']:[])];
+function scanSheet(){const s=scanAsk;const vals=['leer','rot','gelb','blau','weiss',...(hasColor('trans')?['trans']:[]),...(hasColor('schwarz')?['schwarz']:[])];
  sheet(`<h3>Scan ${cellName(...s.cell)}: was ist dort?</h3>
  <div class="row colors">${vals.map(v=>`<button class="cbtn${s.val===v?' on':''}" data-act="sval" data-v="${v}">${vdot(v)}<span>${SHORT[v]||'leer'}</span></button>`).join('')}</div>
  <div class="row"><button class="btn" data-act="close">Abbrechen</button><button class="btn primary grow" data-act="ssave" ${s.val?'':'disabled'}>${s.val?`Speichern: ${VALNAME[s.val]}`:'Antwort wählen'}</button></div>`)}
@@ -595,10 +674,19 @@ document.addEventListener('click',ev=>{
  const t=ev.target.closest('[data-act]');if(!t)return;const a=t.dataset.act;
  switch(a){
  case'tab':ui.tab=t.dataset.tab==='start'?'opp':t.dataset.tab;ui.sel=null;render();window.scrollTo(0,0);break;
- case'setup':ui.setup={mode:t.dataset.mode,opts:{...DEFAULT_OPTS,...(store.get(OKEY)||{})}};setupSheet();break;
+ case'setup':ui.setup={mode:t.dataset.mode,view:'main',opts:{...DEFAULT_OPTS,...(store.get(OKEY)||{})}};setupSheet();break;
  case'scol':ui.setup.opts.color=t.dataset.v;setupSheet();break;
  case'sopt':{const k=t.dataset.k;ui.setup.opts[k]=!ui.setup.opts[k];setupSheet()}break;
- case'start':startGame(ui.setup.mode,ui.setup.opts);break;
+ case'stones':ui.setup.view='stones';setupSheet();break;
+ case'sback':ui.setup.view='main';setupSheet();break;
+ case'preset':{const o=ui.setup.opts,k=t.dataset.k;if(k==='custom'&&o.preset!=='custom'&&!o.custom)o.custom=countsOf(stonesOf(o));o.preset=k;delete o.trans;delete o.schwarz;setupSheet()}break;
+ case'cadd':{const o=ui.setup.opts,k=t.dataset.k,c=o.custom=o.custom||{};const used=blocksOf(customStones(c)),a=shapeArea(k.split('|')[0]);
+  if(used+a>MAX_BLOCKS){toast(`Maximal ${MAX_BLOCKS} Blöcke`);break}c[k]=(c[k]||0)+1;setupSheet()}break;
+ case'csub':{const c=ui.setup.opts.custom||{},k=t.dataset.k;if(c[k]>1)c[k]--;else delete c[k];setupSheet()}break;
+ case'cclear':ui.setup.opts.custom={};setupSheet();break;
+ case'start':{const o=ui.setup.opts;const keep=S.opts;applyOpts(o);
+  const err=!STONES.length?'Wähl mindestens einen Stein aus.':!randomLayout()?'Diese Steine passen so nicht aufs Feld. Nimm weniger oder erlaube Kantenkontakt.':null;
+  if(err){applyOpts(keep);toast(err);break}startGame(ui.setup.mode,o)}break;
  case'new':startGame(t.dataset.mode,S.opts||DEFAULT_OPTS);break;
  case'newmenu':sheet(`<h3>Neues Spiel</h3><div class="stack">${dailyButton()}<button class="mode" data-act="setup" data-mode="duo"><b>Gegeneinander</b><span>Jeder auf seinem Handy.</span></button><button class="mode" data-act="setup" data-mode="solo"><b>Solo gegen das Handy</b><span>Das Handy versteckt, du suchst.</span></button></div><div class="row"><button class="btn grow" data-act="close">Abbrechen</button></div>`);break;
  case'pick':ui.sel=ui.sel===t.dataset.n?null:t.dataset.n;render();break;
@@ -606,7 +694,7 @@ document.addEventListener('click',ev=>{
  case'mir':transform(ctxNow(),mirO);break;
  case'del':{const Pc=P(ctxNow());if(ui.sel&&Pc[ui.sel]){ui.po[ctxNow()][ui.sel]=Pc[ui.sel].o;delete Pc[ui.sel];save();render()}break}
  case'random':{const R=randomLayout();if(!R){toast('Keine passende Verteilung gefunden – nochmal tippen');break}S.me.pieces=R;ui.sel=null;save();render()}break;
- case'lock':{const u=unreachable(S.me.pieces);if(u.length){ui.sel=u[0];render();toast(`${u.map(n=>LBL[COLOR[n]]).join(', ')}: von keinem Strahl erreichbar. Bitte anders legen.`);break}
+ case'lock':{const u=unreachable(S.me.pieces);if(u.length){ui.sel=u[0];render();toast(`${u.map(n=>LBL[COLOR[n]]+' '+SHAPES[SHAPE_OF[n]].name).join(', ')}: von keinem Strahl erreichbar. Bitte anders legen.`);break}
   S.me.locked=true;ui.sel=null;ui.reveal=false;ui.last=null;save();render();window.scrollTo(0,0);toast('Verdeckt. Viel Spaß!')}break;
  case'unlock':if(!t.dataset.ok&&S.me.answered.length){sheet(`<h3>Kristalle neu legen?</h3><p>Du hast schon ${S.me.answered.length} Fragen beantwortet. Wenn du umlegst, stimmen die alten Antworten nicht mehr.</p><div class="row"><button class="btn" data-act="close">Abbrechen</button><button class="btn primary grow" data-act="unlock" data-ok="1">Trotzdem neu legen</button></div>`);break}
   S.me.locked=false;S.me.answered=[];ui.last=null;close();save();render();break;
@@ -650,7 +738,7 @@ document.addEventListener('click',ev=>{
  case'theme':{const order=['auto','light','dark'];themePref=order[(order.indexOf(themePref)+1)%3];try{localStorage.setItem(TKEY,themePref)}catch(e){}applyTheme();render();toast('Design: '+THEMENAME[themePref])}break;
  }});
 /* ---------- QR ---------- */
-function optKey(o=OPTS){return(o.color==='orig'?'o':'h')+(o.mirror?'m':'')+(o.touch?'k':'')+(o.scan?'s':'')+(o.trans?'t':'')+(o.schwarz?'b':'')}
+function optKey(o=OPTS){return(o.color==='orig'?'o':'h')+(o.mirror?'m':'')+(o.touch?'k':'')+(o.scan?'s':'')+'.'+stoneSig(o)}
 function qrPayload(code){return`KE1|${code.replace(/\D/g,'')}|${optKey()}`}
 function qrSVG(text){const q=qrcode(0,'M');q.addData(text);q.make();const n=q.getModuleCount(),m=4;let d='';
  for(let y=0;y<n;y++)for(let x=0;x<n;x++)if(q.isDark(y,x))d+=`M${x+m},${y+m}h1v1h-1z`;
@@ -670,7 +758,7 @@ async function startScan(handler=onQR){startScan.h=handler;const box=$('#scanbox
   cam.raf=requestAnimationFrame(tick)}
  catch(e){const b=$('#scanbox');if(b)b.innerHTML=`<p class="small warn">${e.name==='NotAllowedError'?'Kein Kamerazugriff erlaubt.':'Kamera konnte nicht starten.'} Gib den Code unten ein.</p><button class="btn wide" data-act="rescan">Nochmal versuchen</button>`}}
 function stopScan(){if(!cam)return;cancelAnimationFrame(cam.raf);cam.stream.getTracks().forEach(t=>t.stop());cam=null}
-function onQR(txt){const m=/^KE1\|(\d+)\|([a-z]*)$/.exec(txt);const st=$('#scanstat');
+function onQR(txt){const m=/^KE1\|(\d+)\|([a-z0-9_.]*)$/.exec(txt);const st=$('#scanstat');
  if(!m){if(st)st.textContent='Das ist kein Kristall-Echo-Code';return}
  stopScan();const box=$('#scanbox');if(box)box.innerHTML='<p class="small ok">QR-Code erkannt ✓</p>';
  const inp=$('#code');if(inp)inp.value=m[1].replace(/(\d{3})(?=\d)/g,'$1 ');
