@@ -155,6 +155,26 @@ input#code{font-size:20px}
 .cbtn .dot{width:18px;height:18px}
 .panel{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .cbtn{font-size:clamp(11px,3.15vw,13px);padding:6px 2px;letter-spacing:-.01em}
+.turn{display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px;border-radius:16px;padding:10px 14px;margin:0 0 10px;background:var(--slab);box-shadow:inset 0 0 0 1.5px var(--line);font-size:14px;cursor:pointer}
+.turn b{font-size:15px}.turn span{color:var(--muted)}.turn small{flex-basis:100%;color:var(--muted);font-size:11px;opacity:.8}
+.turn .btn{min-height:36px;padding:0 14px;flex:1}
+.turn.me{background:var(--am);box-shadow:none;color:#fff}.turn.me span,.turn.me small,.turn.me span b{color:#fff}
+.turn.opp{background:var(--am-soft);box-shadow:none}
+.tdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--bad);margin-left:6px;vertical-align:middle}
+.helprow{margin-top:10px}.opt.mini{min-height:48px;margin:0}
+.dailytag{margin:0 4px 6px;font-size:13px;font-weight:700;color:var(--am);text-transform:uppercase;letter-spacing:.04em}
+.mode.daily{border-color:var(--am);background:linear-gradient(135deg,var(--am-soft),var(--slab))}
+.dh{margin-top:4px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:6px 0 4px}
+.stats div{background:var(--slab);border-radius:14px;padding:10px 4px;text-align:center}
+.stats b{display:block;font-size:22px;font-weight:800}.stats span{font-size:12px;color:var(--muted)}
+.tablewrap{background:var(--slab);border-radius:16px;overflow:hidden}
+table.days{width:100%;border-collapse:collapse;font-size:15px}
+table.days th{text-align:left;font-size:12px;color:var(--muted);font-weight:600;padding:10px 12px 6px}
+table.days td{padding:9px 12px;border-top:1px solid var(--rowline)}
+table.days td.best{font-weight:800;color:var(--am)}
+table.days td.best::after{content:' 🏆';font-size:12px}
+.dopts{color:var(--am);font-weight:600}
 </style></head>
 <body>
 <header><h1><svg viewBox="0 0 2 2"><polygon points="1,0 2,1 1,2 0,1" fill="#6A4BE0" stroke="#24213B" stroke-width=".12" stroke-linejoin="round"/><path d="M0,1H2" stroke="#fff" stroke-width=".08" opacity=".7"/></svg>Kristall-Echo</h1><button id="themebtn" data-act="theme" aria-label="Design"></button><button id="newbtn" data-act="newmenu">Neues Spiel</button></header>
@@ -175,7 +195,8 @@ const RAUTE3=[[0,0,'SE'],[1,0,'F'],[2,0,'NW']];
 const BASE={rot:RAUTE3,gelb:TRI2,blau:TRI4,weissR:[[0,0,'SE'],[1,0,'SW'],[0,1,'NE'],[1,1,'NW']],weissT:TRI4,
  trans:TRI1,schwarz:TRI1};
 const COLOR={rot:'rot',gelb:'gelb',blau:'blau',weissR:'weiss',weissT:'weiss',trans:'trans',schwarz:'schwarz'};
-const DEFAULT_OPTS={color:'orig',mirror:false,touch:false,noscan:false,trans:false,schwarz:false};
+const DEFAULT_OPTS={color:'orig',mirror:false,touch:false,noscan:false,trans:false,schwarz:false,helper:false};
+
 let OPTS={...DEFAULT_OPTS},NAMES=[],TINT=[];
 function applyOpts(o){OPTS={...DEFAULT_OPTS,...(o||{})};OPTS.scan=!OPTS.noscan; // Direkter Scan ist Standard
 
@@ -234,7 +255,22 @@ function trace(b,n){let [pos,d]=entry(n);const pts=[[pos[0]+.5,pos[1]+.5]],hit=[
  }}
 function unreachable(P){const b=boardOf(P),seen=new Set();for(let n=1;n<=36;n++)for(const i of trace(b,n).ids)seen.add(i);return NAMES.filter(n=>P[n]&&!seen.has(n))}
 function scanCell(P,x,y){const c=boardOf(P)[x+','+y];return c?COLOR[c.n]:'leer'}
-function rand(n){return Math.floor(Math.random()*n)}
+let RNG=Math.random;
+function rand(n){return Math.floor(RNG()*n)}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function hashStr(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+// Tagesrätsel: Optionen aus dem Datum gewürfelt – zufällig, aber für alle gleich. Logik-Hilfe bleibt aus (fair).
+function dailyOpts(date){const r=mulberry32(hashStr('KE-opts-'+date));
+ return{...DEFAULT_OPTS,color:r()<.65?'orig':'house',mirror:r()<.3,touch:r()<.3,noscan:r()<.2,trans:r()<.35,schwarz:r()<.35,helper:false}}
+function seededLayout(seed){const old=RNG;RNG=mulberry32(hashStr(seed));try{return randomLayout()}finally{RNG=old}}
+// Logik-Hilfe: nur sichere Schlüsse
+function colorlessDeflectors(){return OPTS.color==='house'||OPTS.trans}
+function sureEmpty(log){const s=new Set();const straight=!colorlessDeflectors();
+ for(const e of log){
+  if(e.scan){if(e.val==='leer')s.add(e.scan.join(','));continue}
+  if(straight&&e.out!==0&&e.colors.length===0){const r=trace({},e.n);if(r.out!==e.out)continue;
+   for(const [x,y] of r.pts.map(p=>[p[0]-.5,p[1]-.5]))if(x>=0&&y>=0&&x<COLS&&y<ROWS)s.add(x+','+y)}}
+ return s}
 function randomLayout(){const no=OPTS.mirror?8:4;
  for(let t=0;t<2000;t++){const P={};let ok=true;
   for(const n of NAMES){let done=false;for(let i=0;i<120;i++){const o=rand(no);const [w,h]=dims(shape(n,o));const p={x:rand(COLS-w+1),y:rand(ROWS-h+1),o};if(fits(P,n,p)){P[n]=p;done=true;break}}if(!done){ok=false;break}}
@@ -272,7 +308,7 @@ if(darkMQ){const f=()=>{if(themePref==='auto'){applyTheme();render()}};darkMQ.ad
 const KEY='kristall-echo-v2',OKEY='kristall-echo-opts';
 let mem=null;
 const store={get(k=KEY){try{return JSON.parse(localStorage.getItem(k))}catch(e){return k===KEY?mem:null}},set(v,k=KEY){if(k===KEY)mem=v;try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
-function fresh(mode,opts){applyOpts(opts);return{mode,opts:{...OPTS},me:{pieces:{},locked:false,answered:[]},opp:{guess:{},marks:{},log:[],fails:0,solved:false,revealed:false},secret:mode==='solo'?randomLayout():null}}
+function fresh(mode,opts){applyOpts(opts);const date=mode==='daily'?today():null;return{mode,date,turn:null,opts:{...OPTS},me:{pieces:{},locked:false,answered:[]},opp:{guess:{},marks:{},log:[],fails:0,solved:false,revealed:false},secret:mode==='solo'?randomLayout():mode==='daily'?seededLayout('KE-daily-'+date):null}}
 let S=store.get()||{mode:null};
 // Migration alter Spielstände (vor den Optionen): Hausregel + Spiegeln wie bisher
 if(S.mode&&!S.opts)S.opts={color:'house',mirror:true,touch:true,noscan:true,trans:false,schwarz:false};
@@ -280,6 +316,13 @@ applyOpts(S.opts);
 const ui={drag:null,tab:S.mode==='duo'?'me':'opp',sel:null,tool:'piece',hl:null,reveal:false,last:null,anim:false,po:{me:{},opp:{}},setup:null};
 function save(){store.set(S)}
 const $=s=>document.querySelector(s);
+const isSolo=()=>S.mode==='solo'||S.mode==='daily';
+const DKEY='kristall-echo-daily';
+function today(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function fmtDate(k,withYear){const [y,m,d]=k.split('-');return`${+d}.${+m}.${withYear?y:''}`}
+function dailyData(){const d=store.get(DKEY)||{};d.mine=d.mine||{};d.partner=d.partner||{};return d}
+function saveDaily(d){store.set(d,DKEY)}
+function recordDaily(st){if(S.mode!=='daily'||S.replay)return;const d=dailyData();if(d.mine[S.date])return;d.mine[S.date]={q:S.opp.log.length,f:S.opp.fails,st};saveDaily(d)}
 const MIXNAME={'':'farblos',rot:'Rot',gelb:'Gelb',blau:'Blau','rot,gelb':'Orange','rot,blau':'Lila','gelb,blau':'Grün','rot,gelb,blau':'Schwarz',
  weiss:'Weiß','rot,weiss':'Rosa','gelb,weiss':'Hellgelb','blau,weiss':'Hellblau','rot,gelb,weiss':'Hellorange','rot,blau,weiss':'Helllila','gelb,blau,weiss':'Hellgrün','rot,gelb,blau,weiss':'Grau'};
 const BASEMIX=[[],['rot'],['gelb'],['blau'],['rot','gelb'],['rot','blau'],['gelb','blau'],['rot','gelb','blau']];
@@ -295,7 +338,7 @@ const dots=c=>c.length?`<i class="dot" style="background:${mixColor(c)}"></i>`:'
 const ans=(out,c)=>out===0?'absorbiert':`raus bei ${lab(out)}, ${colorText(c)}`;
 const vdot=v=>v==='leer'?'<i class="dot none"></i>':`<i class="dot" style="background:${FILL[v]}"></i>`;
 const plural=(n,a,b)=>n===1?a:b;
-function optSummary(o=OPTS){const t=[o.color==='orig'?'Original-Farben':'Weiß färbt nicht'];if(o.mirror)t.push('Spiegeln');if(o.touch)t.push('Kantenkontakt');if(!o.scan)t.push('Ohne Scan');if(o.trans)t.push('Transparent');if(o.schwarz)t.push('Schwarz');return t.join(', ')}
+function optSummary(o=OPTS){const t=[o.color==='orig'?'Original-Farben':'Weiß färbt nicht'];if(o.mirror)t.push('Spiegeln');if(o.touch)t.push('Kantenkontakt');if(o.helper)t.push('Logik-Hilfe');if(!o.scan)t.push('Ohne Scan');if(o.trans)t.push('Transparent');if(o.schwarz)t.push('Schwarz');return t.join(', ')}
 
 /* ---------- SVG ---------- */
 function pieceSVG(n,cells,o={}){let f='',ed={};
@@ -331,9 +374,10 @@ function raySVG(r,anim){if(!r||!r.pts||r.pts.length<2)return'';const p=r.pts.map
  return halo+casing+core+ab+`<circle cx="${p[0][0]}" cy="${p[0][1]}" r=".17" fill="${CASE}"/><circle cx="${p[0][0]}" cy="${p[0][1]}" r=".1" fill="${mixColor([])}"/>`}
 function boardSVG(o){
  let s2='',svgS='';let s=`<svg viewBox="-1 -1 12 10" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Spielfeld">`;
- s+=`<rect x="0" y="0" width="10" height="8" fill="${T.board}"/>`;
+ s+=`<defs><pattern id="hatch" width=".25" height=".25" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width=".25" height=".25" fill="${T.board}"/><rect width=".09" height=".25" fill="${T.am}" opacity=".28"/></pattern></defs><rect x="0" y="0" width="10" height="8" fill="${T.board}"/>`;
  let g='';for(let i=1;i<COLS;i++)g+=`M${i},0V8`;for(let j=1;j<ROWS;j++)g+=`M0,${j}H10`;
  s+=`<path d="${g}" stroke="${T.grid}" stroke-width=".035"/>`;
+ if(o.help)for(const k of o.help){const [x,y]=k.split(',').map(Number);s+=`<rect x="${x}" y="${y}" width="1" height="1" fill="url(#hatch)"/>`}
  if(o.marks)for(const k of Object.keys(o.marks)){const [x,y]=k.split(',').map(Number);s+=`<path d="M${x+.36},${y+.36}L${x+.64},${y+.64}M${x+.64},${y+.36}L${x+.36},${y+.64}" stroke="#A39DBB" stroke-width=".07" stroke-linecap="round"/>`}
  if(o.scans)for(const s of o.scans){const [x,y]=s.scan;s.val==='leer'
    ?(svgS=`<circle cx="${x+.5}" cy="${y+.5}" r=".16" fill="none" stroke="#A39DBB" stroke-width=".06"/>`)
@@ -366,11 +410,15 @@ function tray(ctx,extra=''){const P=ctx==='me'?S.me.pieces:S.opp.guess;
  return`<div class="tray" style="--per:${per}">${chips}</div>
  <div class="btngrid"><button class="btn" data-act="rot" ${has?'':'disabled'}>Drehen</button>${OPTS.mirror?`<button class="btn" data-act="mir" ${has?'':'disabled'}>Spiegeln</button>`:''}<button class="btn" data-act="del" ${placed?'':'disabled'}>Wegnehmen</button>${extra}</div>`}
 
+function dailyButton(){const r=dailyData().mine[today()];
+ return`<button class="mode daily" data-act="daily"><b>Tagesrätsel ${fmtDate(today())}</b><span>${r?(r.st==='solved'?`Heute gelöst mit ${r.q} ${plural(r.q,'Frage','Fragen')}. Lösung ansehen.`:'Heute aufgegeben. Lösung ansehen.'):'Jeden Tag ein neues Feld, für alle gleich. Vergleicht eure Fragen.'}<br><small class="dopts">Heute: ${optSummary(applyDailyPreview())}</small></span></button>`}
+function applyDailyPreview(){const o={...dailyOpts(today())};o.scan=!o.noscan;return o}
 function viewStart(){return`<section class="hero">
  <h2>Licht rein, Farbe raus.</h2>
  <p>Versteckt eure Kristalle. Schickt Lichtstrahlen ins Feld des anderen. Aus Ausgang und Farbe findet ihr heraus, wo alles liegt.</p>
  <button class="mode" data-act="setup" data-mode="duo"><b>Gegeneinander</b><span>Jeder auf seinem Handy. Ihr sagt euch Fragen und Antworten.</span></button>
  <button class="mode" data-act="setup" data-mode="solo"><b>Solo gegen das Handy</b><span>Das Handy versteckt, du suchst. Gut zum Reinkommen.</span></button>
+ ${dailyButton()}
  <button class="link" data-act="tab" data-tab="rules">Erst die Regeln lesen</button></section>`}
 
 function logRow(e,num,extra=''){
@@ -378,9 +426,13 @@ function logRow(e,num,extra=''){
  if(e.out===0)return`<span class="no">${num}</span><span>${lab(e.n)}</span><span class="dots"><i class="dot" style="background:${CASE}"></i></span><span class="ct">absorbiert</span>${extra}`;
  return`<span class="no">${num}</span><span>${lab(e.n)} ↔ ${lab(e.out)}</span><span class="dots">${dots(e.colors)}</span><span class="ct">${colorText(e.colors)}</span>${extra}`}
 
+function turnBanner(){if(S.mode!=='duo')return'';const t=S.turn;
+ if(!t)return`<div class="turn"><span>Wer fängt an?</span><button class="btn" data-act="turn" data-v="me">Ich</button><button class="btn" data-act="turn" data-v="opp">Gegenüber</button></div>`;
+ return t==='me'?`<div class="turn me" data-act="turn" data-v="opp"><b>Du bist dran.</b><span>Frag bei <b>Gegner</b> einen Punkt${OPTS.scan?' oder ein Feld':''}.</span><small>tippen zum Wechseln</small></div>`
+  :`<div class="turn opp" data-act="turn" data-v="me"><b>Dein Gegenüber ist dran.</b><span>Beantworte die Frage bei <b>Mein Feld</b>.</span><small>tippen zum Wechseln</small></div>`}
 function viewMe(){const M=S.me;
  if(!M.locked){const n=NAMES.filter(x=>M.pieces[x]).length,N=NAMES.length;
-  return`<p class="hint">Versteck deine ${N} Kristalle: aufs Feld ziehen oder antippen und dann aufs Feld tippen. ${OPTS.touch?'':'Steine dürfen sich nur an Ecken berühren.'}</p>
+  return`${turnBanner()}<p class="hint">Versteck deine ${N} Kristalle: aufs Feld ziehen oder antippen und dann aufs Feld tippen. ${OPTS.touch?'':'Steine dürfen sich nur an Ecken berühren.'}</p>
   <div class="board" data-ctx="me">${boardSVG({ctx:'me',pieces:M.pieces,sel:ui.sel,cells:true})}</div>
   ${tray('me',`<button class="btn" data-act="random">Zufällig verteilen</button><button class="btn primary" data-act="lock" ${n===N?'':'disabled'}>Verdecken (${n}/${N})</button>`)}
   <p class="hint small">Optionen: ${optSummary()}</p>`}
@@ -391,7 +443,7 @@ function viewMe(){const M=S.me;
  else if(L)res=`<div class="result"><div class="rl">Start ${lab(L.n)}. Sag:</div><div class="rbig">${L.out===0?'„Absorbiert.“':`„Raus bei ${lab(L.out)}${L.out===L.n?' (zurück)':''} – ${colorText(L.colors)}.“`}</div><div class="rdots">${L.out===0?'':dots(L.colors)}</div></div>`;
  else res=`<p class="hint">Dein Gegenüber nennt einen Punkt am Rand${OPTS.scan?' oder ein Feld wie C3':''}. Tipp ihn an, das Handy rechnet die Antwort aus.</p>`;
  const list=M.answered.length?`<h3>Schon beantwortet</h3><ul class="log">${M.answered.map((a,i)=>`<li>${logRow(a,M.answered.length-i)}</li>`).join('')}</ul>`:'';
- return`${res}
+ return`${turnBanner()}${res}
  <div class="board" data-ctx="me">${boardSVG({ctx:'me',pieces:M.pieces,cover:!ui.reveal,coverHint:OPTS.scan?'Punkt am Rand oder Feld antippen':null,labels,cells:OPTS.scan,hlCell:ui.reveal&&L&&L.scan?L.scan:null,ray:ui.reveal&&L&&!L.scan?L:null,anim:ui.anim})}</div>
  <div class="row"><button class="btn" data-act="reveal">${ui.reveal?'Verdecken':'Ansehen'}</button><button class="btn primary grow" data-act="verify">Lösung prüfen</button></div>
  ${list}
@@ -400,7 +452,8 @@ function viewMe(){const M=S.me;
 
 function checkEntry(e,G){if(e.scan)return{ok:scanCell(G,...e.scan)===e.val,val:scanCell(G,...e.scan)};
  const r=trace(boardOf(G),e.n);return{ok:r.out===e.out&&r.colors.join()===e.colors.join(),r}}
-function viewOpp(){const O=S.opp,solo=S.mode==='solo',N=NAMES.length;
+function viewOpp(){const O=S.opp,solo=isSolo(),daily=S.mode==='daily',N=NAMES.length;
+ const help=OPTS.helper&&O.help?sureEmpty(O.log):null;
  const labels={};O.log.forEach(e=>{if(!e.scan){labels[e.n]='used';if(e.out)labels[e.out]='used'}});
  let ray=null,cap='',hlCell=null;
  if(ui.hl!=null&&O.log[ui.hl]){const e=O.log[ui.hl],c=checkEntry(e,O.guess);
@@ -408,8 +461,8 @@ function viewOpp(){const O=S.opp,solo=S.mode==='solo',N=NAMES.length;
   else{labels[e.n]='hl';if(e.out)labels[e.out]='hl';ray=c.r;
    cap=`<div class="cap"><b>#${ui.hl+1}: ${lab(e.n)} ${ans(e.out,e.colors)}.</b> Deine Vermutung ergibt: ${ans(c.r.out,c.r.colors)}. <span class="${c.ok?'ok':'bad'}">${c.ok?'Passt.':'Passt nicht.'}</span></div>`}}
  const n=O.log.length;
- const head=solo?`<p class="hint">${O.solved?'Gelöst! ':''}Tippe einen Punkt am Rand an${OPTS.scan?' oder scanne ein Feld':''}. <b>${n} ${plural(n,'Frage','Fragen')}</b>${O.fails?`, ${O.fails} ${plural(O.fails,'Fehlversuch','Fehlversuche')}`:''}.</p>`
-  :`<p class="hint">Tippe den Punkt am Rand an, den du gefragt hast, und trag die Antwort ein.</p>`;
+ const head=(daily?`<p class="dailytag">Tagesrätsel ${fmtDate(S.date,true)}${S.replay?' · nur Ansicht':''}</p>`:'')+turnBanner()+(solo?`<p class="hint">${O.solved?'Gelöst! ':''}Tippe einen Punkt am Rand an${OPTS.scan?' oder scanne ein Feld':''}. <b>${n} ${plural(n,'Frage','Fragen')}</b>${O.fails?`, ${O.fails} ${plural(O.fails,'Fehlversuch','Fehlversuche')}`:''}.</p>`
+  :`<p class="hint">Tippe den Punkt am Rand an, den du gefragt hast, und trag die Antwort ein.</p>`);
  const tools=[['piece','Vermuten'],['mark','Leer markieren'],...(OPTS.scan?[['scan','Feld scannen']]:[])];
  if(!tools.some(t=>t[0]===ui.tool))ui.tool='piece';
  const seg=`<div class="seg">${tools.map(([k,l])=>`<button class="${ui.tool===k?'on':''}" data-act="tool" data-tool="${k}">${l}</button>`).join('')}</div>`;
@@ -418,11 +471,11 @@ function viewOpp(){const O=S.opp,solo=S.mode==='solo',N=NAMES.length;
  const list=n?`<h3>Antworten${all?' – mit deiner Vermutung verglichen':''}</h3><ul class="log">${O.log.map((e,i)=>({e,i})).reverse().map(({e,i})=>{const c=all?checkEntry(e,O.guess):null;
    const extra=(c?`<span class="${c.ok?'ok':'bad'}">${c.ok?'✓':'✗'}</span>`:'')+(solo?'':`<button class="x" data-act="rm" data-i="${i}" aria-label="Eintrag löschen">×</button>`);
    return`<li class="${ui.hl===i?'on':''}" data-act="hl" data-i="${i}">${logRow(e,i+1,extra)}</li>`}).join('')}</ul>`:'';
- const solveBtn=solo&&O.solved?`<button class="btn primary grow" data-act="new" data-mode="solo">Nächstes Rätsel</button>`
+ const solveBtn=daily&&(O.solved||O.revealed)?`<button class="btn primary grow" data-act="tab" data-tab="days">Zum Verlauf</button>`:solo&&O.solved?`<button class="btn primary grow" data-act="new" data-mode="solo">Nächstes Rätsel</button>`
   :`<button class="btn primary grow" data-act="solve" ${all?'':'disabled'}>Lösung prüfen${all?'':` (${N} Kristalle legen)`}</button>`;
  return`${head}
- <div class="board" data-ctx="opp">${boardSVG({ctx:'opp',pieces:O.guess,sel:ui.tool==='piece'?ui.sel:null,marks:O.marks,scans:O.log.filter(e=>e.scan),hlCell,labels,ray,anim:ui.anim,cells:true,ghost:solo&&(O.revealed||O.solved)?S.secret:null})}</div>
- ${cap}${seg}${toolBody}
+ <div class="board" data-ctx="opp">${boardSVG({ctx:'opp',pieces:O.guess,sel:ui.tool==='piece'?ui.sel:null,marks:O.marks,help,scans:O.log.filter(e=>e.scan),hlCell,labels,ray,anim:ui.anim,cells:true,ghost:solo&&(O.revealed||O.solved)?S.secret:null})}</div>
+ ${cap}${OPTS.helper?`<div class="helprow"><button class="opt mini${O.help?' on':''}" data-act="help" role="switch" aria-checked="${!!O.help}"><span><b>Logik-Hilfe</b><small>${help?`${help.size} ${plural(help.size,'Feld','Felder')} sicher leer${colorlessDeflectors()?' (nur aus Scans)':''}`:'Schraffiert sicher leere Felder'}</small></span><i class="sw"></i></button></div>`:''}${seg}${toolBody}
  <div class="row">${solveBtn}</div>
  ${list}
  <p class="hint small">Optionen: ${optSummary()}</p>
@@ -446,16 +499,20 @@ function viewRules(){const N=NAMES.length;const leg=NAMES.map(n=>`<span class="l
  ${OPTS.scan?'<h3>Direkter Scan</h3><p>Statt eines Strahls fragst du nach einem Feld, z.&nbsp;B. „C3“. Die Antwort ist die Farbe des Steins dort oder „leer“.</p>':''}
  <h3>Lösen</h3>
  <p>Leg deine Vermutung im Gegner-Feld und tippe <b>Lösung prüfen</b>. Du bekommst einen QR-Code. Dein Gegenüber scannt ihn bei <b>Mein Feld → Lösung prüfen</b>. Der Zahlencode darunter funktioniert genauso, z.&nbsp;B. per Nachricht. Nach Originalregel gilt: richtig = gewonnen, falsch = verloren.</p>
+ ${S.mode==='duo'?'<h3>Wer ist dran?</h3><p>Oben steht, wer gerade fragt. Die App wechselt automatisch, sobald eine Antwort eingetragen oder beantwortet ist. Falls es mal nicht stimmt: einfach antippen.</p>':''}
+ <h3>Tagesrätsel</h3><p>Jeden Tag gibt es ein neues Feld mit gewürfelten Optionen, für alle gleich. Gezählt wird nur der erste Versuch. Im <b>Verlauf</b> seht ihr eure Ergebnisse und könnt sie per QR-Code vergleichen.</p>
+ ${OPTS.helper?'<h3>Logik-Hilfe</h3><p>Schraffiert Felder, die sicher leer sind: gescannte leere Felder und, wenn kein Stein farblos ablenken kann, alle Felder auf dem geraden Weg eines farblosen Strahls.</p>':''}
  <h3>Tipps</h3>
  <ul><li>Ein Weg gilt in beide Richtungen: Wenn 3 bei C rauskommt, kommt C bei 3 raus.</li><li>Sobald alle deine Kristalle liegen, zeigt die Liste mit ✓ und ✗, welche Antworten zu deiner Vermutung passen.</li><li>Stellt auf beiden Handys dieselben Optionen ein, sonst passen Antworten und Codes nicht.</li></ul>
  </article>`}
 
 function render(){
- const tabs=S.mode==='duo'?[['me','Mein Feld'],['opp','Gegner'],['rules','Regeln']]:S.mode==='solo'?[['opp','Suchen'],['rules','Regeln']]:[['start','Start'],['rules','Regeln']];
+ const tabs=S.mode==='duo'?[['me','Mein Feld'],['opp','Gegner'],['rules','Regeln']]:S.mode==='solo'?[['opp','Suchen'],['rules','Regeln']]:S.mode==='daily'?[['opp','Suchen'],['days','Verlauf'],['rules','Regeln']]:[['start','Start'],['days','Verlauf'],['rules','Regeln']];
  if(!tabs.some(t=>t[0]===ui.tab))ui.tab=tabs[0][0];
- $('#tabs').innerHTML=tabs.map(([k,l])=>`<button class="${ui.tab===k?'on':''}" data-act="tab" data-tab="${k}">${l}</button>`).join('');
+ const dot=S.mode==='duo'&&S.turn?(S.turn==='me'?'opp':'me'):null;
+ $('#tabs').innerHTML=tabs.map(([k,l])=>`<button class="${ui.tab===k?'on':''}" data-act="tab" data-tab="${k}">${l}${dot===k?'<i class="tdot"></i>':''}</button>`).join('');
  $('#newbtn').style.visibility=S.mode?'visible':'hidden';
- const v=ui.tab==='rules'?viewRules():!S.mode?viewStart():ui.tab==='me'?viewMe():viewOpp();
+ const v=ui.tab==='rules'?viewRules():ui.tab==='days'?viewDays():!S.mode?viewStart():ui.tab==='me'?viewMe():viewOpp();
  $('#app').innerHTML=v;ui.anim=false}
 
 /* ---------- Sheets & toast ---------- */
@@ -470,7 +527,7 @@ function sheet(html){$('#toast').classList.remove('show');const w=$('#sheet');co
  if(pnl){const st=pnl.scrollTop;pnl.innerHTML=`<div class="grab"></div>${html}`;pnl.scrollTop=st;return}
  lockScroll();w.innerHTML=`<div class="back" data-act="close"></div><div class="panel" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div>`;w.classList.add('open')}
 function close(){stopScan();$('#sheet').classList.remove('open');$('#sheet').innerHTML='';unlockScroll()}
-function setupSheet(){const u=ui.setup,o=u.opts;const busy=S.mode&&(S.opp.log.length||S.me.answered.length)&&!(S.mode==='solo'&&S.opp.solved);
+function setupSheet(){const u=ui.setup,o=u.opts;const busy=S.mode&&(S.opp.log.length||S.me.answered.length)&&!(isSolo()&&(S.opp.solved||S.opp.revealed));
  const tg=(k,t,d)=>`<button class="opt${o[k]?' on':''}" data-act="sopt" data-k="${k}" role="switch" aria-checked="${!!o[k]}"><span><b>${t}</b><small>${d}</small></span><i class="sw"></i></button>`;
  sheet(`<h3>${u.mode==='duo'?'Gegeneinander':'Solo'}: Optionen</h3>
  <h4>Farben</h4>
@@ -478,6 +535,7 @@ function setupSheet(){const u=ui.setup,o=u.opts;const busy=S.mode&&(S.opp.log.le
  <h4>Dazunehmen</h4>
  ${tg('mirror','Spiegeln erlaubt','Steine dürfen auch gewendet werden.')}
  ${tg('touch','Kanten dürfen sich berühren','Steine dürfen direkt aneinanderliegen.')}
+ ${tg('helper','Logik-Hilfe','Schraffiert Felder, die nach den Antworten sicher leer sind.')}
  ${tg('noscan','Ohne direkten Scan','Nur Strahlen, keine Feldabfragen wie C3.')}
  ${tg('trans','Stein „Transparent“','Lenkt ab, färbt nicht.')}
  ${tg('schwarz','Stein „Schwarz“','Schluckt den Strahl: „absorbiert“.')}
@@ -503,16 +561,16 @@ function known(n){return S.opp.log.findIndex(e=>!e.scan&&(e.n===n||e.out===n))}
 const WHY={out:'Da ist kein Platz',overlap:'Da liegt schon ein Stein',touch:'Steine dürfen sich nicht an einer Kante berühren (Ecken sind okay)'};
 function onLabel(ctx,n){
  if(ctx==='me'){if(!S.me.locked){toast('Erst Kristalle legen und verdecken');return}
-  const r=trace(boardOf(S.me.pieces),n);ui.last={n,...r};S.me.answered.unshift({n,out:r.out,colors:r.colors});ui.anim=true;save();render();window.scrollTo({top:0,behavior:'smooth'});return}
+  const r=trace(boardOf(S.me.pieces),n);ui.last={n,...r};S.me.answered.unshift({n,out:r.out,colors:r.colors});S.turn='me';ui.anim=true;save();render();window.scrollTo({top:0,behavior:'smooth'});return}
  const i=known(n);if(i>=0){const e=S.opp.log[i];ui.hl=i;render();toast(e.out===0?`Schon gefragt (#${i+1}): ${lab(e.n)} wurde absorbiert`:`Schon bekannt (#${i+1}): ${lab(e.n)} und ${lab(e.out)} sind verbunden`);return}
- if(S.mode==='solo'){if(S.opp.solved||S.opp.revealed)return;const r=trace(boardOf(S.secret),n);S.opp.log.push({n,out:r.out,colors:r.colors});ui.hl=S.opp.log.length-1;ui.anim=true;save();render();toast(r.out===0?'Absorbiert':`Raus bei ${lab(r.out)} – ${colorText(r.colors)}`);return}
+ if(isSolo()){if(S.opp.solved||S.opp.revealed)return;const r=trace(boardOf(S.secret),n);S.opp.log.push({n,out:r.out,colors:r.colors});ui.hl=S.opp.log.length-1;ui.anim=true;save();render();toast(r.out===0?'Absorbiert':`Raus bei ${lab(r.out)} – ${colorText(r.colors)}`);return}
  ask={n,out:null,colors:null};askSheet()}
 function onScan(x,y){const i=S.opp.log.findIndex(e=>e.scan&&e.scan[0]===x&&e.scan[1]===y);
  if(i>=0){ui.hl=i;render();toast(`Schon gescannt (#${i+1})`);return}
- if(S.mode==='solo'){if(S.opp.solved||S.opp.revealed)return;const v=scanCell(S.secret,x,y);S.opp.log.push({scan:[x,y],val:v});ui.hl=S.opp.log.length-1;save();render();toast(`Feld ${cellName(x,y)}: ${VALNAME[v]}`);return}
+ if(isSolo()){if(S.opp.solved||S.opp.revealed)return;const v=scanCell(S.secret,x,y);S.opp.log.push({scan:[x,y],val:v});ui.hl=S.opp.log.length-1;save();render();toast(`Feld ${cellName(x,y)}: ${VALNAME[v]}`);return}
  scanAsk={cell:[x,y],val:null};scanSheet()}
 function onCell(ctx,x,y){
- if(ctx==='me'&&S.me.locked){if(!OPTS.scan)return;const v=scanCell(S.me.pieces,x,y);ui.last={scan:[x,y],val:v};S.me.answered.unshift({scan:[x,y],val:v});save();render();window.scrollTo({top:0,behavior:'smooth'});return}
+ if(ctx==='me'&&S.me.locked){if(!OPTS.scan)return;const v=scanCell(S.me.pieces,x,y);ui.last={scan:[x,y],val:v};S.me.answered.unshift({scan:[x,y],val:v});S.turn='me';save();render();window.scrollTo({top:0,behavior:'smooth'});return}
  if(ctx==='opp'&&ui.tool==='scan'){onScan(x,y);return}
  const Pc=P(ctx);const b=boardOf(Pc);const at=b[x+','+y];
  if(ctx==='opp'&&ui.tool==='mark'){if(at){toast('Da liegt deine Vermutung');return}const k=x+','+y;if(S.opp.marks[k])delete S.opp.marks[k];else S.opp.marks[k]=1;save();render();return}
@@ -542,7 +600,7 @@ document.addEventListener('click',ev=>{
  case'sopt':{const k=t.dataset.k;ui.setup.opts[k]=!ui.setup.opts[k];setupSheet()}break;
  case'start':startGame(ui.setup.mode,ui.setup.opts);break;
  case'new':startGame(t.dataset.mode,S.opts||DEFAULT_OPTS);break;
- case'newmenu':sheet(`<h3>Neues Spiel</h3><div class="stack"><button class="mode" data-act="setup" data-mode="duo"><b>Gegeneinander</b><span>Jeder auf seinem Handy.</span></button><button class="mode" data-act="setup" data-mode="solo"><b>Solo gegen das Handy</b><span>Das Handy versteckt, du suchst.</span></button></div><div class="row"><button class="btn grow" data-act="close">Abbrechen</button></div>`);break;
+ case'newmenu':sheet(`<h3>Neues Spiel</h3><div class="stack">${dailyButton()}<button class="mode" data-act="setup" data-mode="duo"><b>Gegeneinander</b><span>Jeder auf seinem Handy.</span></button><button class="mode" data-act="setup" data-mode="solo"><b>Solo gegen das Handy</b><span>Das Handy versteckt, du suchst.</span></button></div><div class="row"><button class="btn grow" data-act="close">Abbrechen</button></div>`);break;
  case'pick':ui.sel=ui.sel===t.dataset.n?null:t.dataset.n;render();break;
  case'rot':transform(ctxNow(),rotO);break;
  case'mir':transform(ctxNow(),mirO);break;
@@ -558,11 +616,13 @@ document.addEventListener('click',ev=>{
  case'rm':{const i=+t.dataset.i;S.opp.log.splice(i,1);ui.hl=null;save();render();toast('Eintrag gelöscht')}break;
  case'aout':ask.out=+t.dataset.k;if(ask.out===0)ask.colors=[];else if(ask.colors&&!ask.colors.length&&ask.wasAb)ask.colors=null;ask.wasAb=ask.out===0;askSheet();break;
  case'acol':ask.colors=mixes()[+t.dataset.i].slice();askSheet();break;
- case'asave':S.opp.log.push({n:ask.n,out:ask.out,colors:ask.out===0?[]:ask.colors.slice()});ui.hl=S.opp.log.length-1;ui.anim=true;save();close();render();break;
+ case'asave':if(S.mode==='duo')S.turn='opp';S.opp.log.push({n:ask.n,out:ask.out,colors:ask.out===0?[]:ask.colors.slice()});ui.hl=S.opp.log.length-1;ui.anim=true;save();close();render();break;
  case'sval':scanAsk.val=t.dataset.v;scanSheet();break;
- case'ssave':S.opp.log.push({scan:scanAsk.cell,val:scanAsk.val});ui.hl=S.opp.log.length-1;save();close();render();break;
- case'solve':{if(!complete(S.opp.guess))break;
-  if(S.mode==='solo'){if(same(S.opp.guess,S.secret)){S.opp.solved=true;ui.hl=null;save();render();const q=S.opp.log.length;sheet(`<h3 class="win">Gefunden!</h3><p>Mit <b>${q} ${plural(q,'Frage','Fragen')}</b>${S.opp.fails?` und ${S.opp.fails} ${plural(S.opp.fails,'Fehlversuch','Fehlversuchen')}`:''}.</p><div class="row"><button class="btn" data-act="close">Ansehen</button><button class="btn primary grow" data-act="new" data-mode="solo">Nächstes Rätsel</button></div>`)}
+ case'ssave':if(S.mode==='duo')S.turn='opp';S.opp.log.push({scan:scanAsk.cell,val:scanAsk.val});ui.hl=S.opp.log.length-1;save();close();render();break;
+ case'solve':{if(!complete(S.opp.guess))break;if(S.mode==='duo')S.turn='opp',save();
+  if(isSolo()){if(same(S.opp.guess,S.secret)){S.opp.solved=true;ui.hl=null;recordDaily('solved');save();render();const q=S.opp.log.length;
+   const next=S.mode==='daily'?`<button class="btn" data-act="share">Teilen</button><button class="btn primary grow" data-act="tab" data-tab="days">Zum Verlauf</button>`:`<button class="btn" data-act="close">Ansehen</button><button class="btn primary grow" data-act="new" data-mode="solo">Nächstes Rätsel</button>`;
+   sheet(`<h3 class="win">Gefunden!</h3><p>Mit <b>${q} ${plural(q,'Frage','Fragen')}</b>${S.opp.fails?` und ${S.opp.fails} ${plural(S.opp.fails,'Fehlversuch','Fehlversuchen')}`:''}.</p><div class="row">${next}</div>`)}
    else{S.opp.fails++;save();render();toast('Stimmt noch nicht. Schau dir die ✗ in der Liste an.')}break}
   {const code=encode(S.opp.guess);sheet(`<h3>Dein Lösungs-Code</h3><p>Zeig den QR-Code deinem Gegenüber. Es scannt ihn bei <b>Mein Feld → Lösung prüfen</b>.</p>
   <div class="qr">${qrSVG(qrPayload(code))}</div>
@@ -574,11 +634,19 @@ document.addEventListener('click',ev=>{
   <p class="small">Oder den ${NAMES.length*3}-stelligen Code eingeben:</p>
   <input id="code" inputmode="numeric" autocomplete="off" placeholder="${NAMES.map(()=>'000').join(' ')}"><div id="vres"></div>
   <div class="row"><button class="btn" data-act="close">Schließen</button><button class="btn primary grow" data-act="vcheck">Prüfen</button></div>`);break;
- case'scanqr':startScan();break;
+ case'scanqr':startScan(onQR);break;
+ case'rescan':startScan(startScan.h||onQR);break;
  case'vcheck':doVerify();break;
  case'giveup':if(!t.dataset.ok){sheet(`<h3>Lösung zeigen?</h3><p>Die Kristalle erscheinen gestrichelt auf deinem Feld.</p><div class="row"><button class="btn" data-act="close">Weitersuchen</button><button class="btn primary grow" data-act="giveup" data-ok="1">Zeigen</button></div>`);break}
-  S.opp.revealed=true;save();close();render();break;
+  S.opp.revealed=true;recordDaily('gaveup');save();close();render();break;
  case'close':close();break;
+ case'turn':S.turn=t.dataset.v;save();render();break;
+ case'help':S.opp.help=!S.opp.help;save();render();break;
+ case'daily':startDaily();break;
+ case'share':shareDaily();break;
+ case'showres':sheet(`<h3>Meine Ergebnisse</h3><p>Dein Gegenüber scannt diesen Code im Verlauf mit „QR scannen“.</p><div class="qr">${qrSVG(resPayload())}</div><div class="row"><button class="btn primary grow" data-act="close">Fertig</button></div>`);break;
+ case'scanres':sheet(`<h3>Ergebnisse scannen</h3><div id="scanbox" class="scanbox"></div><div id="vres"></div><div class="row"><button class="btn grow" data-act="close">Schließen</button></div>`);startScan(onResQR);break;
+ case'clearpartner':{const d=dailyData();d.partner={};saveDaily(d);render()}break;
  case'theme':{const order=['auto','light','dark'];themePref=order[(order.indexOf(themePref)+1)%3];try{localStorage.setItem(TKEY,themePref)}catch(e){}applyTheme();render();toast('Design: '+THEMENAME[themePref])}break;
  }});
 /* ---------- QR ---------- */
@@ -588,7 +656,7 @@ function qrSVG(text){const q=qrcode(0,'M');q.addData(text);q.make();const n=q.ge
  for(let y=0;y<n;y++)for(let x=0;x<n;x++)if(q.isDark(y,x))d+=`M${x+m},${y+m}h1v1h-1z`;
  return`<svg viewBox="0 0 ${n+2*m} ${n+2*m}" shape-rendering="crispEdges" role="img" aria-label="QR-Code"><rect width="100%" height="100%" fill="#fff"/><path d="${d}" fill="#000"/></svg>`}
 let cam=null;
-async function startScan(){const box=$('#scanbox');if(!box)return;
+async function startScan(handler=onQR){startScan.h=handler;const box=$('#scanbox');if(!box)return;
  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){box.innerHTML='<p class="small warn">Die Kamera ist hier nicht verfügbar. Gib den Code unten ein.</p>';return}
  box.innerHTML='<p class="small">Kamera wird gestartet …</p>';
  try{const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
@@ -598,9 +666,9 @@ async function startScan(){const box=$('#scanbox');if(!box)return;
   await v.play();const c=document.createElement('canvas'),ctx=c.getContext('2d',{willReadFrequently:true});
   const tick=t=>{if(!cam)return;cam.raf=requestAnimationFrame(tick);if(t-cam.last<120||v.readyState<2||!v.videoWidth)return;cam.last=t;
    const w=Math.min(640,v.videoWidth),h=Math.round(v.videoHeight*w/v.videoWidth);c.width=w;c.height=h;ctx.drawImage(v,0,0,w,h);
-   const r=jsQR(ctx.getImageData(0,0,w,h).data,w,h,{inversionAttempts:'dontInvert'});if(r&&r.data)onQR(r.data)};
+   const r=jsQR(ctx.getImageData(0,0,w,h).data,w,h,{inversionAttempts:'dontInvert'});if(r&&r.data)handler(r.data)};
   cam.raf=requestAnimationFrame(tick)}
- catch(e){const b=$('#scanbox');if(b)b.innerHTML=`<p class="small warn">${e.name==='NotAllowedError'?'Kein Kamerazugriff erlaubt.':'Kamera konnte nicht starten.'} Gib den Code unten ein.</p><button class="btn wide" data-act="scanqr">Nochmal versuchen</button>`}}
+ catch(e){const b=$('#scanbox');if(b)b.innerHTML=`<p class="small warn">${e.name==='NotAllowedError'?'Kein Kamerazugriff erlaubt.':'Kamera konnte nicht starten.'} Gib den Code unten ein.</p><button class="btn wide" data-act="rescan">Nochmal versuchen</button>`}}
 function stopScan(){if(!cam)return;cancelAnimationFrame(cam.raf);cam.stream.getTracks().forEach(t=>t.stop());cam=null}
 function onQR(txt){const m=/^KE1\|(\d+)\|([a-z]*)$/.exec(txt);const st=$('#scanstat');
  if(!m){if(st)st.textContent='Das ist kein Kristall-Echo-Code';return}
@@ -612,6 +680,50 @@ function doVerify(){const G=decode($('#code').value);const el=$('#vres');
  if(!G){el.innerHTML=`<div class="verdict bad">Code ungültig. Er hat ${NAMES.length*3} Ziffern. Habt ihr dieselben Optionen?</div>`;return}
  const ok=same(G,S.me.pieces);el.innerHTML=ok?'<div class="verdict ok">Stimmt! Dein Gegenüber hat gewonnen.</div>':'<div class="verdict bad">Stimmt nicht. Nach Originalregel hat dein Gegenüber damit verloren.</div>'}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stopScan()});
+
+/* ---------- Tagesrätsel ---------- */
+function startDaily(){const d=today();
+ if(S.mode==='daily'&&S.date===d){close();ui.tab='opp';render();return}
+ const busy=S.mode&&(S.opp.log.length||S.me.answered.length)&&!(isSolo()&&(S.opp.solved||S.opp.revealed));
+ const go=()=>{S=fresh('daily',dailyOpts(d));const r=dailyData().mine[d];if(r){S.replay=true;S.opp.revealed=true;S.opp.solved=r.st==='solved'}
+  Object.assign(ui,{tab:'opp',sel:null,tool:'piece',hl:null,reveal:false,last:null,po:{me:{},opp:{}}});save();close();render();window.scrollTo(0,0);
+  if(r)toast('Heute schon gespielt – hier ist die Lösung')};
+ if(busy&&!startDaily.ok){sheet(`<h3>Zum Tagesrätsel wechseln?</h3><p>Das laufende Spiel wird beendet.</p><div class="row"><button class="btn" data-act="close">Abbrechen</button><button class="btn primary grow" data-act="dailyok">Ja, wechseln</button></div>`);return}
+ go()}
+document.addEventListener('click',e=>{if(e.target.closest('[data-act="dailyok"]')){startDaily.ok=true;startDaily();startDaily.ok=false}});
+function resultText(r){return r?(r.st==='solved'?`${r.q} ${plural(r.q,'Frage','Fragen')}${r.f?` +${r.f}✗`:''}`:'aufgegeben'):'–'}
+function score(r){return r&&r.st==='solved'?r.q+2*r.f:null} // Fehlversuche zählen doppelt
+function streak(mine){let n=0;const d=new Date();for(;;){const k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  if(mine[k]&&mine[k].st==='solved')n++;else if(!(n===0&&k===today()))break;d.setDate(d.getDate()-1)}return n}
+function shareDaily(){const r=dailyData().mine[S.date||today()];if(!r)return;
+ const txt=`Kristall-Echo 💎 Tagesrätsel ${fmtDate(S.date||today(),true)}: ${r.st==='solved'?`gelöst mit ${r.q} ${plural(r.q,'Frage','Fragen')}${r.f?` und ${r.f} ${plural(r.f,'Fehlversuch','Fehlversuchen')}`:''}`:'aufgegeben'}`;
+ if(navigator.share)navigator.share({text:txt}).catch(()=>{});else navigator.clipboard&&navigator.clipboard.writeText(txt).then(()=>toast('In die Zwischenablage kopiert'))}
+function resPayload(){const m=dailyData().mine;return'KED1|'+Object.keys(m).sort().slice(-40).map(k=>`${k.replace(/-/g,'')}:${m[k].q}:${m[k].f}:${m[k].st==='solved'?1:0}`).join(',')}
+function onResQR(txt){const m=/^KED1\|([\d:,]*)$/.exec(txt);const st=$('#scanstat');
+ if(!m){if(st)st.textContent='Das ist kein Ergebnis-Code';return}
+ stopScan();const d=dailyData();let n=0;
+ for(const it of m[1].split(',').filter(Boolean)){const [k,q,f,s]=it.split(':');const key=k.slice(0,4)+'-'+k.slice(4,6)+'-'+k.slice(6,8);d.partner[key]={q:+q,f:+f,st:s==='1'?'solved':'gaveup'};n++}
+ d.partnerAt=Date.now();saveDaily(d);close();render();toast(`${n} ${plural(n,'Ergebnis','Ergebnisse')} übernommen`)}
+function viewDays(){const d=dailyData(),mine=d.mine,par=d.partner;
+ const keys=[...new Set([...Object.keys(mine),...Object.keys(par)])].sort().reverse().slice(0,30);
+ const solved=Object.values(mine).filter(r=>r.st==='solved');const avg=solved.length?(solved.reduce((s,r)=>s+r.q,0)/solved.length).toFixed(1).replace('.',','):'–';
+ const best=solved.length?Math.min(...solved.map(r=>r.q)):'–';
+ let wm=0,wp=0;for(const k of keys){const a=score(mine[k]),b=score(par[k]);if(a!=null&&b!=null){if(a<b)wm++;else if(b<a)wp++}else if(a!=null&&par[k])wm++;else if(b!=null&&mine[k])wp++}
+ const hasP=Object.keys(par).length>0;const t=mine[today()];
+ const rows=keys.map(k=>{const a=score(mine[k]),b=score(par[k]);const win=a!=null&&(b==null||a<b)&&par[k]?'me':b!=null&&(a==null||b<a)&&mine[k]?'p':'';
+  return`<tr><td>${fmtDate(k)}</td><td class="${win==='me'?'best':''}">${resultText(mine[k])}</td>${hasP?`<td class="${win==='p'?'best':''}">${resultText(par[k])}</td>`:''}</tr>`}).join('');
+ return`<h2 class="dh">Tagesrätsel</h2><p class="hint small">Heute: ${optSummary(applyDailyPreview())}</p>
+ <div class="stats"><div><b>${solved.length}</b><span>gelöst</span></div><div><b>${streak(mine)}</b><span>Serie</span></div><div><b>${avg}</b><span>Ø Fragen</span></div><div><b>${best}</b><span>Bestwert</span></div></div>
+ <div class="row"><button class="btn primary grow" data-act="daily">${t?'Heutige Lösung ansehen':'Heutiges Rätsel spielen'}</button>${t?'<button class="btn" data-act="share">Teilen</button>':''}</div>
+ <h3>Vergleich${hasP?`: Ich ${wm} – ${wp} Gegenüber`:''}</h3>
+ ${keys.length?`<div class="tablewrap"><table class="days"><thead><tr><th>Tag</th><th>Ich</th>${hasP?'<th>Gegenüber</th>':''}</tr></thead><tbody>${rows}</tbody></table></div>`:'<p class="hint">Noch keine Ergebnisse. Spiel das heutige Rätsel!</p>'}
+ <div class="btngrid"><button class="btn" data-act="showres">Mein QR zeigen</button><button class="btn" data-act="scanres">QR scannen</button></div>
+ <p class="hint small">Zum Vergleichen zeigt einer seinen QR-Code, der andere scannt ihn. Weniger Fragen gewinnt, ein Fehlversuch zählt wie zwei Fragen. Die Optionen wechseln täglich, sind aber für alle gleich.</p>
+ ${hasP?'<div class="row"><button class="link" data-act="clearpartner">Ergebnisse vom Gegenüber löschen</button></div>':''}`}
+
+/* ---------- Offline ---------- */
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+window.addEventListener('offline',()=>toast('Offline – das Spiel läuft trotzdem weiter'));
 
 /* ---------- Drag & Drop ---------- */
 let pend=null,suppressClick=false,touchSynth=false,raf=0,lastEv=null;
