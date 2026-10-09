@@ -123,7 +123,7 @@ html.standalone header{padding-top:calc(env(safe-area-inset-top) + 24px)}
 html.standalone nav#tabs{padding-bottom:max(6px,calc(env(safe-area-inset-bottom) - 8px))}
 html.standalone body{padding-bottom:calc(52px + max(6px,calc(env(safe-area-inset-bottom) - 8px)))}
 html.standalone #toast{bottom:calc(60px + max(6px,calc(env(safe-area-inset-bottom) - 8px)))}
-.chip{touch-action:none}
+.chip{touch-action:manipulation}
 .tray{display:flex;flex-wrap:wrap;gap:6px}
 .tray .chip{flex:1 1 calc((100% - (var(--per) - 1) * 6px) / var(--per));min-width:0}
 .btngrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
@@ -215,9 +215,67 @@ input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:d
 .sw-btn{padding:6px 0 5px;justify-content:flex-start}
 .sw-btn span{font-size:10px;line-height:1.1;text-align:center;letter-spacing:-.01em;overflow:visible;text-overflow:clip}
 .sw-btn span small{display:block;font-size:9px;font-weight:500;color:var(--muted)}
+.rchips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.rchips i{font-style:normal;font-size:12px;font-weight:600;background:var(--am-soft);color:var(--am);border-radius:99px;padding:3px 9px}
+.invwarn{background:color-mix(in srgb,var(--bad) 14%,var(--slab));color:var(--ink);border-radius:14px;padding:10px 12px;margin:10px 0 0;font-size:14px;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--bad) 45%,transparent)}
+.toolrow{display:flex;justify-content:space-between;gap:8px;margin:8px 0 0}
+.toolrow>div{display:flex;gap:6px}
+.ibtn{width:48px;height:42px;border-radius:12px;border:1.5px solid var(--line);background:var(--slab);color:var(--ink);display:grid;place-items:center;padding:0}
+.ibtn:disabled{opacity:.35}
+.ibtn:not(:disabled):active{transform:scale(.94)}
+.cap{display:flex;gap:10px;align-items:center;margin:0 0 8px;padding:9px 12px}
+.cap b{display:block;font-size:14px}.cap small{display:block;color:var(--muted);font-size:13px}
+.capi{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;font-size:17px}
+.capi.ok{background:var(--ok);color:#fff}.capi.bad{background:var(--bad);color:#fff}
+.cap.is-ok{box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--ok) 50%,transparent)}
+.cap.is-bad{box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--bad) 50%,transparent)}
+#dragG.lifted{animation:liftin .15s ease-out}
+@keyframes liftin{from{opacity:.4}}
+.topbar{display:flex;align-items:center;gap:8px;margin:0 0 8px;min-height:36px}
+.tb-info{flex:1;font-size:14px;color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tchip{border:0;border-radius:99px;padding:7px 12px;font-size:13px;font-weight:700;white-space:nowrap;background:var(--slab);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line)}
+.tchip.me{background:var(--am);color:#fff;box-shadow:none}.tchip.opp{background:var(--am-soft);color:var(--am);box-shadow:none}
+.btn.sm{min-height:36px;padding:0 16px;border-radius:99px;font-size:14px}
+.toolrow{gap:6px}.toolrow>div{gap:4px}
+.toolrow .ibtn{width:auto;min-width:36px;flex:1;max-width:46px;height:40px}
+.toolrow>div:first-child{flex:1}
+.ibtn.on{background:var(--am);border-color:var(--am);color:#fff}
+.strip{display:flex;gap:6px;overflow-x:auto;margin-top:8px;padding:2px 1px 4px;scrollbar-width:none}
+.strip::-webkit-scrollbar{display:none}
+.strip .chip{flex:0 0 64px;min-height:62px;padding:6px 2px 4px;font-size:12px}
+.strip.fit .chip{flex:1 1 0}
+.chip.placed{opacity:.5}.chip.placed.on{opacity:1}
+.answers-btn{display:flex;align-items:center;gap:8px;width:100%;margin-top:10px;border:1.5px solid var(--line);background:var(--slab);color:var(--ink);border-radius:14px;padding:10px 14px;font-weight:700;font-size:15px}
+.answers-btn b{background:var(--nobg);border-radius:99px;padding:1px 8px;font-size:13px}
+.answers-btn i{font-style:normal;font-size:13px}.answers-btn .chev{margin-left:auto}
+.chev.up{transform:rotate(-90deg);display:inline-block}
+.capi.scan{background:var(--am);font-size:14px}
+.cap{margin:0 0 8px}
+nav#tabs button.gear{flex:0 0 52px;max-width:52px;display:grid;place-items:center;padding:0}
+.stack{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+nav#tabs button{position:relative;white-space:nowrap;min-width:0;overflow:visible;padding:0 12px}
+nav#tabs .tdot{position:static;display:inline-block;margin:0 0 0 5px;width:8px;height:8px;vertical-align:middle;flex:none}
+nav#tabs button{padding:0 8px}
+nav#tabs{gap:4px;padding-left:8px;padding-right:8px}
+nav#tabs button:not(.gear){flex:1 1 auto;font-size:14.5px}
+.btngrid .btn svg{width:18px;height:18px;vertical-align:-3px;margin-right:4px}
+.center{text-align:center}
+#helpbtn{flex:none;border:0;background:var(--slab);color:var(--ink);width:36px;height:36px;border-radius:50%;font-weight:800;font-size:17px;box-shadow:inset 0 0 0 1.5px var(--line)}
+#helpbtn.on{background:var(--pri-bg);color:var(--pri-fg);box-shadow:none}
+.home h2{margin-top:4px}
+.home h3{margin:18px 4px 8px}
+.mode.cont{display:flex;align-items:center;gap:10px;border-color:var(--am);background:var(--am);color:#fff}
+.mode.cont .ct-l{flex:1}.mode.cont small{display:block;font-size:12px;opacity:.85;text-transform:uppercase;letter-spacing:.05em;font-weight:700}
+.mode.cont span,.mode.cont b{color:#fff}.mode.cont .chev{color:#fff;font-size:28px}
+.mode.join b svg{width:18px;height:18px;vertical-align:-3px;margin-right:4px}
+.mode.join{border-style:dashed}
+.homestats{display:flex;align-items:center;gap:8px;background:var(--slab);border-radius:16px;padding:10px 14px;margin-top:6px;cursor:pointer}
+.homestats div{flex:1;text-align:center}.homestats b{display:block;font-size:20px;font-weight:800}.homestats span{font-size:12px;color:var(--muted)}
+.btn.ghost{background:var(--slab);color:var(--ink);border:1.5px solid var(--line)}
+.btn.sm svg{width:16px;height:16px;vertical-align:-3px;margin-right:3px}
 </style></head>
 <body>
-<header><h1><svg viewBox="0 0 2 2"><polygon points="1,0 2,1 1,2 0,1" fill="#6A4BE0" stroke="#24213B" stroke-width=".12" stroke-linejoin="round"/><path d="M0,1H2" stroke="#fff" stroke-width=".08" opacity=".7"/></svg>Kristall-Echo</h1><button id="themebtn" data-act="theme" aria-label="Design"></button><button id="newbtn" data-act="newmenu">Neues Spiel</button></header>
+<header><h1><svg viewBox="0 0 2 2"><polygon points="1,0 2,1 1,2 0,1" fill="#6A4BE0" stroke="#24213B" stroke-width=".12" stroke-linejoin="round"/><path d="M0,1H2" stroke="#fff" stroke-width=".08" opacity=".7"/></svg>Kristall-Echo</h1><button id="helpbtn" data-act="tab" data-tab="rules" aria-label="Spielregeln">?</button></header>
 <main id="app"></main>
 <nav id="tabs"></nav>
 <div id="sheet"></div><div id="toast" role="status" aria-live="polite"></div>
@@ -246,6 +304,8 @@ const SHAPES={
 const SHAPE_ORDER=Object.keys(SHAPES);
 // Reihenfolge nur anhängen (Index steckt im Lösungs-Code); Anzeige-Reihenfolge siehe PICK_COLORS
 const STONE_COLORS=['rot','gelb','blau','weiss','trans','schwarz','orange','lila','gruen','rosa','hellgelb','hellblau','hellorange','helllila','hellgruen'];
+// In Schwarz wirkt jede Form wie ihr Rechteck – deshalb nur je eine Form pro Rechteckgröße anbieten
+const BLACK_SHAPES=['sq1','tri1','raute3','dia2','hex4']; // füllen ihr Rechteck: 1×1, 2×1, 3×1, 2×2, 3×2
 const PICK_COLORS=['rot','gelb','blau','orange','gruen','lila','rosa','hellgelb','hellblau','hellorange','hellgruen','helllila','weiss','trans','schwarz'];
 const LIGHT_COLORS=['rosa','hellgelb','hellblau','hellorange','helllila','hellgruen'];
 // Welche Grundanteile ein Stein beisteuert. Helle Steine bringen ihr „Weiß“ selbst mit, auch bei „Weiß färbt nicht“.
@@ -359,7 +419,11 @@ function randomLayout(){const no=OPTS.mirror?8:4;
  for(let t=0;t<2000;t++){const P={};let ok=true;
   for(const n of NAMES){let done=false;for(let i=0;i<120;i++){const o=rand(no);const [w,h]=dims(shape(n,o));const p={x:rand(COLS-w+1),y:rand(ROWS-h+1),o};if(fits(P,n,p)){P[n]=p;done=true;break}}if(!done){ok=false;break}}
   if(ok&&!unreachable(P).length)return P}}
-function keyOf(n,p){if(n==='schwarz')return p.x+','+p.y; // nur Position zählt
+// Schwarz schluckt jeden Strahl, der eines seiner Kästchen betritt. Von außen ist dadurch nur sein
+// umschließendes Rechteck erkennbar (Lücken in Ecken liegen immer im „Schatten“). Gelöst ist also: gleiches Rechteck.
+function footprint(n,p){return cellsOf(n,p).map(a=>a[0]+','+a[1]).sort().join(';')}
+function bboxKey(n,p){const c=cellsOf(n,p),xs=c.map(a=>a[0]),ys=c.map(a=>a[1]);return[Math.min(...xs),Math.min(...ys),Math.max(...xs),Math.max(...ys)].join(',')}
+function keyOf(n,p){if(COLOR[n]==='schwarz')return'B:'+bboxKey(n,p);
  return cellsOf(n,p).map(a=>a.join(',')).sort().join(';')}
 function same(a,b){return NAMES.every(n=>a[n]&&b[n]&&keyOf(n,a[n])===keyOf(n,b[n]))}
 function complete(P){return NAMES.every(n=>P&&P[n])}
@@ -372,8 +436,8 @@ const SHORT={...LBL,trans:'Transp.',hellorange:'Hellor.',hellgruen:'Hellgrün',h
 const FILL={rot:'#E5484D',gelb:'#F5C518',blau:'#2F7BEA',weiss:'#FFFFFF',trans:'#CDEFF5',schwarz:'#2B2838',orange:'#F28C28',lila:'#8E44AD',gruen:'#2EAD5B',rosa:'#F2A4A6',hellgelb:'#FAE28B',hellblau:'#97BDF4',hellorange:'#F9C593',helllila:'#C7A1D6',hellgruen:'#96D6AD'};
 const VALNAME={leer:'leer',...LBL};
 const CASE='#16132B';
-const TL={outline:'#24213B',board:'#FBFAFE',grid:'#DCD7EA',edge:'#24213B',am:'#6A4BE0',amSoft:'#E3DCFB',muted:'#6E6987'};
-const TD={outline:'#D4CFEA',board:'#1A1730',grid:'#2E2A4A',edge:'#8E88B0',am:'#9B85FF',amSoft:'#2F2760',muted:'#9D98B8'};
+const TL={hl:'#24213B',hlTxt:'#fff',outline:'#24213B',board:'#FBFAFE',grid:'#DCD7EA',edge:'#24213B',am:'#6A4BE0',amSoft:'#E3DCFB',muted:'#6E6987'};
+const TD={hl:'#ECE9FA',hlTxt:'#16132B',outline:'#D4CFEA',board:'#1A1730',grid:'#2E2A4A',edge:'#8E88B0',am:'#9B85FF',amSoft:'#2F2760',muted:'#9D98B8'};
 let T=TL;
 const fillOf=c=>c==='schwarz'&&T===TD?'#07060D':FILL[c];
 const TKEY='kristall-echo-theme';
@@ -397,9 +461,12 @@ let S=store.get()||{mode:null};
 // Migration alter Spielstände (vor den Optionen): Hausregel + Spiegeln wie bisher
 if(S.mode&&!S.opts)S.opts={color:'house',mirror:true,touch:true,noscan:true,trans:false,schwarz:false};
 applyOpts(S.opts);
-const ui={drag:null,tab:S.mode==='duo'?'me':'opp',sel:null,tool:'piece',hl:null,reveal:false,last:null,anim:false,po:{me:{},opp:{}},setup:null};
+const ui={drag:null,tab:'home',sel:null,tool:'piece',hl:null,reveal:false,last:null,anim:false,po:{me:{},opp:{}},setup:null};
 function save(){store.set(S)}
 const $=s=>document.querySelector(s);
+const SKEY='kristall-echo-settings';
+const SET={edgeCheck:true,holdMs:170,rayAnim:true,confirmGiveup:true,...(store.get(SKEY)||{})};
+function saveSet(){store.set(SET,SKEY)}
 const isSolo=()=>S.mode==='solo'||S.mode==='daily';
 const DKEY='kristall-echo-daily';
 function today(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
@@ -423,7 +490,7 @@ const ans=(out,c)=>out===0?'absorbiert':`raus bei ${lab(out)}, ${colorText(c)}`;
 const vdot=v=>v==='leer'?'<i class="dot none"></i>':`<i class="dot" style="background:${FILL[v]}"></i>`;
 const plural=(n,a,b)=>n===1?a:b;
 function presetName(o){if(o.preset==='custom')return'Eigene Auswahl';const k=o.preset||(o.trans&&o.schwarz?'std_tb':o.trans?'std_t':o.schwarz?'std_b':'std');return(PRESETS[k]||PRESETS.std).name}
-function optSummary(o=OPTS){const t=[o.color==='orig'?'Original-Farben':'Weiß färbt nicht'];if(o.mirror)t.push('Spiegeln');if(o.touch)t.push('Kantenkontakt');if(o.helper)t.push('Logik-Hilfe');if(o.scan===false||o.noscan)t.push('Ohne Scan');const p=presetName(o);if(p!=='Standard')t.push('Steine: '+p);return t.join(', ')}
+function optSummary(o=OPTS){const t=RULES.filter(([k])=>ruleOn(o,k)).map(r=>r[1]);const p=presetName(o);if(p!=='Standard')t.push('Steine: '+p);return t.length?t.join(', '):'Originalregeln'}
 
 /* ---------- SVG ---------- */
 function pieceSVG(n,cells,o={}){let f='',ed={};const col=o.color||COLOR[n];
@@ -436,7 +503,7 @@ function pieceSVG(n,cells,o={}){let f='',ed={};const col=o.color||COLOR[n];
 const MIX={'':'#C4BDDC',rot:'#E5484D',gelb:'#F5C518',blau:'#2F7BEA','rot,gelb':'#F28C28','rot,blau':'#8E44AD','gelb,blau':'#2EAD5B','rot,gelb,blau':'#3A3550'};
 function mixColor(c){const w=c.includes('weiss');const base=c.filter(x=>x!=='weiss').join(',');if(!w)return MIX[base];if(!base)return '#FFFFFF';
  const h=MIX[base];const n=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));return '#'+n.map(v=>Math.round(v+(255-v)*.5).toString(16).padStart(2,'0')).join('')}
-function raySVG(r,anim){if(!r||!r.pts||r.pts.length<2)return'';const p=r.pts.map(a=>a.slice()),pc=r.pcs||p.map(()=>[]);
+function raySVG(r,anim){anim=anim&&SET.rayAnim;if(!r||!r.pts||r.pts.length<2)return'';const p=r.pts.map(a=>a.slice()),pc=r.pcs||p.map(()=>[]);
  const mid=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2];p[0]=mid(p[0],p[1]);if(r.out!==0)p[p.length-1]=mid(p[p.length-1],p[p.length-2]);
  // lane offset: shift every segment a little to the right of its travel direction, so out- and return paths sit side by side
  {const O=.12,q=p.map(a=>a.slice()),nrm=(a,b)=>{const dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy)||1;return[-dy/l*O,dx/l*O]};
@@ -457,17 +524,21 @@ function raySVG(r,anim){if(!r||!r.pts||r.pts.length<2)return'';const p=r.pts.map
   core+=`<path d="${d}" pathLength="1"${st} fill="none" stroke="${col}" stroke-width=".1" stroke-linejoin="round" stroke-linecap="round"/>`}
  const end=p[p.length-1],ab=r.out===0?`<circle cx="${end[0]}" cy="${end[1]}" r=".2" fill="${CASE}"/><path d="M${end[0]-.1},${end[1]-.1}L${end[0]+.1},${end[1]+.1}M${end[0]+.1},${end[1]-.1}L${end[0]-.1},${end[1]+.1}" stroke="#fff" stroke-width=".06"/>`:'';
  return halo+casing+core+ab+`<circle cx="${p[0][0]}" cy="${p[0][1]}" r=".17" fill="${CASE}"/><circle cx="${p[0][0]}" cy="${p[0][1]}" r=".1" fill="${mixColor([])}"/>`}
+function invalidOverlay(n,p){const e=edgesOf(cellsOf(n,p)).map(k=>{const [a,b]=k.split('|');return`M${a}L${b}`}).join('');
+ return`<path d="${e}" fill="none" stroke="#E5484D" stroke-width=".16" stroke-dasharray=".22 .14" stroke-linejoin="round" class="pulse"/>`}
 function boardSVG(o){
  let s2='',svgS='';let s=`<svg viewBox="-1 -1 12 10" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Spielfeld">`;
  s+=`<defs><pattern id="hatch" width=".25" height=".25" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width=".25" height=".25" fill="${T.board}"/><rect width=".09" height=".25" fill="${T.am}" opacity=".28"/></pattern></defs><rect x="0" y="0" width="10" height="8" fill="${T.board}"/>`;
  let g='';for(let i=1;i<COLS;i++)g+=`M${i},0V8`;for(let j=1;j<ROWS;j++)g+=`M0,${j}H10`;
  s+=`<path d="${g}" stroke="${T.grid}" stroke-width=".035"/>`;
  if(o.help)for(const k of o.help){const [x,y]=k.split(',').map(Number);s+=`<rect x="${x}" y="${y}" width="1" height="1" fill="url(#hatch)"/>`}
- if(o.marks)for(const k of Object.keys(o.marks)){const [x,y]=k.split(',').map(Number);s+=`<path d="M${x+.36},${y+.36}L${x+.64},${y+.64}M${x+.64},${y+.36}L${x+.36},${y+.64}" stroke="#A39DBB" stroke-width=".07" stroke-linecap="round"/>`}
+ if(o.marks)for(const k of Object.keys(o.marks)){const [x,y]=k.split(',').map(Number);s+=`<path data-mark="${k}" d="M${x+.36},${y+.36}L${x+.64},${y+.64}M${x+.64},${y+.36}L${x+.36},${y+.64}" stroke="#A39DBB" stroke-width=".07" stroke-linecap="round"/>`}
  if(o.scans)for(const s of o.scans){const [x,y]=s.scan;s.val==='leer'
    ?(svgS=`<circle cx="${x+.5}" cy="${y+.5}" r=".16" fill="none" stroke="#A39DBB" stroke-width=".06"/>`)
    :(svgS=`<circle cx="${x+.5}" cy="${y+.5}" r=".2" fill="${FILL[s.val]}" stroke="${T.outline}" stroke-width=".05"/>`);s2+=svgS}
- if(o.pieces)for(const n of NAMES){const p=o.pieces[n];if(!p)continue;const g=pieceSVG(n,cellsOf(n,p),{sel:o.sel===n&&!(ui.drag&&ui.drag.n===n)});s+=ui.drag&&ui.drag.n===n&&ui.drag.ctx===o.ctx?`<g opacity=".22">${g}</g>`:g}
+ const inv=o.pieces&&o.cells&&canPlace(o.ctx)?invalidSet(o.pieces):new Set();const order=o.pieces?[...NAMES.filter(n=>n!==o.sel),...(o.sel?[o.sel]:[])]:[];
+ if(o.pieces)for(const n of order){const p=o.pieces[n];if(!p)continue;const g=pieceSVG(n,cellsOf(n,p),{sel:o.sel===n&&!(ui.drag&&ui.drag.n===n)});s+=`<g data-pc="${n}"${ui.drag&&ui.drag.n===n&&ui.drag.ctx===o.ctx?' opacity=".22"':''}>${g}</g>`;
+  if(inv.has(n)&&!(ui.drag&&ui.drag.n===n))s+=invalidOverlay(n,p)}
  if(o.ghost)for(const n of NAMES){const p=o.ghost[n];if(p)s+=pieceSVG(n,cellsOf(n,p),{ghost:true})}
  s+=s2;if(o.ray)s+=raySVG(o.ray,o.anim);
  if(o.hlCell)s+=`<rect x="${o.hlCell[0]+.04}" y="${o.hlCell[1]+.04}" width=".92" height=".92" fill="none" stroke="${T.am}" stroke-width=".1" rx=".08"/>`;
@@ -478,50 +549,85 @@ function boardSVG(o){
  if(o.cells)for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++)s+=`<rect data-cell="${x},${y}" x="${x}" y="${y}" width="1" height="1" fill="transparent" pointer-events="fill"/>`;
  s+=`<rect x="0" y="0" width="10" height="8" fill="none" stroke="${T.edge}" stroke-width=".08" rx=".05"/>`;
  for(let n=1;n<=36;n++){const [[ex,ey]]=entry(n);const cx=ex+.5,cy=ey+.5;const st=(o.labels&&o.labels[n])||'';
-  if(st==='hl')s+=`<circle cx="${cx}" cy="${cy}" r=".44" fill="${T.am}"/>`;
+  // Randprüfung „Ton in Ton“: passt = lila gefüllt, passt nicht = gestrichelter Ring. Ausgewählt = dunkel.
+  const ck=o.check&&o.check[n];let txt=st==='used'?T.am:T.muted;
+  if(st==='hl'){s+=`<circle cx="${cx}" cy="${cy}" r=".42" fill="${T.hl}"/>`;txt=T.hlTxt;
+   if(ck)s+=`<circle cx="${cx}" cy="${cy}" r=".47" fill="none" stroke="${T.am}" stroke-width=".07"${ck==='bad'?' stroke-dasharray=".12 .08"':''}/>`}
+  else if(ck==='ok'){s+=`<circle cx="${cx}" cy="${cy}" r=".4" fill="${T.am}"/>`;txt='#fff'}
+  else if(ck==='bad'){s+=`<circle cx="${cx}" cy="${cy}" r=".37" fill="${T.board}" stroke="${T.am}" stroke-width=".06" stroke-dasharray=".12 .08"/>`;txt=T.am}
   else if(st==='used')s+=`<circle cx="${cx}" cy="${cy}" r=".4" fill="${T.amSoft}"/>`;
-  s+=`<text x="${cx}" y="${cy+.15}" text-anchor="middle" font-size=".42" font-weight="700" fill="${st==='hl'?'#fff':st==='used'?T.am:T.muted}" pointer-events="none">${lab(n)}</text>`;
+  s+=`<text x="${cx}" y="${cy+.15}" text-anchor="middle" font-size=".42" font-weight="700" fill="${txt}" pointer-events="none">${lab(n)}</text>`;
   s+=`<rect data-label="${n}" x="${ex}" y="${ey}" width="1" height="1" fill="transparent" pointer-events="fill"/>`}
- if(ui.drag&&ui.drag.ctx===o.ctx)s+=`<g id="snapG" pointer-events="none"></g><g id="dragG" pointer-events="none"></g>`;
+ if(o.cells&&o.ctx&&canPlace(o.ctx))s+=`<g id="paintG" pointer-events="none"></g><g id="snapG" pointer-events="none"></g><g id="dragG" pointer-events="none"></g>`;
  return s+'</svg>'}
 function miniShapeSVG(sh,color,u=10){const c=SHAPES[sh].cells;const [w,h]=dims(c);return`<svg viewBox="-.15 -.15 ${w+.3} ${h+.3}" style="width:${(w+.3)*u}px;height:${(h+.3)*u}px">${pieceSVG(null,c,{color})}</svg>`}
 function miniSVG(n,o,u=12){const c=shape(n,o);const [w,h]=dims(c);return`<svg viewBox="-.15 -.15 ${w+.3} ${h+.3}" style="width:${(w+.3)*u}px;height:${(h+.3)*u}px">${pieceSVG(n,c)}</svg>`}
 
 /* ---------- Views ---------- */
-function tray(ctx,extra=''){const P=ctx==='me'?S.me.pieces:S.opp.guess;
- const chips=NAMES.map(n=>{const o=P[n]?P[n].o:(ui.po[ctx][n]||0);const on=ui.sel===n;
-  return`<button class="chip${on?' on':''}" data-act="pick" data-n="${n}" aria-pressed="${on}">${miniSVG(n,o)}<span>${SHORT[COLOR[n]]}</span><span class="st">${P[n]?'liegt':'—'}</span></button>`}).join('');
- const has=ui.sel!=null,placed=has&&P[ui.sel];
- const rows=Math.ceil(NAMES.length/5)||1,per=Math.ceil(NAMES.length/rows);
- return`<div class="tray" style="--per:${per}">${chips}</div>
- <div class="btngrid"><button class="btn" data-act="rot" ${has?'':'disabled'}>Drehen</button>${OPTS.mirror?`<button class="btn" data-act="mir" ${has?'':'disabled'}>Spiegeln</button>`:''}<button class="btn" data-act="del" ${placed?'':'disabled'}>Wegnehmen</button>${extra}</div>`}
+function tray(ctx,extra=''){const Pc=ctx==='me'?S.me.pieces:S.opp.guess;
+ const chips=NAMES.map(n=>{const o=Pc[n]?Pc[n].o:(ui.po[ctx][n]||0);const on=ui.sel===n;
+  return`<button class="chip${on?' on':''}${Pc[n]?' placed':''}" data-act="pick" data-n="${n}" aria-pressed="${on}">${miniSVG(n,o,10)}<span>${SHORT[COLOR[n]]}</span></button>`}).join('');
+ return`<div class="strip${NAMES.length<=5?' fit':''}">${chips}</div>
+ ${extra?`<div class="btngrid">${extra}</div>`:''}`}
+const ICO={rot:'<path d="M20 12a8 8 0 1 1-2.6-5.9" /><path d="M20 4v5h-5"/>',
+ mirh:'<path d="M12 3v18" stroke-dasharray="2 2.5"/><path d="M9 7 3 17h6z"/><path d="M15 7l6 10h-6z"/>',
+ mirv:'<g transform="rotate(90 12 12)"><path d="M12 3v18" stroke-dasharray="2 2.5"/><path d="M9 7 3 17h6z"/><path d="M15 7l6 10h-6z"/></g>',
+ qr:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 14v7h-4M14 21v-3"/>',
+ scanmode:'<circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5.5 5.5"/>',
+ help:'<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 12 12 4M4 20 20 4M12 20l8-8"/>',
+ del:'<path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/>',
+ undo:'<path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>',
+ redo:'<path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/>'};
+const icon=(k)=>`<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICO[k]}</svg>`;
+function toolRow(ctx){const Pc=P(ctx),has=ui.sel!=null,placed=has&&Pc[ui.sel],h=hist(ctx);
+ const b=(a,lbl,on,act='')=>`<button class="ibtn${act}" data-act="${a}" aria-label="${lbl}" title="${lbl}" ${on?'':'disabled'}>${icon(a)}</button>`;
+ const extra=ctx==='opp'?(OPTS.scan?b('scanmode','Feld scannen',!(isSolo()&&(S.opp.solved||S.opp.revealed)),ui.scanMode?' on':''):'')+(OPTS.helper?b('help','Logik-Hilfe',true,S.opp.help?' on':''):''):'';
+ return`<div class="toolrow"><div>${b('rot','Drehen',has)}${OPTS.mirror?b('mirh','Spiegeln links/rechts',has)+b('mirv','Spiegeln oben/unten',has):''}${b('del','Wegnehmen',placed)}</div>${extra?`<div>${extra}</div>`:''}<div>${b('undo','Rückgängig',h.u.length)}${b('redo','Wiederholen',h.r.length)}</div></div>`}
 
 function dailyButton(){const r=dailyData().mine[today()];
  return`<button class="mode daily" data-act="daily"><b>Tagesrätsel ${fmtDate(today())}</b><span>${r?(r.st==='solved'?`Heute gelöst mit ${r.q} ${plural(r.q,'Frage','Fragen')}. Lösung ansehen.`:'Heute aufgegeben. Lösung ansehen.'):'Jeden Tag ein neues Feld, für alle gleich. Vergleicht eure Fragen.'}<br><small class="dopts">Heute: ${optSummary(applyDailyPreview())}</small></span></button>`}
 function applyDailyPreview(){const o={...dailyOpts(today())};o.scan=!o.noscan;return o}
-function viewStart(){return`<section class="hero">
+const HOME_ICON='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>';
+function gameStatus(){if(!S.mode)return null;const O=S.opp,n=O.log.length;
+ if(S.mode==='duo'){const me=S.me.locked?'Feld verdeckt':'Steine legen';const t=S.turn==='me'?' · du bist dran':S.turn==='opp'?' · Gegenüber ist dran':'';return{title:'Gegeneinander',sub:`${me} · ${n} ${plural(n,'Frage','Fragen')}${t}`}}
+ const done=O.solved?'gelöst':O.revealed?'aufgelöst':`${n} ${plural(n,'Frage','Fragen')}`;
+ return{title:S.mode==='daily'?`Tagesrätsel ${fmtDate(S.date)}`:'Solo',sub:done,finished:O.solved||O.revealed}}
+function viewHome(){const g=gameStatus(),last={...DEFAULT_OPTS,...(store.get(OKEY)||{})};const dd=dailyData(),t=dd.mine[today()];
+ return`<section class="home">
  <h2>Licht rein, Farbe raus.</h2>
- <p>Versteckt eure Kristalle. Schickt Lichtstrahlen ins Feld des anderen. Aus Ausgang und Farbe findet ihr heraus, wo alles liegt.</p>
+ ${g?`<button class="mode cont" data-act="continue"><span class="ct-l"><small>${g.finished?'Letztes Spiel':'Weiterspielen'}</small><b>${g.title}</b><span>${g.sub}</span></span><span class="chev">›</span></button>`:`<p class="hint">Versteckt Kristalle, schickt Lichtstrahlen ins Feld des anderen und findet aus Ausgang und Farbe heraus, wo alles liegt.</p>`}
+ <h3>Neues Spiel</h3>
  <button class="mode" data-act="setup" data-mode="duo"><b>Gegeneinander</b><span>Jeder auf seinem Handy. Ihr sagt euch Fragen und Antworten.</span></button>
- <button class="mode" data-act="setup" data-mode="solo"><b>Solo gegen das Handy</b><span>Das Handy versteckt, du suchst. Gut zum Reinkommen.</span></button>
+ <button class="mode" data-act="setup" data-mode="solo"><b>Solo gegen das Handy</b><span>Das Handy versteckt, du suchst.</span></button>
  ${dailyButton()}
- <button class="link" data-act="tab" data-tab="rules">Erst die Regeln lesen</button></section>`}
+ <button class="mode join" data-act="join"><b>${icon('qr')} Per QR beitreten</b><span>Den Einladungs-Code deines Gegenübers scannen.</span></button>
+ <p class="hint small">Zuletzt gewählt: ${presetName(last)} · ${RULES.filter(([k])=>ruleOn(last,k)).map(r=>r[1]).join(', ')||'Originalregeln'}</p>
+ <div class="homestats" data-act="tab" data-tab="days"><div><b>${streak(dd.mine)}</b><span>Serie</span></div><div><b>${t?(t.st==='solved'?t.q:'–'):'?'}</b><span>heute</span></div><div><b>${Object.values(dd.mine).filter(r=>r.st==='solved').length}</b><span>gelöst</span></div><span class="chev">›</span></div>
+ <div class="row"><button class="link" data-act="tab" data-tab="rules">Spielregeln</button><button class="link" data-act="tab" data-tab="days">Verlauf</button></div>
+ </section>`}
+
 
 function logRow(e,num,extra=''){
  if(e.scan)return`<span class="no">${num}</span><span>Feld ${cellName(...e.scan)}</span><span class="dots">${vdot(e.val)}</span><span class="ct">${VALNAME[e.val]}</span>${extra}`;
  if(e.out===0)return`<span class="no">${num}</span><span>${lab(e.n)}</span><span class="dots"><i class="dot" style="background:${CASE}"></i></span><span class="ct">absorbiert</span>${extra}`;
  return`<span class="no">${num}</span><span>${lab(e.n)} ↔ ${lab(e.out)}</span><span class="dots">${dots(e.colors)}</span><span class="ct">${colorText(e.colors)}</span>${extra}`}
 
+function turnChip(){if(S.mode!=='duo')return'';const t=S.turn;
+ if(!t)return`<button class="tchip ask" data-act="turnask">Wer fängt an?</button>`;
+ return t==='me'?`<button class="tchip me" data-act="turn" data-v="opp">Du bist dran</button>`:`<button class="tchip opp" data-act="turn" data-v="me">Gegenüber ist dran</button>`}
 function turnBanner(){if(S.mode!=='duo')return'';const t=S.turn;
  if(!t)return`<div class="turn"><span>Wer fängt an?</span><button class="btn" data-act="turn" data-v="me">Ich</button><button class="btn" data-act="turn" data-v="opp">Gegenüber</button></div>`;
  return t==='me'?`<div class="turn me" data-act="turn" data-v="opp"><b>Du bist dran.</b><span>Frag bei <b>Gegner</b> einen Punkt${OPTS.scan?' oder ein Feld':''}.</span><small>tippen zum Wechseln</small></div>`
   :`<div class="turn opp" data-act="turn" data-v="me"><b>Dein Gegenüber ist dran.</b><span>Beantworte die Frage bei <b>Mein Feld</b>.</span><small>tippen zum Wechseln</small></div>`}
+function invWarn(Pc){const s=invalidSet(Pc);if(!s.size)return'';const why=new Set([...s].map(n=>whyNot(Pc,n,Pc[n])));
+ return`<div class="invwarn">Rot markierte Steine ${why.has('overlap')?'liegen übereinander':''}${why.has('overlap')&&why.has('touch')?' oder ':''}${why.has('touch')?'berühren sich an einer Kante':''}. Verschieb oder dreh sie, dann geht es weiter.</div>`}
 function viewMe(){const M=S.me;
  if(!M.locked){const n=NAMES.filter(x=>M.pieces[x]).length,N=NAMES.length;
-  return`${turnBanner()}<p class="hint">Versteck deine ${N} Kristalle: aufs Feld ziehen oder antippen und dann aufs Feld tippen. ${OPTS.touch?'':'Steine dürfen sich nur an Ecken berühren.'}</p>
+  return`<div class="topbar">${turnChip()}<span class="tb-info">${N} Steine legen</span>${S.mode==='duo'?`<button class="btn sm ghost" data-act="invite">${icon('qr')} Einladen</button>`:''}</div>
   <div class="board" data-ctx="me">${boardSVG({ctx:'me',pieces:M.pieces,sel:ui.sel,cells:true})}</div>
-  ${tray('me',`<button class="btn" data-act="random">Zufällig verteilen</button><button class="btn primary" data-act="lock" ${n===N?'':'disabled'}>Verdecken (${n}/${N})</button>`)}
-  <p class="hint small">Optionen: ${optSummary()}</p>`}
+  ${toolRow('me')}${invWarn(M.pieces)}
+  ${tray('me',`<button class="btn" data-act="random">Zufällig verteilen</button><button class="btn primary" data-act="lock" ${n===N&&!invalidSet(M.pieces).size?'':'disabled'}>Verdecken (${n}/${N})</button>`)}
+  <p class="hint small">Antippen und aufs Feld tippen, oder kurz halten und ziehen.${OPTS.touch?'':' Steine dürfen sich nur an Ecken berühren.'}</p>`}
  const labels={};M.answered.forEach(a=>{if(!a.scan){labels[a.n]='used';if(a.out)labels[a.out]='used'}});
  const L=ui.last;if(L&&!L.scan){labels[L.n]='hl';if(L.out)labels[L.out]='hl'}
  let res;
@@ -529,7 +635,7 @@ function viewMe(){const M=S.me;
  else if(L)res=`<div class="result"><div class="rl">Start ${lab(L.n)}. Sag:</div><div class="rbig">${L.out===0?'„Absorbiert.“':`„Raus bei ${lab(L.out)}${L.out===L.n?' (zurück)':''} – ${colorText(L.colors)}.“`}</div><div class="rdots">${L.out===0?'':dots(L.colors)}</div></div>`;
  else res=`<p class="hint">Dein Gegenüber nennt einen Punkt am Rand${OPTS.scan?' oder ein Feld wie C3':''}. Tipp ihn an, das Handy rechnet die Antwort aus.</p>`;
  const list=M.answered.length?`<h3>Schon beantwortet</h3><ul class="log">${M.answered.map((a,i)=>`<li>${logRow(a,M.answered.length-i)}</li>`).join('')}</ul>`:'';
- return`${turnBanner()}${res}
+ return`${S.mode==='duo'?`<div class="topbar">${turnChip()}</div>`:''}${res}
  <div class="board" data-ctx="me">${boardSVG({ctx:'me',pieces:M.pieces,cover:!ui.reveal,coverHint:OPTS.scan?'Punkt am Rand oder Feld antippen':null,labels,cells:OPTS.scan,hlCell:ui.reveal&&L&&L.scan?L.scan:null,ray:ui.reveal&&L&&!L.scan?L:null,anim:ui.anim})}</div>
  <div class="row"><button class="btn" data-act="reveal">${ui.reveal?'Verdecken':'Ansehen'}</button><button class="btn primary grow" data-act="verify">Lösung prüfen</button></div>
  ${list}
@@ -543,30 +649,46 @@ function viewOpp(){const O=S.opp,solo=isSolo(),daily=S.mode==='daily',N=NAMES.le
  const labels={};O.log.forEach(e=>{if(!e.scan){labels[e.n]='used';if(e.out)labels[e.out]='used'}});
  let ray=null,cap='',hlCell=null;
  if(ui.hl!=null&&O.log[ui.hl]){const e=O.log[ui.hl],c=checkEntry(e,O.guess);
-  if(e.scan){hlCell=e.scan;cap=`<div class="cap"><b>#${ui.hl+1}: Feld ${cellName(...e.scan)} ist ${VALNAME[e.val]}.</b> Bei deiner Vermutung: ${VALNAME[c.val]}. <span class="${c.ok?'ok':'bad'}">${c.ok?'Passt.':'Passt nicht.'}</span></div>`}
+  const icon=`<span class="capi ${c.ok?'ok':'bad'}" aria-label="${c.ok?'passt':'passt nicht'}">${c.ok?'✓':'✗'}</span>`;
+  if(e.scan){hlCell=e.scan;cap=`<div class="cap ${c.ok?'is-ok':'is-bad'}">${icon}<div><b>#${ui.hl+1} Feld ${cellName(...e.scan)}: ${VALNAME[e.val]}</b><small>Deine Vermutung: ${VALNAME[c.val]}</small></div></div>`}
   else{labels[e.n]='hl';if(e.out)labels[e.out]='hl';ray=c.r;
-   cap=`<div class="cap"><b>#${ui.hl+1}: ${lab(e.n)} ${ans(e.out,e.colors)}.</b> Deine Vermutung ergibt: ${ans(c.r.out,c.r.colors)}. <span class="${c.ok?'ok':'bad'}">${c.ok?'Passt.':'Passt nicht.'}</span></div>`}}
- const n=O.log.length;
- const head=(daily?`<p class="dailytag">Tagesrätsel ${fmtDate(S.date,true)}${S.replay?' · nur Ansicht':''}</p>`:'')+turnBanner()+(solo?`<p class="hint">${O.solved?'Gelöst! ':''}Tippe einen Punkt am Rand an${OPTS.scan?' oder scanne ein Feld':''}. <b>${n} ${plural(n,'Frage','Fragen')}</b>${O.fails?`, ${O.fails} ${plural(O.fails,'Fehlversuch','Fehlversuche')}`:''}.</p>`
-  :`<p class="hint">Tippe den Punkt am Rand an, den du gefragt hast, und trag die Antwort ein.</p>`);
- const tools=[['piece','Vermuten'],['mark','Leer markieren'],...(OPTS.scan?[['scan','Feld scannen']]:[])];
- if(!tools.some(t=>t[0]===ui.tool))ui.tool='piece';
- const seg=`<div class="seg">${tools.map(([k,l])=>`<button class="${ui.tool===k?'on':''}" data-act="tool" data-tool="${k}">${l}</button>`).join('')}</div>`;
- const toolBody=ui.tool==='piece'?tray('opp'):ui.tool==='mark'?'<p class="hint small">Tippe Kästchen an, in denen sicher nichts liegt.</p>':'<p class="hint small">Tippe das Feld an, das du scannen willst (z. B. C3). Das zählt als dein Zug.</p>';
- const all=complete(O.guess);
- const list=n?`<h3>Antworten${all?' – mit deiner Vermutung verglichen':''}</h3><ul class="log">${O.log.map((e,i)=>({e,i})).reverse().map(({e,i})=>{const c=all?checkEntry(e,O.guess):null;
+   cap=`<div class="cap ${c.ok?'is-ok':'is-bad'}">${icon}<div><b>#${ui.hl+1} Soll: ${lab(e.n)} ${ans(e.out,e.colors)}</b><small>Deine Vermutung: ${lab(e.n)} ${ans(c.r.out,c.r.colors)}</small></div></div>`}}
+ const n=O.log.length,all=complete(O.guess),inv=invalidSet(O.guess).size,done=solo&&(O.solved||O.revealed);
+ const solveBtn=daily&&done?`<button class="btn primary sm" data-act="tab" data-tab="days">Verlauf</button>`:solo&&O.solved?`<button class="btn primary sm" data-act="new" data-mode="solo">Neues Rätsel</button>`
+  :`<button class="btn primary sm" data-act="solve" ${all&&!inv&&!done?'':'disabled'}>Lösen</button>`;
+ let okc=0,badc=0;if(all)for(const e of O.log){checkEntry(e,O.guess).ok?okc++:badc++}
+ const top=`<div class="topbar">${turnChip()}<span class="tb-info">${daily?'Tagesrätsel · ':''}${O.solved?'Gelöst · ':''}${n} ${plural(n,'Frage','Fragen')}${O.fails?` · ${O.fails}✗`:''}</span>${solveBtn}</div>`;
+ const scanHint=ui.scanMode?'<div class="cap scanhint"><span class="capi scan">🔍</span><div><b>Feld scannen</b><small>Tippe das Feld an, das du abfragst. Das zählt als Zug.</small></div></div>':'';
+ let check=null;if(SET.edgeCheck&&NAMES.some(k=>O.guess[k])){check={};for(const e of O.log){if(e.scan)continue;const ok=checkEntry(e,O.guess).ok?'ok':'bad';for(const l of [e.n,e.out])if(l){if(check[l]!=='bad')check[l]=ok}}}
+ return`${top}${scanHint||cap}
+ <div class="board" data-ctx="opp">${boardSVG({ctx:'opp',pieces:O.guess,sel:ui.sel,marks:O.marks,help,check,scans:O.log.filter(e=>e.scan),hlCell,labels,ray,anim:ui.anim,cells:true,ghost:solo&&(O.revealed||O.solved)?S.secret:null})}</div>
+ ${toolRow('opp')}${invWarn(O.guess)}
+ ${tray('opp')}
+ <button class="answers-btn" data-act="answers"><span>Antworten</span><b>${n}</b>${all&&n?`<i class="ok">✓ ${okc}</i><i class="bad">✗ ${badc}</i>`:''}<span class="chev up">›</span></button>`}
+function answersSheet(){const O=S.opp,solo=isSolo(),all=complete(O.guess),n=O.log.length;
+ const list=n?`<ul class="log">${O.log.map((e,i)=>({e,i})).reverse().map(({e,i})=>{const c=all?checkEntry(e,O.guess):null;
    const extra=(c?`<span class="${c.ok?'ok':'bad'}">${c.ok?'✓':'✗'}</span>`:'')+(solo?'':`<button class="x" data-act="rm" data-i="${i}" aria-label="Eintrag löschen">×</button>`);
-   return`<li class="${ui.hl===i?'on':''}" data-act="hl" data-i="${i}">${logRow(e,i+1,extra)}</li>`}).join('')}</ul>`:'';
- const solveBtn=daily&&(O.solved||O.revealed)?`<button class="btn primary grow" data-act="tab" data-tab="days">Zum Verlauf</button>`:solo&&O.solved?`<button class="btn primary grow" data-act="new" data-mode="solo">Nächstes Rätsel</button>`
-  :`<button class="btn primary grow" data-act="solve" ${all?'':'disabled'}>Lösung prüfen${all?'':` (${N} Kristalle legen)`}</button>`;
- return`${head}
- <div class="board" data-ctx="opp">${boardSVG({ctx:'opp',pieces:O.guess,sel:ui.tool==='piece'?ui.sel:null,marks:O.marks,help,scans:O.log.filter(e=>e.scan),hlCell,labels,ray,anim:ui.anim,cells:true,ghost:solo&&(O.revealed||O.solved)?S.secret:null})}</div>
- ${cap}${OPTS.helper?`<div class="helprow"><button class="opt mini${O.help?' on':''}" data-act="help" role="switch" aria-checked="${!!O.help}"><span><b>Logik-Hilfe</b><small>${help?`${help.size} ${plural(help.size,'Feld','Felder')} sicher leer${colorlessDeflectors()?' (nur aus Scans)':''}`:'Schraffiert sicher leere Felder'}</small></span><i class="sw"></i></button></div>`:''}${seg}${toolBody}
- <div class="row">${solveBtn}</div>
- ${list}
- <p class="hint small">Optionen: ${optSummary()}</p>
- ${solo&&!O.solved&&!O.revealed?'<div class="row"><button class="link" data-act="giveup">Aufgeben und Lösung zeigen</button></div>':''}`}
+   return`<li class="${ui.hl===i?'on':''}" data-act="hl" data-i="${i}">${logRow(e,i+1,extra)}</li>`}).join('')}</ul>`:'<p>Noch keine Antworten. Tippe eine Zahl am Rand an.</p>';
+ sheet(`<h3>Antworten${all&&n?' · mit deiner Vermutung verglichen':''}</h3>${list}
+ <p class="small">Optionen: ${optSummary()}</p>
+ <div class="row">${solo&&!O.solved&&!O.revealed?'<button class="btn" data-act="giveup">Aufgeben</button>':''}<button class="btn primary grow" data-act="close">Schließen</button></div>`)}
 
+function viewSettings(){const seg=(act,cur,opts)=>`<div class="seg">${opts.map(([v,l])=>`<button class="${String(cur)===String(v)?'on':''}" data-act="${act}" data-v="${v}">${l}</button>`).join('')}</div>`;
+ const tg=(k,t,d)=>`<button class="opt${SET[k]?' on':''}" data-act="set" data-k="${k}" role="switch" aria-checked="${!!SET[k]}"><span><b>${t}</b><small>${d}</small></span><i class="sw"></i></button>`;
+ return`<h2 class="dh">Einstellungen</h2>
+ <h3>Darstellung</h3>
+ ${seg('settheme',themePref,[['auto','Automatisch'],['light','Hell'],['dark','Dunkel']])}
+ <div class="stack">${tg('edgeCheck','Randzahlen prüfen','Gefragte Zahlen und Buchstaben am Rand: lila gefüllt, wenn deine Vermutung zur Antwort passt, gestrichelt, wenn nicht.')}
+ ${tg('rayAnim','Strahl animieren','Der Lichtstrahl wird gezeichnet statt sofort angezeigt.')}</div>
+ <h3>Bedienung</h3>
+ <p class="hint small">Wie lange du einen Stein halten musst, bevor er sich ziehen lässt. Kürzer ist schneller, länger verhindert versehentliches Ziehen beim Scrollen.</p>
+ ${seg('sethold',SET.holdMs,[[110,'Kurz'],[170,'Normal'],[280,'Lang']])}
+ <div class="stack">${tg('confirmGiveup','Aufgeben bestätigen','Vor dem Aufgeben einmal nachfragen.')}</div>
+ <h3>Daten</h3>
+ <div class="btngrid"><button class="btn" data-act="cleardaily">Verlauf löschen</button><button class="btn" data-act="resetall">Zurücksetzen</button></div>
+ <p class="hint small">Alles wird nur auf diesem Gerät gespeichert. Offline-fähig: ${'serviceWorker' in navigator?'ja':'nein'}.</p>
+ <h3>Info</h3>
+ <p class="hint small">Kristall-Echo · Ein Deduktionsspiel mit Licht und Kristallen. QR-Codes mit qrcode-generator (MIT), Scanner mit jsQR (Apache-2.0).</p>`}
 function viewRules(){const N=NAMES.length;const leg=NAMES.map(n=>`<span class="lg">${miniSVG(n,0,11)}${SHORT[COLOR[n]]}</span>`).join('');
  const sec=STONES.some(s=>['orange','lila','gruen'].includes(s.color)),lt=hasLight();
  const colorRule=(OPTS.color==='orig'
@@ -584,7 +706,7 @@ function viewRules(){const N=NAMES.length;const leg=NAMES.map(n=>`<span class="l
  <h3>Ein Zug</h3>
  <ol><li>Du nennst einen Punkt vom Rand, z.&nbsp;B. „7“ oder „C“${OPTS.scan?', oder ein Feld wie „C3“ (direkter Scan)':''}.</li><li>Dein Gegenüber tippt ihn bei <b>Mein Feld</b> an. Das Handy rechnet und zeigt die Antwort.</li><li>Du tippst bei <b>Gegner</b> dasselbe an und trägst die Antwort ein.</li></ol>
  <h3>Wie der Strahl läuft</h3>
- <ul><li>Geradeaus von Kästchen zu Kästchen.</li><li>Schräge Kante: biegt um 90° ab. Gerade Kante: prallt zurück.</li>${colorRule}<li>Jede Farbe zählt nur einmal. Ohne Kontakt bleibt er farblos.</li>${hasColor('trans')?'<li><b>Transparent</b> lenkt ab, färbt aber nicht.</li>':''}${hasColor('schwarz')?'<li><b>Schwarz</b> schluckt den Strahl. Antwort: „absorbiert“. Beim Lösen zählt beim schwarzen Stein nur die Position, nicht die Drehung.</li>':''}</ul>
+ <ul><li>Geradeaus von Kästchen zu Kästchen.</li><li>Schräge Kante: biegt um 90° ab. Gerade Kante: prallt zurück.</li>${colorRule}<li>Jede Farbe zählt nur einmal. Ohne Kontakt bleibt er farblos.</li>${hasColor('trans')?'<li><b>Transparent</b> lenkt ab, färbt aber nicht.</li>':''}${hasColor('schwarz')?'<li><b>Schwarz</b> schluckt den Strahl. Antwort: „absorbiert“. Beim Lösen zählt beim schwarzen Stein nur, welches Rechteck er abdeckt, nicht Form oder Drehung.</li>':''}</ul>
  ${OPTS.scan?'<h3>Direkter Scan</h3><p>Statt eines Strahls fragst du nach einem Feld, z.&nbsp;B. „C3“. Die Antwort ist die Farbe des Steins dort oder „leer“.</p>':''}
  <h3>Lösen</h3>
  <p>Leg deine Vermutung im Gegner-Feld und tippe <b>Lösung prüfen</b>. Du bekommst einen QR-Code. Dein Gegenüber scannt ihn bei <b>Mein Feld → Lösung prüfen</b>. Der Zahlencode darunter funktioniert genauso, z.&nbsp;B. per Nachricht. Nach Originalregel gilt: richtig = gewonnen, falsch = verloren.</p>
@@ -592,16 +714,17 @@ function viewRules(){const N=NAMES.length;const leg=NAMES.map(n=>`<span class="l
  <h3>Tagesrätsel</h3><p>Jeden Tag gibt es ein neues Feld mit gewürfelten Optionen, für alle gleich. Gezählt wird nur der erste Versuch. Im <b>Verlauf</b> seht ihr eure Ergebnisse und könnt sie per QR-Code vergleichen.</p>
  ${OPTS.helper?'<h3>Logik-Hilfe</h3><p>Schraffiert Felder, die sicher leer sind: gescannte leere Felder und, wenn kein Stein farblos ablenken kann, alle Felder auf dem geraden Weg eines farblosen Strahls.</p>':''}
  <h3>Tipps</h3>
- <ul><li>Ein Weg gilt in beide Richtungen: Wenn 3 bei C rauskommt, kommt C bei 3 raus.</li><li>Sobald alle deine Kristalle liegen, zeigt die Liste mit ✓ und ✗, welche Antworten zu deiner Vermutung passen.</li><li>Stellt auf beiden Handys dieselben Optionen ein, sonst passen Antworten und Codes nicht.</li></ul>
+ <ul><li><b>Wegstreichen:</b> Im Gegner-Feld ein leeres Kästchen antippen. Kurz halten und ziehen streicht mehrere auf einmal (oder hebt sie wieder auf, wenn das erste schon gestrichen war).</li><li><b>Steine:</b> Antippen und aufs Feld tippen, oder kurz halten und ziehen. Wischen scrollt.</li><li>Ein Weg gilt in beide Richtungen: Wenn 3 bei C rauskommt, kommt C bei 3 raus.</li><li>Sobald alle deine Kristalle liegen, zeigt die Liste mit ✓ und ✗, welche Antworten zu deiner Vermutung passen.</li><li>Stellt auf beiden Handys dieselben Optionen ein, sonst passen Antworten und Codes nicht.</li></ul>
  </article>`}
 
 function render(){
- const tabs=S.mode==='duo'?[['me','Mein Feld'],['opp','Gegner'],['rules','Regeln']]:S.mode==='solo'?[['opp','Suchen'],['rules','Regeln']]:S.mode==='daily'?[['opp','Suchen'],['days','Verlauf'],['rules','Regeln']]:[['start','Start'],['days','Verlauf'],['rules','Regeln']];
- if(!tabs.some(t=>t[0]===ui.tab))ui.tab=tabs[0][0];
+ const tabs0=S.mode==='duo'?[['me','Mein Feld'],['opp','Gegner']]:S.mode?[['opp','Suchen']]:[];
+ const tabs=[['home','⌂'],...tabs0,['settings','⚙']];
+ if(!tabs.some(t=>t[0]===ui.tab)&&!['rules','days'].includes(ui.tab))ui.tab='home';
  const dot=S.mode==='duo'&&S.turn?(S.turn==='me'?'opp':'me'):null;
- $('#tabs').innerHTML=tabs.map(([k,l])=>`<button class="${ui.tab===k?'on':''}" data-act="tab" data-tab="${k}">${l}${dot===k?'<i class="tdot"></i>':''}</button>`).join('');
- $('#newbtn').style.visibility=S.mode?'visible':'hidden';
- const v=ui.tab==='rules'?viewRules():ui.tab==='days'?viewDays():!S.mode?viewStart():ui.tab==='me'?viewMe():viewOpp();
+ $('#tabs').innerHTML=tabs.map(([k,l])=>k==='home'?`<button class="gear${ui.tab===k?' on':''}" data-act="tab" data-tab="home" aria-label="Start">${HOME_ICON}</button>`:k==='settings'?`<button class="gear${ui.tab===k?' on':''}" data-act="tab" data-tab="settings" aria-label="Einstellungen"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>`:`<button class="${ui.tab===k?'on':''}" data-act="tab" data-tab="${k}">${l}${dot===k?'<i class="tdot"></i>':''}</button>`).join('');
+ const hb=$('#helpbtn');if(hb)hb.classList.toggle('on',ui.tab==='rules');
+ const v=ui.tab==='settings'?viewSettings():ui.tab==='rules'?viewRules():ui.tab==='days'?viewDays():ui.tab==='home'||!S.mode?viewHome():ui.tab==='me'?viewMe():viewOpp();
  $('#app').innerHTML=v;ui.anim=false}
 
 /* ---------- Sheets & toast ---------- */
@@ -616,22 +739,49 @@ function sheet(html){$('#toast').classList.remove('show');const w=$('#sheet');co
  if(pnl){const st=pnl.scrollTop;pnl.innerHTML=`<div class="grab"></div>${html}`;pnl.scrollTop=st;return}
  lockScroll();w.innerHTML=`<div class="back" data-act="close"></div><div class="panel" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div>`;w.classList.add('open')}
 function close(){stopScan();$('#sheet').classList.remove('open');$('#sheet').innerHTML='';unlockScroll()}
-function setupSheet(){const u=ui.setup,o=u.opts;if(u.view==='stones')return stonesSheet();
+const RULES=[['house','Weiß färbt nicht','Weiße Steine lenken nur ab, ohne zu färben.'],['mirror','Spiegeln erlaubt','Steine dürfen auch gewendet werden.'],
+ ['touch','Kanten dürfen sich berühren','Steine dürfen direkt aneinanderliegen.'],['noscan','Ohne direkten Scan','Nur Strahlen, keine Feldabfragen wie C3.'],
+ ['helper','Logik-Hilfe','Schraffiert Felder, die nach den Antworten sicher leer sind.']];
+const ruleOn=(o,k)=>k==='house'?o.color==='house':!!o[k];
+function setupSheet(){const u=ui.setup,o=u.opts;if(u.view==='stones')return stonesSheet();if(u.view==='rules')return rulesSheet();if(u.view==='oshare')return shareOptsSheet();if(u.view==='oscan')return scanOptsSheet();
  const busy=S.mode&&(S.opp.log.length||S.me.answered.length)&&!(isSolo()&&(S.opp.solved||S.opp.revealed));
- const tg=(k,t,d)=>`<button class="opt${o[k]?' on':''}" data-act="sopt" data-k="${k}" role="switch" aria-checked="${!!o[k]}"><span><b>${t}</b><small>${d}</small></span><i class="sw"></i></button>`;
- const st=stonesOf(o);
+ const st=stonesOf(o),act=RULES.filter(([k])=>ruleOn(o,k));
  sheet(`<h3>${u.mode==='duo'?'Gegeneinander':'Solo'}: Optionen</h3>
  <h4>Steine</h4>
  <button class="opt stonepick" data-act="stones"><span><b>${presetName(o)}</b><small>${st.length} ${plural(st.length,'Stein','Steine')} · ${blocksOf(st)} Blöcke</small><span class="minis">${st.map(s=>miniShapeSVG(s.shape,s.color,6)).join('')}</span></span><span class="chev">›</span></button>
- <h4>Farben</h4>
- <div class="seg"><button class="${o.color==='orig'?'on':''}" data-act="scol" data-v="orig">Standard (helle Töne)</button><button class="${o.color==='house'?'on':''}" data-act="scol" data-v="house">Weiß färbt nicht</button></div>
  <h4>Regeln</h4>
- ${tg('mirror','Spiegeln erlaubt','Steine dürfen auch gewendet werden.')}
- ${tg('touch','Kanten dürfen sich berühren','Steine dürfen direkt aneinanderliegen.')}
- ${tg('helper','Logik-Hilfe','Schraffiert Felder, die nach den Antworten sicher leer sind.')}
- ${tg('noscan','Ohne direkten Scan','Nur Strahlen, keine Feldabfragen wie C3.')}
- ${u.mode==='duo'?'<p class="small">Stellt auf beiden Handys dasselbe ein.</p>':''}${busy?'<p class="small warn">Das laufende Spiel wird beendet.</p>':''}
+ <button class="opt stonepick" data-act="rules"><span><b>${act.length?`${act.length} ${plural(act.length,'Sonderregel','Sonderregeln')} aktiv`:'Originalregeln'}</b><small>${act.length?'':'Keine Sonderregeln, so wie im Original.'}</small>${act.length?`<span class="rchips">${act.map(([k,t])=>`<i>${t}</i>`).join('')}</span>`:''}</span><span class="chev">›</span></button>
+ ${u.mode==='duo'?'<p class="small">Nach dem Start kannst du dein Gegenüber per QR-Code einladen. Dann spielt ihr automatisch mit denselben Einstellungen.</p>':''}${busy?'<p class="small warn">Das laufende Spiel wird beendet.</p>':''}
  <div class="row"><button class="btn" data-act="close">Abbrechen</button><button class="btn primary grow" data-act="start">Spiel starten</button></div>`)}
+function rulesSheet(){const o=ui.setup.opts;
+ sheet(`<div class="shead"><button class="back-btn" data-act="sback" aria-label="Zurück">‹</button><h3>Regeln</h3></div>
+ <p class="small">Alles aus entspricht den Originalregeln.</p>
+ ${RULES.map(([k,t,d])=>{const on=ruleOn(o,k);return`<button class="opt${on?' on':''}" data-act="sopt" data-k="${k}" role="switch" aria-checked="${on}"><span><b>${t}</b><small>${d}</small></span><i class="sw"></i></button>`}).join('')}
+ <div class="row"><button class="btn primary grow" data-act="sback">Fertig</button></div>`)}
+// Optionen als QR: kompaktes JSON, base64url
+function optsPayload(o){const p={c:o.color==='house'?1:0,m:+!!o.mirror,t:+!!o.touch,n:+!!o.noscan,h:+!!o.helper,p:o.preset||'std'};if(p.p==='custom')p.x=o.custom||{};
+ return'KEO1|'+btoa(unescape(encodeURIComponent(JSON.stringify(p)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+function parseOpts(txt){const m=/^KEO1\|([A-Za-z0-9_-]+)$/.exec(txt);if(!m)return null;
+ try{const p=JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/-/g,'+').replace(/_/g,'/')))));
+  if(p.p!=='custom'&&!PRESETS[p.p])return null;
+  const custom=p.p==='custom'?Object.fromEntries(Object.entries(p.x||{}).filter(([k,v])=>{const [sh,col]=k.split('|');return SHAPES[sh]&&STONE_COLORS.includes(col)&&v>0&&v<30})):null;
+  return{...DEFAULT_OPTS,color:p.c?'house':'orig',mirror:!!p.m,touch:!!p.t,noscan:!!p.n,helper:!!p.h,preset:p.p,custom}}catch(e){return null}}
+function shareOptsSheet(){const o=ui.setup.opts,st=stonesOf(o);
+ sheet(`<div class="shead"><button class="back-btn" data-act="sback" aria-label="Zurück">‹</button><h3>Optionen teilen</h3></div>
+ <p class="small">Dein Gegenüber öffnet „Neues Spiel“ und tippt bei den Optionen auf „Scannen“.</p>
+ <div class="qr">${qrSVG(optsPayload(o))}</div>
+ <p class="small center"><b>${presetName(o)}</b> · ${st.length} ${plural(st.length,'Stein','Steine')} · ${RULES.filter(([k])=>ruleOn(o,k)).map(r=>r[1]).join(', ')||'Originalregeln'}</p>
+ <div class="row"><button class="btn primary grow" data-act="sback">Fertig</button></div>`)}
+function scanOptsSheet(){sheet(`<div class="shead"><button class="back-btn" data-act="sback" aria-label="Zurück">‹</button><h3>Optionen scannen</h3></div>
+ <div id="scanbox" class="scanbox"></div><div id="vres"></div>`);startScan(onOptQR)}
+function onJoinQR(txt){const o=parseOpts(txt);const st=$('#scanstat');
+ if(!o){if(st)st.textContent=/^KE/.test(txt)?'Das ist kein Einladungs-Code':'Das ist kein Kristall-Echo-Code';return}
+ stopScan();ui.joinOpts=o;const busy=S.mode&&(S.opp.log.length||S.me.answered.length)&&!(isSolo()&&(S.opp.solved||S.opp.revealed));
+ if(!busy){close();ui.joinOpts=null;startGame('duo',o);toast('Beigetreten – leg jetzt deine Kristalle');return}
+ sheet(`<h3>Einladung erkannt</h3><p>${presetName(o)} · ${RULES.filter(([k])=>ruleOn(o,k)).map(r=>r[1]).join(', ')||'Originalregeln'}</p><p class="small warn">Das laufende Spiel wird beendet.</p><div class="row"><button class="btn" data-act="close">Abbrechen</button><button class="btn primary grow" data-act="joinok">Beitreten</button></div>`)}
+function onOptQR(txt){const o=parseOpts(txt);const st=$('#scanstat');
+ if(!o){if(st)st.textContent=/^KE/.test(txt)?'Das ist kein Optionen-Code':'Das ist kein Kristall-Echo-Code';return}
+ stopScan();ui.setup.opts=o;ui.setup.view='main';setupSheet();toast('Optionen übernommen')}
 function countsOf(stones){const c={};for(const s of stones){const k=s.shape+'|'+s.color;c[k]=(c[k]||0)+1}return c}
 function stonesSheet(){const o=ui.setup.opts;const cur=o.preset||'std';
  const card=(k,p)=>`<button class="preset${cur===k?' on':''}" data-act="preset" data-k="${k}"><span class="pt"><b>${p.name}</b><small>${p.desc} · ${blocksOf(p.stones)} Blöcke</small></span><span class="minis">${p.stones.map(s=>miniShapeSVG(s.shape,s.color,6)).join('')}</span></button>`;
@@ -642,7 +792,8 @@ function stonesSheet(){const o=ui.setup.opts;const cur=o.preset||'std';
   <h4>Farbe</h4>
   <div class="swatches">${PICK_COLORS.map(col=>`<button class="sw-btn${pc===col?' on':''}" data-act="pickcol" data-c="${col}" aria-label="${LBL[col]}"><i style="background:${fillOf(col)}"></i><span>${col==='rosa'?'<small>hellrot</small>Rosa':LIGHT_COLORS.includes(col)?`<small>hell</small>${LBL[col].slice(4).replace(/^./,m=>m.toUpperCase())}`:col==='trans'?'Transp.':LBL[col]}</span></button>`).join('')}</div>
   <h4>Form in ${LBL[pc]}</h4>
-  <div class="shgrid">${SHAPE_ORDER.map(sh=>{const a=shapeArea(sh),k=sh+'|'+pc,n=c[k]||0,blocked=used+a>MAX_BLOCKS;const [w]=dims(SHAPES[sh].cells);
+  ${pc==='schwarz'?'<p class="small">Schwarz schluckt jeden Strahl, der eines seiner Kästchen berührt. Von außen sieht man daher nur, welches Rechteck er abdeckt, nicht seine Form oder Drehung. Deshalb gibt es Schwarz nur in Formen, die ihr Rechteck ausfüllen: 1×1, 2×1, 3×1, 2×2 und 3×2.</p>':''}
+  <div class="shgrid">${SHAPE_ORDER.filter(sh=>pc!=='schwarz'||BLACK_SHAPES.includes(sh)).map(sh=>{const a=shapeArea(sh),k=sh+'|'+pc,n=c[k]||0,blocked=used+a>MAX_BLOCKS;const [w]=dims(SHAPES[sh].cells);
    return`<div class="ccard${n?' on':''}${blocked&&!n?' dis':''}" data-act="cadd" data-k="${k}" role="button" aria-label="${SHAPES[sh].name} ${LBL[pc]}: ${n}">${miniShapeSVG(sh,pc,Math.min(11,46/w))}<span class="cname">${SHAPES[sh].name}<small>${a} ${plural(a,'Block','Blöcke')}</small></span>${n?`<span class="cnt">${n}</span><span class="csub" data-act="csub" data-k="${k}" aria-label="weniger">−</span>`:''}</div>`}).join('')}</div>
   <h4>Ausgewählt <span>(${chosen.length} ${plural(chosen.length,'Stein','Steine')}, antippen zum Entfernen)</span></h4>
   <div class="chosen">${chosen.length?chosen.map(st=>`<button class="chosen-st" data-act="csub" data-k="${st.shape}|${st.color}" aria-label="${SHAPES[st.shape].name} ${LBL[st.color]} entfernen">${miniShapeSVG(st.shape,st.color,8)}</button>`).join(''):'<p class="small">Noch nichts ausgewählt.</p>'}</div>
@@ -669,6 +820,19 @@ function scanSheet(){const s=scanAsk;const vals=['leer',...PICK_COLORS.filter(c=
 
 /* ---------- Actions ---------- */
 function P(ctx){return ctx==='me'?S.me.pieces:S.opp.guess}
+// Rückgängig/Wiederholen: Schnappschüsse der Steine (und im Gegner-Feld der Markierungen)
+const HIST={me:{u:[],r:[]},opp:{u:[],r:[]}};
+function hist(ctx){return HIST[ctx]}
+function stateOf(ctx){return JSON.stringify(ctx==='me'?{p:S.me.pieces}:{p:S.opp.guess,m:S.opp.marks})}
+function setState(ctx,j){const v=JSON.parse(j);if(ctx==='me')S.me.pieces=v.p;else{S.opp.guess=v.p;S.opp.marks=v.m}}
+function snap(ctx){const h=HIST[ctx],s=stateOf(ctx);if(h.u[h.u.length-1]!==s)h.u.push(s);if(h.u.length>60)h.u.shift();h.r=[]}
+function undoRedo(ctx,dir){const h=HIST[ctx],from=dir==='undo'?h.u:h.r,to=dir==='undo'?h.r:h.u;if(!from.length)return;to.push(stateOf(ctx));setState(ctx,from.pop());
+ if(ui.sel&&!P(ctx)[ui.sel]&&!NAMES.includes(ui.sel))ui.sel=null;save();render()}
+function clearHist(){for(const k in HIST){HIST[k].u=[];HIST[k].r=[]}}
+// Stein unter einem Kästchen; der ausgewählte gewinnt, sonst der oberste (zuletzt gezeichnete)
+function pieceAt(Pc,x,y,sel){let hit=null;for(const n of NAMES){const p=Pc[n];if(!p)continue;if(cellsOf(n,p).some(c=>c[0]===x&&c[1]===y)){if(n===sel)return n;hit=n}}return hit}
+// Steine, die gerade ungültig liegen (überlappen oder verbotener Kantenkontakt)
+function invalidSet(Pc){const s=new Set();for(const n of NAMES)if(Pc[n]&&whyNot(Pc,n,Pc[n]))s.add(n);return s}
 function known(n){return S.opp.log.findIndex(e=>!e.scan&&(e.n===n||e.out===n))}
 const WHY={out:'Da ist kein Platz',overlap:'Da liegt schon ein Stein',touch:'Steine dürfen sich nicht an einer Kante berühren (Ecken sind okay)'};
 function onLabel(ctx,n){
@@ -683,22 +847,25 @@ function onScan(x,y){const i=S.opp.log.findIndex(e=>e.scan&&e.scan[0]===x&&e.sca
  scanAsk={cell:[x,y],val:null};scanSheet()}
 function onCell(ctx,x,y){
  if(ctx==='me'&&S.me.locked){if(!OPTS.scan)return;const v=scanCell(S.me.pieces,x,y);ui.last={scan:[x,y],val:v};S.me.answered.unshift({scan:[x,y],val:v});S.turn='me';save();render();window.scrollTo({top:0,behavior:'smooth'});return}
- if(ctx==='opp'&&ui.tool==='scan'){onScan(x,y);return}
- const Pc=P(ctx);const b=boardOf(Pc);const at=b[x+','+y];
- if(ctx==='opp'&&ui.tool==='mark'){if(at){toast('Da liegt deine Vermutung');return}const k=x+','+y;if(S.opp.marks[k])delete S.opp.marks[k];else S.opp.marks[k]=1;save();render();return}
- if(at&&at.n!==ui.sel){ui.sel=at.n;render();return}
+ if(ctx==='opp'&&ui.scanMode){ui.scanMode=false;onScan(x,y);return}
+ const Pc=P(ctx);const atn=pieceAt(Pc,x,y,ui.sel);const at=atn?{n:atn}:null;
+ // Gegner-Feld: leeres Kästchen antippen = wegstreichen (außer ein neuer Stein aus der Leiste ist gewählt)
+ if(ctx==='opp'&&!at&&!(ui.sel&&!Pc[ui.sel])){ui.sel=null;snap(ctx);const k=x+','+y;if(S.opp.marks[k])delete S.opp.marks[k];else S.opp.marks[k]=1;save();render();return}
+ // Neuer Stein aus der Leiste wird immer gelegt, auch auf andere drauf
+ if(at&&at.n!==ui.sel&&!(ui.sel&&!Pc[ui.sel])){ui.sel=at.n;render();return}
  if(at&&at.n===ui.sel){ui.sel=null;render();return}
  if(!ui.sel){toast('Wähle unten erst einen Kristall');return}
  const n=ui.sel;const o=Pc[n]?Pc[n].o:(ui.po[ctx][n]||0);const [w,h]=dims(shape(n,o));
  const p=clampPos(n,o,x-Math.floor((w-1)/2),y-Math.floor((h-1)/2));
- const why=whyNot(Pc,n,p);if(why){toast(WHY[why]);return}
- Pc[n]=p;if(ctx==='opp')for(const [cx,cy] of cellsOf(n,p))delete S.opp.marks[cx+','+cy];save();render()}
+ snap(ctx);Pc[n]=p;if(ctx==='opp')for(const [cx,cy] of cellsOf(n,p))delete S.opp.marks[cx+','+cy];save();render()}
 function transform(ctx,f){const n=ui.sel;if(!n)return;const Pc=P(ctx);
  if(!Pc[n]){ui.po[ctx][n]=f(ui.po[ctx][n]||0);render();return}
- const no=f(Pc[n].o);const p=clampPos(n,no,Pc[n].x,Pc[n].y);const why=whyNot(Pc,n,p);if(why){toast(why==='touch'?WHY.touch:'Kein Platz dafür – erst verschieben');return}Pc[n]=p;save();render()}
-const rotO=o=>(o%4+1)%4+(o>=4?4:0),mirO=o=>(o+4)%8;
+ const no=f(Pc[n].o);snap(ctx);Pc[n]=clampPos(n,no,Pc[n].x,Pc[n].y);save();render()}
+const rotO=o=>(o%4+1)%4+(o>=4?4:0);
+// Spiegeln so, wie man es sieht: links↔rechts bzw. oben↔unten (Form ist erst gespiegelt, dann gedreht gespeichert)
+const flipH=o=>(o>=4?0:4)+(4-o%4)%4, flipV=o=>(o>=4?0:4)+(6-o%4)%4;
 function ctxNow(){return ui.tab==='me'?'me':'opp'}
-function startGame(m,opts){store.set(opts,OKEY);S=fresh(m,opts);Object.assign(ui,{tab:m==='duo'?'me':'opp',sel:null,tool:'piece',hl:null,reveal:false,last:null,po:{me:{},opp:{}}});save();close();render();window.scrollTo(0,0)}
+function startGame(m,opts){clearHist();store.set(opts,OKEY);S=fresh(m,opts);Object.assign(ui,{tab:m==='duo'?'me':'opp',sel:null,tool:'piece',hl:null,reveal:false,last:null,po:{me:{},opp:{}}});save();close();render();window.scrollTo(0,0)}
 
 document.addEventListener('click',ev=>{
  if(suppressClick){suppressClick=false;return}
@@ -706,12 +873,15 @@ document.addEventListener('click',ev=>{
  if(labEl||cell){const ctx=ev.target.closest('.board').dataset.ctx;if(labEl)onLabel(ctx,+labEl.dataset.label);else{const [x,y]=cell.dataset.cell.split(',').map(Number);onCell(ctx,x,y)}return}
  const t=ev.target.closest('[data-act]');if(!t)return;const a=t.dataset.act;
  switch(a){
- case'tab':ui.tab=t.dataset.tab==='start'?'opp':t.dataset.tab;ui.sel=null;render();window.scrollTo(0,0);break;
+ case'tab':ui.tab=t.dataset.tab==='start'?'home':t.dataset.tab;ui.sel=null;ui.scanMode=false;render();window.scrollTo(0,0);break;
  case'setup':ui.setup={mode:t.dataset.mode,view:'main',opts:{...DEFAULT_OPTS,...(store.get(OKEY)||{})}};setupSheet();break;
  case'scol':ui.setup.opts.color=t.dataset.v;setupSheet();break;
- case'sopt':{const k=t.dataset.k;ui.setup.opts[k]=!ui.setup.opts[k];setupSheet()}break;
+ case'sopt':{const k=t.dataset.k,o=ui.setup.opts;if(k==='house')o.color=o.color==='house'?'orig':'house';else o[k]=!o[k];setupSheet()}break;
+ case'rules':ui.setup.view='rules';setupSheet();break;
  case'stones':ui.setup.view='stones';setupSheet();break;
- case'sback':ui.setup.view='main';setupSheet();break;
+ case'sback':stopScan();ui.setup.view='main';setupSheet();break;
+ case'oshare':ui.setup.view='oshare';setupSheet();break;
+ case'oscan':ui.setup.view='oscan';setupSheet();break;
  case'preset':{const o=ui.setup.opts,k=t.dataset.k;if(k==='custom'&&o.preset!=='custom'&&!o.custom)o.custom=countsOf(stonesOf(o));o.preset=k;delete o.trans;delete o.schwarz;setupSheet()}break;
  case'cadd':{const o=ui.setup.opts,k=t.dataset.k,c=o.custom=o.custom||{};const used=blocksOf(customStones(c)),a=shapeArea(k.split('|')[0]);
   if(used+a>MAX_BLOCKS){toast(`Maximal ${MAX_BLOCKS} Blöcke`);break}c[k]=(c[k]||0)+1;setupSheet()}break;
@@ -725,17 +895,20 @@ document.addEventListener('click',ev=>{
  case'newmenu':sheet(`<h3>Neues Spiel</h3><div class="stack">${dailyButton()}<button class="mode" data-act="setup" data-mode="duo"><b>Gegeneinander</b><span>Jeder auf seinem Handy.</span></button><button class="mode" data-act="setup" data-mode="solo"><b>Solo gegen das Handy</b><span>Das Handy versteckt, du suchst.</span></button></div><div class="row"><button class="btn grow" data-act="close">Abbrechen</button></div>`);break;
  case'pick':ui.sel=ui.sel===t.dataset.n?null:t.dataset.n;render();break;
  case'rot':transform(ctxNow(),rotO);break;
- case'mir':transform(ctxNow(),mirO);break;
- case'del':{const Pc=P(ctxNow());if(ui.sel&&Pc[ui.sel]){ui.po[ctxNow()][ui.sel]=Pc[ui.sel].o;delete Pc[ui.sel];save();render()}break}
- case'random':{const R=randomLayout();if(!R){toast('Keine passende Verteilung gefunden – nochmal tippen');break}S.me.pieces=R;ui.sel=null;save();render()}break;
+ case'mirh':transform(ctxNow(),flipH);break;
+ case'mirv':transform(ctxNow(),flipV);break;
+ case'undo':undoRedo(ctxNow(),'undo');break;
+ case'redo':undoRedo(ctxNow(),'redo');break;
+ case'del':{const Pc=P(ctxNow());if(ui.sel&&Pc[ui.sel]){snap(ctxNow());ui.po[ctxNow()][ui.sel]=Pc[ui.sel].o;delete Pc[ui.sel];save();render()}break}
+ case'random':{const R=randomLayout();if(!R){toast('Keine passende Verteilung gefunden – nochmal tippen');break}snap('me');S.me.pieces=R;ui.sel=null;save();render()}break;
  case'lock':{const u=unreachable(S.me.pieces);if(u.length){ui.sel=u[0];render();toast(`${u.map(n=>LBL[COLOR[n]]+' '+SHAPES[SHAPE_OF[n]].name).join(', ')}: von keinem Strahl erreichbar. Bitte anders legen.`);break}
-  S.me.locked=true;ui.sel=null;ui.reveal=false;ui.last=null;save();render();window.scrollTo(0,0);toast('Verdeckt. Viel Spaß!')}break;
+  clearHist();S.me.locked=true;ui.sel=null;ui.reveal=false;ui.last=null;save();render();window.scrollTo(0,0);toast('Verdeckt. Viel Spaß!')}break;
  case'unlock':if(!t.dataset.ok&&S.me.answered.length){sheet(`<h3>Kristalle neu legen?</h3><p>Du hast schon ${S.me.answered.length} Fragen beantwortet. Wenn du umlegst, stimmen die alten Antworten nicht mehr.</p><div class="row"><button class="btn" data-act="close">Abbrechen</button><button class="btn primary grow" data-act="unlock" data-ok="1">Trotzdem neu legen</button></div>`);break}
   S.me.locked=false;S.me.answered=[];ui.last=null;close();save();render();break;
  case'reveal':ui.reveal=!ui.reveal;render();break;
  case'tool':ui.tool=t.dataset.tool;render();break;
- case'hl':if(ev.target.closest('.x'))break;{const i=+t.dataset.i;ui.hl=ui.hl===i?null:i;ui.anim=ui.hl!=null;render();window.scrollTo({top:0,behavior:'smooth'})}break;
- case'rm':{const i=+t.dataset.i;S.opp.log.splice(i,1);ui.hl=null;save();render();toast('Eintrag gelöscht')}break;
+ case'hl':if(ev.target.closest('.x'))break;{const i=+t.dataset.i;ui.hl=ui.hl===i?null:i;ui.anim=ui.hl!=null;close();render();window.scrollTo({top:0,behavior:'smooth'})}break;
+ case'rm':{const i=+t.dataset.i;S.opp.log.splice(i,1);ui.hl=null;save();render();if($('#sheet').classList.contains('open'))answersSheet();toast('Eintrag gelöscht')}break;
  case'aout':ask.out=+t.dataset.k;if(ask.out===0)ask.colors=[];else if(ask.colors&&!ask.colors.length&&ask.wasAb)ask.colors=null;ask.wasAb=ask.out===0;askSheet();break;
  case'acol':ask.colors=mixes()[+t.dataset.i].slice();askSheet();break;
  case'asave':if(S.mode==='duo')S.turn='opp';S.opp.log.push({n:ask.n,out:ask.out,colors:ask.out===0?[]:ask.colors.slice()});ui.hl=S.opp.log.length-1;ui.anim=true;save();close();render();break;
@@ -759,11 +932,26 @@ document.addEventListener('click',ev=>{
  case'scanqr':startScan(onQR);break;
  case'rescan':startScan(startScan.h||onQR);break;
  case'vcheck':doVerify();break;
- case'giveup':if(!t.dataset.ok){sheet(`<h3>Lösung zeigen?</h3><p>Die Kristalle erscheinen gestrichelt auf deinem Feld.</p><div class="row"><button class="btn" data-act="close">Weitersuchen</button><button class="btn primary grow" data-act="giveup" data-ok="1">Zeigen</button></div>`);break}
+ case'giveup':if(!t.dataset.ok&&SET.confirmGiveup){sheet(`<h3>Lösung zeigen?</h3><p>Die Kristalle erscheinen gestrichelt auf deinem Feld.</p><div class="row"><button class="btn" data-act="close">Weitersuchen</button><button class="btn primary grow" data-act="giveup" data-ok="1">Zeigen</button></div>`);break}
   S.opp.revealed=true;recordDaily('gaveup');save();close();render();break;
  case'close':close();break;
+ case'continue':ui.tab=S.mode==='duo'?(S.me.locked?'opp':'me'):'opp';render();window.scrollTo(0,0);break;
+ case'join':sheet(`<h3>Per QR beitreten</h3><p class="small">Halte die Kamera auf den Einladungs-Code deines Gegenübers.</p><div id="scanbox" class="scanbox"></div><div id="vres"></div><div class="row"><button class="btn grow" data-act="close">Abbrechen</button></div>`);startScan(onJoinQR);break;
+ case'joinok':if(ui.joinOpts){const o=ui.joinOpts;ui.joinOpts=null;startGame('duo',o);toast('Beigetreten – leg jetzt deine Kristalle')}break;
+ case'invite':sheet(`<h3>Gegenüber einladen</h3><p class="small">Dein Gegenüber tippt auf dem Startbildschirm auf „Per QR beitreten“ und scannt diesen Code.</p><div class="qr">${qrSVG(optsPayload(S.opts))}</div><p class="small center"><b>${presetName(S.opts)}</b> · ${STONES.length} ${plural(STONES.length,'Stein','Steine')} · ${RULES.filter(([k])=>ruleOn(S.opts,k)).map(r=>r[1]).join(', ')||'Originalregeln'}</p><div class="row"><button class="btn primary grow" data-act="close">Fertig</button></div>`);break;
+ case'set':{const k=t.dataset.k;SET[k]=!SET[k];saveSet();render()}break;
+ case'settheme':themePref=t.dataset.v;try{localStorage.setItem(TKEY,themePref)}catch(e){}applyTheme();render();break;
+ case'sethold':SET.holdMs=+t.dataset.v;saveSet();render();break;
+ case'cleardaily':if(!t.dataset.ok){sheet(`<h3>Verlauf löschen?</h3><p>Alle Tagesrätsel-Ergebnisse (deine und die vom Gegenüber) werden entfernt.</p><div class="row"><button class="btn" data-act="close">Abbrechen</button><button class="btn primary grow" data-act="cleardaily" data-ok="1">Löschen</button></div>`);break}
+  saveDaily({mine:{},partner:{}});close();render();toast('Verlauf gelöscht');break;
+ case'resetall':if(!t.dataset.ok){sheet(`<h3>Alles zurücksetzen?</h3><p>Laufendes Spiel, Verlauf, Optionen und Einstellungen werden gelöscht.</p><div class="row"><button class="btn" data-act="close">Abbrechen</button><button class="btn primary grow" data-act="resetall" data-ok="1">Zurücksetzen</button></div>`);break}
+  try{[KEY,OKEY,DKEY,SKEY,TKEY].forEach(k=>localStorage.removeItem(k))}catch(e){}location.reload();break;
  case'turn':S.turn=t.dataset.v;save();render();break;
  case'help':S.opp.help=!S.opp.help;save();render();break;
+ case'scanmode':ui.scanMode=!ui.scanMode;ui.sel=null;render();break;
+ case'answers':answersSheet();break;
+ case'turnask':sheet(`<h3>Wer fängt an?</h3><div class="row"><button class="btn grow" data-act="turnset" data-v="me">Ich</button><button class="btn grow" data-act="turnset" data-v="opp">Gegenüber</button></div>`);break;
+ case'turnset':S.turn=t.dataset.v;save();close();render();break;
  case'daily':startDaily();break;
  case'share':shareDaily();break;
  case'showres':sheet(`<h3>Meine Ergebnisse</h3><p>Dein Gegenüber scannt diesen Code im Verlauf mit „QR scannen“.</p><div class="qr">${qrSVG(resPayload())}</div><div class="row"><button class="btn primary grow" data-act="close">Fertig</button></div>`);break;
@@ -848,39 +1036,60 @@ if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostnam
 window.addEventListener('offline',()=>toast('Offline – das Spiel läuft trotzdem weiter'));
 
 /* ---------- Drag & Drop ---------- */
-let pend=null,suppressClick=false,touchSynth=false,raf=0,lastEv=null;
-function canPlace(ctx){return ctx==='me'?!S.me.locked:ui.tool==='piece'}
+let pend=null,suppressClick=false,raf=0,lastEv=null;
+function canPlace(ctx){return ctx==='me'?!S.me.locked:true}
 function boardSvg(ctx){return document.querySelector(`.board[data-ctx="${ctx}"] svg`)}
 function toSvg(svg,e){const m=svg.getScreenCTM();if(!m)return{x:-99,y:-99};const p=new DOMPoint(e.clientX,e.clientY).matrixTransform(m.inverse());return{x:p.x,y:p.y}}
 function outlineSVG(cells,color,dash){const e=edgesOf(cells).map(k=>{const [a,b]=k.split('|');return`M${a}L${b}`}).join('');
  return`<path d="${e}" fill="none" stroke="${color}" stroke-width=".1" ${dash?'stroke-dasharray=".2 .14"':''} stroke-linejoin="round"/>`}
-// Kann an dieser Stelle ein Ziehen beginnen?
-function dragCandidate(t){if(!t||!t.closest)return false;
- const chip=t.closest('.chip[data-n]');if(chip)return canPlace(ctxNow());
- const cell=t.closest('[data-cell]');if(!cell)return false;const b=t.closest('.board');if(!b)return false;const ctx=b.dataset.ctx;if(!canPlace(ctx))return false;
- return !!boardOf(P(ctx))[cell.dataset.cell]}
-// Bei Berührung auf einem Stein sofort das Scrollen sperren (zuverlässiger als erst beim Bewegen)
-document.addEventListener('touchstart',e=>{if(e.touches.length===1&&dragCandidate(e.target)){e.preventDefault();touchSynth=true}},{passive:false});
-document.addEventListener('touchmove',e=>{if(pend||touchSynth)e.preventDefault()},{passive:false});
+// Scrollen hat Vorrang: Mit dem Finger wird ein Stein erst nach kurzem Halten „angehoben“.
+// Wischt man sofort los, scrollt die Seite ganz normal. Mit der Maus startet das Ziehen direkt.
+const MOVE_TOL=9;const LIFT=()=>SET.holdMs||170;
+function startDrag(){const d=pend;if(!d||d.moved)return;clearTimeout(d.timer);
+ if(d.kind==='paint'){d.moved=true;d.svg=boardSvg('opp');d.layer=document.getElementById('paintG');const k=d.cell.join(',');d.op=S.opp.marks[k]?'del':'add';snap('opp');d.done=new Set();paintCell(d,...d.cell);return}
+ d.moved=true;
+ // Kein render(): das Element unter dem Finger muss bleiben, sonst kommen keine Touch-Events mehr an
+ ui.drag={ctx:d.ctx,n:d.n};ui.sel=d.n;
+ d.svg=boardSvg(d.ctx);const orig=d.svg&&d.svg.querySelector(`[data-pc="${d.n}"]`);if(orig)orig.setAttribute('opacity','.22');d.g=document.getElementById('dragG');d.sg=document.getElementById('snapG');
+ if(d.g){d.g.innerHTML=pieceSVG(d.n,shape(d.n,d.o),{});d.g.classList.add('lifted')}
+ dragUpdate(lastEv||{clientX:d.x0,clientY:d.y0})}
+// Nach dem Anheben steuern Touch-Events das Ziehen (robuster als Pointer-Events, die der Browser abbrechen kann)
+document.addEventListener('touchmove',e=>{if(!(pend&&pend.moved&&pend.touch))return;e.preventDefault();const t=e.touches[0];if(!t)return;
+ lastEv={clientX:t.clientX,clientY:t.clientY};if(!raf)raf=requestAnimationFrame(()=>{raf=0;if(pend&&pend.moved&&lastEv)dragUpdate(lastEv)})},{passive:false});
+document.addEventListener('touchend',()=>{if(pend&&pend.touch&&pend.moved)dragEnd(true)});
+document.addEventListener('touchcancel',()=>{if(pend&&pend.touch&&pend.moved)dragEnd(false)});
 document.addEventListener('pointerdown',e=>{
  if(e.button>0||pend)return;
  const chip=e.target.closest('.chip[data-n]');
  const cell=e.target.closest('[data-cell]');
+ const touch=e.pointerType!=='mouse';
  if(chip){const ctx=ctxNow();if(!canPlace(ctx))return;const n=chip.dataset.n,Pc=P(ctx);const o=Pc[n]?Pc[n].o:(ui.po[ctx][n]||0);const [w,h]=dims(shape(n,o));
-  pend={kind:'tray',el:chip,ctx,n,o,grab:[w/2,h/2],x0:e.clientX,y0:e.clientY,touch:e.pointerType==='touch',moved:false};return}
- if(cell){const ctx=e.target.closest('.board').dataset.ctx;if(!canPlace(ctx))return;const [x,y]=cell.dataset.cell.split(',').map(Number);
-  const at=boardOf(P(ctx))[x+','+y];if(!at)return;const p=P(ctx)[at.n];const pt=toSvg(boardSvg(ctx),e);
-  pend={kind:'board',el:cell,ctx,n:at.n,o:p.o,grab:[pt.x-p.x,pt.y-p.y],x0:e.clientX,y0:e.clientY,touch:e.pointerType==='touch',moved:false}}
+  pend={kind:'tray',el:chip,ctx,n,o,grab:[w/2,h/2],x0:e.clientX,y0:e.clientY,touch,moved:false}}
+ else if(cell){const b=e.target.closest('.board');const ctx=b.dataset.ctx;if(!canPlace(ctx))return;const [x,y]=cell.dataset.cell.split(',').map(Number);
+  const an=pieceAt(P(ctx),x,y,ui.sel);
+  if(!an){ // Gegner-Feld: auf leerem Kästchen halten und ziehen = mehrere Felder wegstreichen
+   if(ctx!=='opp'||ui.scanMode||(ui.sel&&!P(ctx)[ui.sel]))return;
+   pend={kind:'paint',el:cell,ctx,cell:[x,y],x0:e.clientX,y0:e.clientY,touch,moved:false};lastEv={clientX:e.clientX,clientY:e.clientY};if(touch)pend.timer=setTimeout(startDrag,LIFT());return}
+  const p=P(ctx)[an];const pt=toSvg(boardSvg(ctx),e);
+  pend={kind:'board',el:cell,ctx,n:an,o:p.o,grab:[pt.x-p.x,pt.y-p.y],x0:e.clientX,y0:e.clientY,touch,moved:false}}
+ else return;
+ lastEv={clientX:e.clientX,clientY:e.clientY};
+ if(touch)pend.timer=setTimeout(startDrag,LIFT());
 });
 document.addEventListener('pointermove',e=>{
  if(!pend)return;
- if(!pend.moved){if(Math.hypot(e.clientX-pend.x0,e.clientY-pend.y0)<6)return;
-  pend.moved=true;ui.drag={ctx:pend.ctx,n:pend.n};ui.sel=pend.n;render();
-  pend.svg=boardSvg(pend.ctx);pend.g=document.getElementById('dragG');pend.sg=document.getElementById('snapG');
-  if(pend.g)pend.g.innerHTML=pieceSVG(pend.n,shape(pend.n,pend.o),{})}
+ if(pend.touch&&pend.moved)return; // läuft über Touch-Events
  lastEv={clientX:e.clientX,clientY:e.clientY};
+ if(!pend.moved){const dist=Math.hypot(e.clientX-pend.x0,e.clientY-pend.y0);
+  if(pend.touch){if(dist>MOVE_TOL){clearTimeout(pend.timer);pend=null}return} // zu früh bewegt: das ist Scrollen
+  if(dist<4)return;startDrag();return}
  if(!raf)raf=requestAnimationFrame(()=>{raf=0;if(pend&&pend.moved&&lastEv)dragUpdate(lastEv)})});
-function dragUpdate(e,d=pend){if(!d||!d.svg)return;const pt=toSvg(d.svg,e);
+function paintCell(d,x,y){const k=x+','+y;if(d.done.has(k)||x<0||y<0||x>=COLS||y>=ROWS)return;d.done.add(k);
+ if(pieceAt(S.opp.guess,x,y))return;
+ if(d.op==='add'){if(S.opp.marks[k])return;S.opp.marks[k]=1;if(d.layer)d.layer.insertAdjacentHTML('beforeend',`<path d="M${x+.36},${y+.36}L${x+.64},${y+.64}M${x+.64},${y+.36}L${x+.36},${y+.64}" stroke="${T.am}" stroke-width=".09" stroke-linecap="round"/>`)}
+ else{if(!S.opp.marks[k])return;delete S.opp.marks[k];const el=d.svg&&d.svg.querySelector(`[data-mark="${k}"]`);if(el)el.setAttribute('opacity','.12')}}
+function paintUpdate(e,d=pend){if(!d||!d.svg)return;const pt=toSvg(d.svg,e);paintCell(d,Math.floor(pt.x),Math.floor(pt.y))}
+function dragUpdate(e,d=pend){if(d&&d.kind==='paint')return paintUpdate(e,d);if(!d||!d.svg)return;const pt=toSvg(d.svg,e);
  const lift=d.touch?1:0;const fx=pt.x-d.grab[0],fy=pt.y-d.grab[1]-lift;
  if(d.g)d.g.setAttribute('transform',`translate(${fx.toFixed(3)},${fy.toFixed(3)})`);
  const off=pt.x<-.6||pt.y<-.6||pt.x>COLS+.6||pt.y>ROWS+.6;
@@ -890,20 +1099,21 @@ function dragUpdate(e,d=pend){if(!d||!d.svg)return;const pt=toSvg(d.svg,e);
  if(key===d.key)return; // nur neu prüfen, wenn sich das Einrast-Feld ändert
  d.key=key;const why=whyNot(P(d.ctx),d.n,p);d.target=p;d.why=why;
  if(d.sg)d.sg.innerHTML=outlineSVG(cellsOf(d.n,p),why?'#E5484D':T.am,!!why)}
-function dragEnd(commit){const d=pend;pend=null;const synth=touchSynth;touchSynth=false;if(raf){cancelAnimationFrame(raf);raf=0}
- if(!d)return;
- if(!d.moved){ // war nur ein Tippen: Klick selbst auslösen, weil der Browser ihn wegen der Scroll-Sperre nicht schickt
-  if(commit&&synth&&d.el&&d.el.isConnected)d.el.dispatchEvent(new MouseEvent('click',{bubbles:true}));return}
- if(lastEv)dragUpdate(lastEv,d);lastEv=null;
- suppressClick=!synth;if(suppressClick)setTimeout(()=>suppressClick=false,80);ui.drag=null;
+function dragEnd(commit){const d=pend;pend=null;if(raf){cancelAnimationFrame(raf);raf=0}
+ if(!d)return;clearTimeout(d.timer);
+ if(!d.moved)return; // normales Tippen: der Browser schickt den Klick selbst
+ if(d.kind==='paint'){if(lastEv)paintUpdate(lastEv,d);lastEv=null;suppressClick=true;setTimeout(()=>suppressClick=false,60);save();render();return}
+ const pos=lastEv;lastEv=null;if(pos)dragUpdate(pos,d);
+ suppressClick=true;setTimeout(()=>suppressClick=false,60);ui.drag=null;
+ const travelled=pos?Math.hypot(pos.clientX-d.x0,pos.clientY-d.y0):0;
+ if(commit&&travelled<MOVE_TOL){ui.sel=d.n;render();return} // nur gehalten, nicht bewegt: Stein auswählen
+ if(commit&&(d.off?d.kind==='board':!!d.target))snap(d.ctx);
  if(commit){const Pc=P(d.ctx);
   if(d.off){if(d.kind==='board'){ui.po[d.ctx][d.n]=Pc[d.n].o;delete Pc[d.n];ui.sel=null;save();toast('Weggenommen')}}
-  else if(d.target&&!d.why){Pc[d.n]=d.target;ui.sel=d.n;if(d.ctx==='opp')for(const [cx,cy] of cellsOf(d.n,d.target))delete S.opp.marks[cx+','+cy];save()}
-  else if(d.why)toast(WHY[d.why])}
+  else if(d.target){Pc[d.n]=d.target;ui.sel=d.n;if(d.ctx==='opp')for(const [cx,cy] of cellsOf(d.n,d.target))delete S.opp.marks[cx+','+cy];save()}}
  render()}
-document.addEventListener('pointerup',()=>dragEnd(true));
-document.addEventListener('pointercancel',()=>dragEnd(false));
-document.addEventListener('touchend',()=>{if(!pend)touchSynth=false});
+document.addEventListener('pointerup',()=>{if(pend&&pend.touch&&pend.moved)return;dragEnd(true)});
+document.addEventListener('pointercancel',()=>{if(pend&&pend.touch&&pend.moved)return;dragEnd(false)});
 
 render();
 
