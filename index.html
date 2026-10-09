@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="de"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#ECE8F2">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -273,9 +273,21 @@ nav#tabs button:not(.gear){flex:1 1 auto;font-size:14.5px}
 .homestats div{flex:1;text-align:center}.homestats b{display:block;font-size:20px;font-weight:800}.homestats span{font-size:12px;color:var(--muted)}
 .btn.ghost{background:var(--slab);color:var(--ink);border:1.5px solid var(--line)}
 .btn.sm svg{width:16px;height:16px;vertical-align:-3px;margin-right:3px}
+html,body,*{touch-action:manipulation}
+input,select,textarea{font-size:16px}
+body.nonav{padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+body.nonav nav#tabs{display:none}
+body.nonav #toast{bottom:calc(24px + env(safe-area-inset-bottom))!important}
+#backbtn{flex:none;border:0;background:var(--slab);color:var(--ink);width:36px;height:36px;border-radius:50%;display:grid;place-items:center;padding:0;box-shadow:inset 0 0 0 1.5px var(--line)}
+#backbtn[hidden],#helpbtn[hidden],#setbtn[hidden]{display:none}
+#setbtn{flex:none;border:0;background:var(--slab);color:var(--ink);width:36px;height:36px;border-radius:50%;display:grid;place-items:center;padding:0;box-shadow:inset 0 0 0 1.5px var(--line)}
+header h1{flex:1}
+html:not(.lobby) header h1 svg{display:none}
+html:not(.lobby) header h1{font-size:19px}
+.dh{display:none}
 </style></head>
 <body>
-<header><h1><svg viewBox="0 0 2 2"><polygon points="1,0 2,1 1,2 0,1" fill="#6A4BE0" stroke="#24213B" stroke-width=".12" stroke-linejoin="round"/><path d="M0,1H2" stroke="#fff" stroke-width=".08" opacity=".7"/></svg>Kristall-Echo</h1><button id="helpbtn" data-act="tab" data-tab="rules" aria-label="Spielregeln">?</button></header>
+<header><button id="backbtn" data-act="back" aria-label="Zurück" hidden><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h1><svg viewBox="0 0 2 2"><polygon points="1,0 2,1 1,2 0,1" fill="#6A4BE0" stroke="#24213B" stroke-width=".12" stroke-linejoin="round"/><path d="M0,1H2" stroke="#fff" stroke-width=".08" opacity=".7"/></svg><span id="htitle">Kristall-Echo</span></h1><button id="helpbtn" data-act="tab" data-tab="rules" aria-label="Spielregeln">?</button><button id="setbtn" data-act="tab" data-tab="settings" aria-label="Einstellungen"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button></header>
 <main id="app"></main>
 <nav id="tabs"></nav>
 <div id="sheet"></div><div id="toast" role="status" aria-live="polite"></div>
@@ -717,14 +729,25 @@ function viewRules(){const N=NAMES.length;const leg=NAMES.map(n=>`<span class="l
  <ul><li><b>Wegstreichen:</b> Im Gegner-Feld ein leeres Kästchen antippen. Kurz halten und ziehen streicht mehrere auf einmal (oder hebt sie wieder auf, wenn das erste schon gestrichen war).</li><li><b>Steine:</b> Antippen und aufs Feld tippen, oder kurz halten und ziehen. Wischen scrollt.</li><li>Ein Weg gilt in beide Richtungen: Wenn 3 bei C rauskommt, kommt C bei 3 raus.</li><li>Sobald alle deine Kristalle liegen, zeigt die Liste mit ✓ und ✗, welche Antworten zu deiner Vermutung passen.</li><li>Stellt auf beiden Handys dieselben Optionen ein, sonst passen Antworten und Codes nicht.</li></ul>
  </article>`}
 
+const SUBPAGES={rules:'Spielregeln',settings:'Einstellungen',days:'Tagesrätsel'};
+const GAMEVIEWS=['me','opp'];
 function render(){
- const tabs0=S.mode==='duo'?[['me','Mein Feld'],['opp','Gegner']]:S.mode?[['opp','Suchen']]:[];
- const tabs=[['home','⌂'],...tabs0,['settings','⚙']];
- if(!tabs.some(t=>t[0]===ui.tab)&&!['rules','days'].includes(ui.tab))ui.tab='home';
+ // Zwei Ebenen: Lobby (Start + Unterseiten) und Spiel (eigene Leiste nur bei 2 Ansichten)
+ if(GAMEVIEWS.includes(ui.tab)&&!S.mode)ui.tab='home';
+ if(S.mode&&S.mode!=='duo'&&ui.tab==='me')ui.tab='opp';
+ if(!GAMEVIEWS.includes(ui.tab)&&!SUBPAGES[ui.tab])ui.tab='home';
+ const inGame=GAMEVIEWS.includes(ui.tab),sub=SUBPAGES[ui.tab];
+ const tabs=inGame&&S.mode==='duo'?[['me','Mein Feld'],['opp','Gegner']]:[];
  const dot=S.mode==='duo'&&S.turn?(S.turn==='me'?'opp':'me'):null;
- $('#tabs').innerHTML=tabs.map(([k,l])=>k==='home'?`<button class="gear${ui.tab===k?' on':''}" data-act="tab" data-tab="home" aria-label="Start">${HOME_ICON}</button>`:k==='settings'?`<button class="gear${ui.tab===k?' on':''}" data-act="tab" data-tab="settings" aria-label="Einstellungen"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>`:`<button class="${ui.tab===k?'on':''}" data-act="tab" data-tab="${k}">${l}${dot===k?'<i class="tdot"></i>':''}</button>`).join('');
- const hb=$('#helpbtn');if(hb)hb.classList.toggle('on',ui.tab==='rules');
- const v=ui.tab==='settings'?viewSettings():ui.tab==='rules'?viewRules():ui.tab==='days'?viewDays():ui.tab==='home'||!S.mode?viewHome():ui.tab==='me'?viewMe():viewOpp();
+ $('#tabs').innerHTML=tabs.map(([k,l])=>`<button class="${ui.tab===k?'on':''}" data-act="tab" data-tab="${k}">${l}${dot===k?'<i class="tdot"></i>':''}</button>`).join('');
+ document.body.classList.toggle('nonav',!tabs.length);
+ // Kopfzeile: links zurück (im Spiel und auf Unterseiten), Titel, rechts ? und ⚙
+ const back=$('#backbtn');if(back)back.hidden=!(inGame||sub);
+ const ttl=$('#htitle');if(ttl)ttl.textContent=sub?SUBPAGES[ui.tab]:inGame?(S.mode==='duo'?'Gegeneinander':S.mode==='daily'?'Tagesrätsel':'Solo'):'Kristall-Echo';
+ document.documentElement.classList.toggle('lobby',!inGame&&!sub);
+ const hb=$('#helpbtn');if(hb){hb.classList.toggle('on',ui.tab==='rules');hb.hidden=ui.tab==='rules'}
+ const sb=$('#setbtn');if(sb){sb.classList.toggle('on',ui.tab==='settings');sb.hidden=ui.tab==='settings'}
+ const v=ui.tab==='settings'?viewSettings():ui.tab==='rules'?viewRules():ui.tab==='days'?viewDays():ui.tab==='home'?viewHome():ui.tab==='me'?viewMe():viewOpp();
  $('#app').innerHTML=v;ui.anim=false}
 
 /* ---------- Sheets & toast ---------- */
@@ -873,7 +896,8 @@ document.addEventListener('click',ev=>{
  if(labEl||cell){const ctx=ev.target.closest('.board').dataset.ctx;if(labEl)onLabel(ctx,+labEl.dataset.label);else{const [x,y]=cell.dataset.cell.split(',').map(Number);onCell(ctx,x,y)}return}
  const t=ev.target.closest('[data-act]');if(!t)return;const a=t.dataset.act;
  switch(a){
- case'tab':ui.tab=t.dataset.tab==='start'?'home':t.dataset.tab;ui.sel=null;ui.scanMode=false;render();window.scrollTo(0,0);break;
+ case'tab':{const to=t.dataset.tab==='start'?'home':t.dataset.tab;if(SUBPAGES[to]&&!SUBPAGES[ui.tab])ui.back=ui.tab;ui.tab=to;ui.sel=null;ui.scanMode=false;close();render();window.scrollTo(0,0)}break;
+ case'back':ui.tab=SUBPAGES[ui.tab]?(ui.back||'home'):'home';ui.back=null;ui.sel=null;ui.scanMode=false;render();window.scrollTo(0,0);break;
  case'setup':ui.setup={mode:t.dataset.mode,view:'main',opts:{...DEFAULT_OPTS,...(store.get(OKEY)||{})}};setupSheet();break;
  case'scol':ui.setup.opts.color=t.dataset.v;setupSheet();break;
  case'sopt':{const k=t.dataset.k,o=ui.setup.opts;if(k==='house')o.color=o.color==='house'?'orig':'house';else o[k]=!o[k];setupSheet()}break;
@@ -1034,6 +1058,18 @@ function viewDays(){const d=dailyData(),mine=d.mine,par=d.partner;
 /* ---------- Offline ---------- */
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 window.addEventListener('offline',()=>toast('Offline – das Spiel läuft trotzdem weiter'));
+
+/* ---------- Nie zoomen ---------- */
+['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false})); // iOS Pinch
+document.addEventListener('touchmove',e=>{if(e.touches.length>1||(e.scale&&e.scale!==1))e.preventDefault()},{passive:false});
+document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
+// Doppeltipp: Zoom verhindern, aber den zweiten Tipp trotzdem als Klick ausführen (schnell zweimal drehen etc.)
+let lastTouchEnd=0;document.addEventListener('touchend',e=>{const n=Date.now(),quick=n-lastTouchEnd<350;lastTouchEnd=n;
+ if(!quick||!e.cancelable||e.touches.length||(typeof pend!=='undefined'&&pend&&pend.moved))return;
+ const t=e.changedTouches[0];if(!t)return;const el=document.elementFromPoint(t.clientX,t.clientY);if(!el||el.closest('input,textarea,select'))return;
+ e.preventDefault();el.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,clientX:t.clientX,clientY:t.clientY}))},{passive:false});
+window.addEventListener('wheel',e=>{if(e.ctrlKey)e.preventDefault()},{passive:false}); // Trackpad-Zoom
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&['+','-','=','0'].includes(e.key))e.preventDefault()});
 
 /* ---------- Drag & Drop ---------- */
 let pend=null,suppressClick=false,raf=0,lastEv=null;
