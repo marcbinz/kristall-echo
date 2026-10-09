@@ -199,6 +199,22 @@ table.days td.best::after{content:' 🏆';font-size:12px}
 /* Nirgends versehentlich Text markieren – außer im Code-Eingabefeld */
 *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+.swatches{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.sw-btn{display:flex;flex-direction:column;align-items:center;gap:3px;border:1.5px solid var(--line);background:var(--slab);border-radius:12px;padding:7px 2px 5px;min-width:0}
+.sw-btn i{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--ink)}
+.sw-btn span{font-size:10.5px;font-weight:600;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sw-btn.on{border-color:var(--am);box-shadow:inset 0 0 0 1.5px var(--am);background:var(--am-soft)}
+.shgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.shgrid .ccard{min-height:84px;padding:8px 2px 6px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px}
+.cname{font-size:11.5px;font-weight:700;text-align:center;line-height:1.15;max-width:100%}
+.cname small{display:block;font-weight:400;color:var(--muted);font-size:10.5px}
+.chosen{display:flex;flex-wrap:wrap;gap:6px;min-height:20px}
+.chosen-st{border:1.5px solid var(--line);background:var(--slab);border-radius:10px;padding:6px 8px;display:grid;place-items:center}
+.panel h4 span{font-weight:400;color:var(--muted)}
+.chip span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sw-btn{padding:6px 0 5px;justify-content:flex-start}
+.sw-btn span{font-size:10px;line-height:1.1;text-align:center;letter-spacing:-.01em;overflow:visible;text-overflow:clip}
+.sw-btn span small{display:block;font-size:9px;font-weight:500;color:var(--muted)}
 </style></head>
 <body>
 <header><h1><svg viewBox="0 0 2 2"><polygon points="1,0 2,1 1,2 0,1" fill="#6A4BE0" stroke="#24213B" stroke-width=".12" stroke-linejoin="round"/><path d="M0,1H2" stroke="#fff" stroke-width=".08" opacity=".7"/></svg>Kristall-Echo</h1><button id="themebtn" data-act="theme" aria-label="Design"></button><button id="newbtn" data-act="newmenu">Neues Spiel</button></header>
@@ -228,7 +244,14 @@ const SHAPES={
  blitz3:{name:'Blitz',cells:[[0,0,'SE'],[1,0,'F'],[1,1,'F'],[2,1,'NW']]},
 };
 const SHAPE_ORDER=Object.keys(SHAPES);
-const STONE_COLORS=['rot','gelb','blau','weiss','trans','schwarz'];
+// Reihenfolge nur anhängen (Index steckt im Lösungs-Code); Anzeige-Reihenfolge siehe PICK_COLORS
+const STONE_COLORS=['rot','gelb','blau','weiss','trans','schwarz','orange','lila','gruen','rosa','hellgelb','hellblau','hellorange','helllila','hellgruen'];
+const PICK_COLORS=['rot','gelb','blau','orange','gruen','lila','rosa','hellgelb','hellblau','hellorange','hellgruen','helllila','weiss','trans','schwarz'];
+const LIGHT_COLORS=['rosa','hellgelb','hellblau','hellorange','helllila','hellgruen'];
+// Welche Grundanteile ein Stein beisteuert. Helle Steine bringen ihr „Weiß“ selbst mit, auch bei „Weiß färbt nicht“.
+const COMPS={rot:['rot'],gelb:['gelb'],blau:['blau'],orange:['rot','gelb'],lila:['rot','blau'],gruen:['gelb','blau'],
+ rosa:['rot','weiss'],hellgelb:['gelb','weiss'],hellblau:['blau','weiss'],hellorange:['rot','gelb','weiss'],helllila:['rot','blau','weiss'],hellgruen:['gelb','blau','weiss'],trans:[],schwarz:[]};
+function compsOf(color){return color==='weiss'?(OPTS.color==='orig'?['weiss']:[]):(COMPS[color]||[])}
 const MAX_BLOCKS=20; // ein Viertel des Felds
 function shapeArea(s){return SHAPES[s].cells.reduce((a,c)=>a+(c[2]==='F'?1:.5),0)}
 const ST=(id,shape,color)=>({id,shape,color});
@@ -257,9 +280,10 @@ function applyOpts(o){OPTS={...DEFAULT_OPTS,...(o||{})};if(o&&!o.preset&&(o.tran
  STONES=stonesOf(OPTS);for(const k in BASE){delete BASE[k];delete COLOR[k];delete SHAPE_OF[k]}
  for(const s of STONES){BASE[s.id]=SHAPES[s.shape].cells;COLOR[s.id]=s.color;SHAPE_OF[s.id]=s.shape}
  NAMES=STONES.map(s=>s.id);
- TINT=OPTS.color==='orig'?['rot','gelb','blau','weiss']:['rot','gelb','blau']}
+ TINT=['rot','gelb','blau','weiss']}
 function hasColor(c){return STONES.some(s=>s.color===c)}
-function stoneSig(o=OPTS){if(o.preset&&o.preset!=='custom')return o.preset;return stonesOf(o).map(s=>SHAPE_ORDER.indexOf(s.shape).toString(36)+STONE_COLORS.indexOf(s.color)).join('')}
+function hasLight(){return STONES.some(s=>LIGHT_COLORS.includes(s.color))}
+function stoneSig(o=OPTS){if(o.preset&&o.preset!=='custom')return o.preset;return stonesOf(o).map(s=>SHAPE_ORDER.indexOf(s.shape).toString(36)+STONE_COLORS.indexOf(s.color).toString(36)).join('')}
 applyOpts();
 function lab(n){if(n===0)return'–';if(n<=18)return String(n);if(n<=28)return String.fromCharCode(73+(28-n));return String.fromCharCode(65+(36-n))}
 function cellName(x,y){return String.fromCharCode(65+y)+(x+1)}
@@ -303,7 +327,7 @@ function trace(b,n){let [pos,d]=entry(n);const pts=[[pos[0]+.5,pos[1]+.5]],hit=[
   if(!c){pos=[nx,ny];P_([nx+.5,ny+.5]);continue}
   ids.add(c.n);
   if(COLOR[c.n]==='schwarz'){P_([(pos[0]+nx)/2+.5,(pos[1]+ny)/2+.5]);return done(0)}
-  if(!hit.includes(COLOR[c.n]))hit.push(COLOR[c.n]);
+  for(const k of compsOf(COLOR[c.n]))if(!hit.includes(k))hit.push(k);
   const side=OPP[d];
   if(c.k==='F'||c.k.includes(side)){P_([(pos[0]+nx)/2+.5,(pos[1]+ny)/2+.5]);d=OPP[d];
    {const pc=b[pos[0]+','+pos[1]];if(pc&&pc.k!=='F'){d=mirrorD(pc.k,d)}P_([pos[0]+.5,pos[1]+.5]);}
@@ -324,7 +348,7 @@ function dailyOpts(date){const r=mulberry32(hashStr('KE-opts-'+date));
  return o}
 function seededLayout(seed){const old=RNG;RNG=mulberry32(hashStr(seed));try{return randomLayout()}finally{RNG=old}}
 // Logik-Hilfe: nur sichere Schlüsse
-function colorlessDeflectors(){return OPTS.color==='house'||hasColor('trans')}
+function colorlessDeflectors(){return(OPTS.color==='house'&&hasColor('weiss'))||hasColor('trans')}
 function sureEmpty(log){const s=new Set();const straight=!colorlessDeflectors();
  for(const e of log){
   if(e.scan){if(e.val==='leer')s.add(e.scan.join(','));continue}
@@ -343,9 +367,9 @@ function encode(P){return NAMES.map(n=>`${P[n].x}${P[n].y}${P[n].o}`).join(' ')}
 function decode(s){const d=(s||'').replace(/\D/g,'');if(d.length!==NAMES.length*3)return null;const P={};
  for(let i=0;i<NAMES.length;i++){const x=+d[i*3],y=+d[i*3+1],o=+d[i*3+2];if(o>7)return null;const n=NAMES[i],p={x,y,o};if(whyNot(P,n,p)==='out'||whyNot(P,n,p)==='overlap')return null;P[n]=p}return P}
 
-const LBL={rot:'Rot',gelb:'Gelb',blau:'Blau',weiss:'Weiß',trans:'Transparent',schwarz:'Schwarz'};
-const SHORT={...LBL,trans:'Transp.'};
-const FILL={rot:'#E5484D',gelb:'#F5C518',blau:'#2F7BEA',weiss:'#FFFFFF',trans:'#CDEFF5',schwarz:'#2B2838'};
+const LBL={rot:'Rot',gelb:'Gelb',blau:'Blau',weiss:'Weiß',trans:'Transparent',schwarz:'Schwarz',orange:'Orange',lila:'Lila',gruen:'Grün',rosa:'Rosa',hellgelb:'Hellgelb',hellblau:'Hellblau',hellorange:'Hellorange',helllila:'Helllila',hellgruen:'Hellgrün'};
+const SHORT={...LBL,trans:'Transp.',hellorange:'Hellor.',hellgruen:'Hellgrün',hellgelb:'Hellgelb'};
+const FILL={rot:'#E5484D',gelb:'#F5C518',blau:'#2F7BEA',weiss:'#FFFFFF',trans:'#CDEFF5',schwarz:'#2B2838',orange:'#F28C28',lila:'#8E44AD',gruen:'#2EAD5B',rosa:'#F2A4A6',hellgelb:'#FAE28B',hellblau:'#97BDF4',hellorange:'#F9C593',helllila:'#C7A1D6',hellgruen:'#96D6AD'};
 const VALNAME={leer:'leer',...LBL};
 const CASE='#16132B';
 const TL={outline:'#24213B',board:'#FBFAFE',grid:'#DCD7EA',edge:'#24213B',am:'#6A4BE0',amSoft:'#E3DCFB',muted:'#6E6987'};
@@ -392,7 +416,7 @@ const MIX_ORIG=[[],['rot','weiss'],['gelb','weiss'],['blau','weiss'],
  ['rot','gelb','blau','weiss'],['rot','gelb','weiss'],['gelb','blau','weiss'],['rot','blau','weiss'],
  ['rot','gelb','blau'],['rot','gelb'],['gelb','blau'],['rot','blau']];
 const MIX_HOUSE=[[],['rot'],['gelb'],['blau'],['rot','gelb','blau'],['rot','gelb'],['gelb','blau'],['rot','blau']];
-function mixes(){return OPTS.color==='orig'?MIX_ORIG:MIX_HOUSE}
+function mixes(){return OPTS.color==='orig'||hasLight()?MIX_ORIG:MIX_HOUSE}
 const colorText=c=>MIXNAME[c.filter(x=>TINT.includes(x)).join(',')]||'?';
 const dots=c=>c.length?`<i class="dot" style="background:${mixColor(c)}"></i>`:'<i class="dot none"></i>';
 const ans=(out,c)=>out===0?'absorbiert':`raus bei ${lab(out)}, ${colorText(c)}`;
@@ -544,9 +568,12 @@ function viewOpp(){const O=S.opp,solo=isSolo(),daily=S.mode==='daily',N=NAMES.le
  ${solo&&!O.solved&&!O.revealed?'<div class="row"><button class="link" data-act="giveup">Aufgeben und Lösung zeigen</button></div>':''}`}
 
 function viewRules(){const N=NAMES.length;const leg=NAMES.map(n=>`<span class="lg">${miniSVG(n,0,11)}${SHORT[COLOR[n]]}</span>`).join('');
- const colorRule=OPTS.color==='orig'
+ const sec=STONES.some(s=>['orange','lila','gruen'].includes(s.color)),lt=hasLight();
+ const colorRule=(OPTS.color==='orig'
   ?'<li>Jeder farbige Stein färbt ihn, auch Weiß. Farben mischen sich: Rot+Gelb = Orange, Rot+Blau = Lila, Gelb+Blau = Grün, alle drei = Schwarz. Mit Weiß wird es hell: Rosa, Hellgelb, Hellblau, Hellorange, Helllila, Hellgrün, Grau. Nur Weiß ergibt Weiß.</li>'
-  :'<li>Rot, Gelb und Blau färben ihn, Weiß lenkt nur ab. Farben mischen sich: Rot+Gelb = Orange, Rot+Blau = Lila, Gelb+Blau = Grün, alle drei = Schwarz.</li>';
+  :'<li>Rot, Gelb und Blau färben ihn, Weiß lenkt nur ab. Farben mischen sich: Rot+Gelb = Orange, Rot+Blau = Lila, Gelb+Blau = Grün, alle drei = Schwarz.</li>')
+  +(sec?'<li>Ein Stein in Mischfarbe färbt wie seine Bestandteile: Orange wirkt wie Rot+Gelb, Lila wie Rot+Blau, Grün wie Gelb+Blau.</li>':'')
+  +(lt?`<li>Helle Steine (Rosa, Hellblau …) machen den Strahl immer hell${OPTS.color==='house'?', auch wenn Weiß sonst nicht färbt':''}. Hellblau wirkt wie Blau+Weiß.</li>`:'');
  return`<article class="rules">
  <h2>So geht's</h2>
  <p>Jeder versteckt ${N} Kristalle. Ihr fragt abwechselnd. Die Antwort verrät, <b>wo</b> der Strahl rauskommt und in <b>welcher Farbe</b>. Wer zuerst alle Kristalle exakt richtig hat, gewinnt.</p>
@@ -610,9 +637,15 @@ function stonesSheet(){const o=ui.setup.opts;const cur=o.preset||'std';
  const card=(k,p)=>`<button class="preset${cur===k?' on':''}" data-act="preset" data-k="${k}"><span class="pt"><b>${p.name}</b><small>${p.desc} · ${blocksOf(p.stones)} Blöcke</small></span><span class="minis">${p.stones.map(s=>miniShapeSVG(s.shape,s.color,6)).join('')}</span></button>`;
  let builder='';
  if(cur==='custom'){const c=o.custom||{};const used=blocksOf(customStones(c));const pct=Math.min(100,used/MAX_BLOCKS*100);
+  const pc=ui.setup.pick||'rot';const chosen=customStones(c);
   builder=`<div class="budget${used>=MAX_BLOCKS?' full':''}"><div class="bar"><i style="width:${pct}%"></i></div><span><b>${used}</b> / ${MAX_BLOCKS} Blöcke</span></div>
-  ${SHAPE_ORDER.map(sh=>{const a=shapeArea(sh);return`<div class="shrow"><div class="shlab">${SHAPES[sh].name}<small>${a} ${plural(a,'Block','Blöcke')}</small></div><div class="cgrid">${STONE_COLORS.map(col=>{const k=sh+'|'+col,n=c[k]||0,blocked=used+a>MAX_BLOCKS;
-   return`<div class="ccard${n?' on':''}${blocked&&!n?' dis':''}" data-act="cadd" data-k="${k}" role="button" aria-label="${SHAPES[sh].name} ${LBL[col]}: ${n}">${miniShapeSVG(sh,col,Math.min(9,40/dims(SHAPES[sh].cells)[0]))}${n?`<span class="cnt">${n}</span><span class="csub" data-act="csub" data-k="${k}" aria-label="weniger">−</span>`:''}</div>`}).join('')}</div></div>`}).join('')}
+  <h4>Farbe</h4>
+  <div class="swatches">${PICK_COLORS.map(col=>`<button class="sw-btn${pc===col?' on':''}" data-act="pickcol" data-c="${col}" aria-label="${LBL[col]}"><i style="background:${fillOf(col)}"></i><span>${col==='rosa'?'<small>hellrot</small>Rosa':LIGHT_COLORS.includes(col)?`<small>hell</small>${LBL[col].slice(4).replace(/^./,m=>m.toUpperCase())}`:col==='trans'?'Transp.':LBL[col]}</span></button>`).join('')}</div>
+  <h4>Form in ${LBL[pc]}</h4>
+  <div class="shgrid">${SHAPE_ORDER.map(sh=>{const a=shapeArea(sh),k=sh+'|'+pc,n=c[k]||0,blocked=used+a>MAX_BLOCKS;const [w]=dims(SHAPES[sh].cells);
+   return`<div class="ccard${n?' on':''}${blocked&&!n?' dis':''}" data-act="cadd" data-k="${k}" role="button" aria-label="${SHAPES[sh].name} ${LBL[pc]}: ${n}">${miniShapeSVG(sh,pc,Math.min(11,46/w))}<span class="cname">${SHAPES[sh].name}<small>${a} ${plural(a,'Block','Blöcke')}</small></span>${n?`<span class="cnt">${n}</span><span class="csub" data-act="csub" data-k="${k}" aria-label="weniger">−</span>`:''}</div>`}).join('')}</div>
+  <h4>Ausgewählt <span>(${chosen.length} ${plural(chosen.length,'Stein','Steine')}, antippen zum Entfernen)</span></h4>
+  <div class="chosen">${chosen.length?chosen.map(st=>`<button class="chosen-st" data-act="csub" data-k="${st.shape}|${st.color}" aria-label="${SHAPES[st.shape].name} ${LBL[st.color]} entfernen">${miniShapeSVG(st.shape,st.color,8)}</button>`).join(''):'<p class="small">Noch nichts ausgewählt.</p>'}</div>
   <div class="row"><button class="link" data-act="cclear">Alle entfernen</button></div>`}
  sheet(`<div class="shead"><button class="back-btn" data-act="sback" aria-label="Zurück">‹</button><h3>Steine</h3></div>
  <div class="presets">${Object.entries(PRESETS).map(([k,p])=>card(k,p)).join('')}
@@ -629,7 +662,7 @@ function askSheet(){const a=ask;const ab=a.out===0;
  <div class="row colors">${mixes().map((m,i)=>`<button class="cbtn${a.colors&&a.colors.join()===m.join()?' on':''}" data-act="acol" data-i="${i}">${dots(m)}<span>${colorText(m)}</span></button>`).join('')}</div>`}
  <div class="row"><button class="btn" data-act="close">Abbrechen</button><button class="btn primary grow" data-act="asave" ${a.out!=null&&(ab||a.colors)?'':'disabled'}>${a.out==null?'Ausgang wählen':ab?'Speichern: absorbiert':!a.colors?'Farbe wählen':`Speichern: ${lab(a.out)}, ${colorText(a.colors)}`}</button></div>`)}
 let scanAsk=null;
-function scanSheet(){const s=scanAsk;const vals=['leer','rot','gelb','blau','weiss',...(hasColor('trans')?['trans']:[]),...(hasColor('schwarz')?['schwarz']:[])];
+function scanSheet(){const s=scanAsk;const vals=['leer',...PICK_COLORS.filter(c=>hasColor(c))];
  sheet(`<h3>Scan ${cellName(...s.cell)}: was ist dort?</h3>
  <div class="row colors">${vals.map(v=>`<button class="cbtn${s.val===v?' on':''}" data-act="sval" data-v="${v}">${vdot(v)}<span>${SHORT[v]||'leer'}</span></button>`).join('')}</div>
  <div class="row"><button class="btn" data-act="close">Abbrechen</button><button class="btn primary grow" data-act="ssave" ${s.val?'':'disabled'}>${s.val?`Speichern: ${VALNAME[s.val]}`:'Antwort wählen'}</button></div>`)}
@@ -684,6 +717,7 @@ document.addEventListener('click',ev=>{
   if(used+a>MAX_BLOCKS){toast(`Maximal ${MAX_BLOCKS} Blöcke`);break}c[k]=(c[k]||0)+1;setupSheet()}break;
  case'csub':{const c=ui.setup.opts.custom||{},k=t.dataset.k;if(c[k]>1)c[k]--;else delete c[k];setupSheet()}break;
  case'cclear':ui.setup.opts.custom={};setupSheet();break;
+ case'pickcol':ui.setup.pick=t.dataset.c;setupSheet();break;
  case'start':{const o=ui.setup.opts;const keep=S.opts;applyOpts(o);
   const err=!STONES.length?'Wähl mindestens einen Stein aus.':!randomLayout()?'Diese Steine passen so nicht aufs Feld. Nimm weniger oder erlaube Kantenkontakt.':null;
   if(err){applyOpts(keep);toast(err);break}startGame(ui.setup.mode,o)}break;
