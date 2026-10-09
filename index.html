@@ -21,7 +21,7 @@ html,body{margin:0;background:var(--rock);color:var(--ink);font-family:'Bricolag
 body{padding-bottom:calc(80px + env(safe-area-inset-bottom));-webkit-text-size-adjust:100%}
 button{font:inherit;color:inherit;cursor:pointer}
 button:focus-visible,input:focus-visible{outline:3px solid var(--am);outline-offset:2px}
-header{display:flex;align-items:center;gap:8px;padding:calc(12px + env(safe-area-inset-top)) 16px 8px;max-width:520px;margin:0 auto}
+header{position:sticky;top:0;z-index:6;display:flex;align-items:center;gap:8px;padding:calc(10px + env(safe-area-inset-top)) max(16px,calc((100% - 488px)/2)) 8px;background:var(--nav);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);margin-bottom:10px}
 h1{white-space:nowrap;margin-right:auto!important;font-size:24px;font-weight:800;letter-spacing:-.03em;margin:0;display:flex;align-items:center;gap:8px}
 h1 svg{width:26px;height:26px}
 
@@ -72,8 +72,8 @@ h3{font-size:17px;margin:20px 4px 8px;font-weight:700}
 .rules h3{margin-left:0}.rules ul,.rules ol{padding-left:20px;margin:0}.rules li{margin:4px 0}
 .legend{display:flex;justify-content:space-between;align-items:flex-end;gap:4px;margin:12px 0 4px}
 .lg{display:flex;flex-direction:column;align-items:center;font-size:13px;font-weight:600;gap:2px}
-nav#tabs{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;gap:6px;padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:var(--nav);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--line);z-index:5}
-nav#tabs button{flex:1;max-width:170px;border:0;background:none;border-radius:12px;min-height:46px;font-weight:700;color:var(--muted)}
+nav#tabs{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;gap:6px;padding:6px 12px calc(6px + env(safe-area-inset-bottom));background:var(--nav);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--line);z-index:5}
+nav#tabs button{flex:1;max-width:150px;border:0;background:none;border-radius:999px;min-height:34px;padding:0 10px;font-size:15px;font-weight:700;color:var(--muted)}
 nav#tabs button.on{background:var(--pri-bg);color:var(--pri-fg)}
 #sheet{position:fixed;inset:0;z-index:10;display:none}
 #sheet.open{display:block}
@@ -113,16 +113,17 @@ input#code{width:100%;font:inherit;font-size:24px;font-weight:700;letter-spacing
 #themebtn{border:0;background:var(--slab);color:var(--ink);width:38px;height:38px;border-radius:50%;display:grid;place-items:center;box-shadow:inset 0 0 0 1.5px var(--line)}
 :root[data-theme=dark] .dot.none{background:repeating-linear-gradient(45deg,#3a3558 0 2px,#6b6590 2px 4px)}
 :root[data-theme=dark] .opt .sw::after{background:#ECE9FA}
-@media (display-mode: standalone){header{padding-top:calc(env(safe-area-inset-top) + 26px)}}
-html.standalone header{padding-top:calc(env(safe-area-inset-top) + 26px)}
+@media (display-mode: standalone){header{padding-top:calc(env(safe-area-inset-top) + 24px)}}
+html.standalone header{padding-top:calc(env(safe-area-inset-top) + 24px)}
 .board,.chip{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
 @media (display-mode: standalone){
- nav#tabs{padding-bottom:max(6px,calc(env(safe-area-inset-bottom) - 18px))}
- body{padding-bottom:calc(64px + max(6px,calc(env(safe-area-inset-bottom) - 18px)))}
- #toast{bottom:calc(72px + max(6px,calc(env(safe-area-inset-bottom) - 18px)))}}
-html.standalone nav#tabs{padding-bottom:max(6px,calc(env(safe-area-inset-bottom) - 18px))}
-html.standalone body{padding-bottom:calc(64px + max(6px,calc(env(safe-area-inset-bottom) - 18px)))}
-html.standalone #toast{bottom:calc(72px + max(6px,calc(env(safe-area-inset-bottom) - 18px)))}
+ nav#tabs{padding-bottom:max(6px,calc(env(safe-area-inset-bottom) - 20px))}
+ body{padding-bottom:calc(52px + max(6px,calc(env(safe-area-inset-bottom) - 20px)))}
+ #toast{bottom:calc(60px + max(6px,calc(env(safe-area-inset-bottom) - 20px)))}}
+html.standalone nav#tabs{padding-bottom:max(6px,calc(env(safe-area-inset-bottom) - 20px))}
+html.standalone body{padding-bottom:calc(52px + max(6px,calc(env(safe-area-inset-bottom) - 20px)))}
+html.standalone #toast{bottom:calc(60px + max(6px,calc(env(safe-area-inset-bottom) - 20px)))}
+.chip{touch-action:none}
 </style></head>
 <body>
 <header><h1><svg viewBox="0 0 2 2"><polygon points="1,0 2,1 1,2 0,1" fill="#6A4BE0" stroke="#24213B" stroke-width=".12" stroke-linejoin="round"/><path d="M0,1H2" stroke="#fff" stroke-width=".08" opacity=".7"/></svg>Kristall-Echo</h1><button id="themebtn" data-act="theme" aria-label="Design"></button><button id="newbtn" data-act="newmenu">Neues Spiel</button></header>
@@ -522,40 +523,54 @@ document.addEventListener('click',ev=>{
  case'theme':{const order=['auto','light','dark'];themePref=order[(order.indexOf(themePref)+1)%3];try{localStorage.setItem(TKEY,themePref)}catch(e){}applyTheme();render();toast('Design: '+THEMENAME[themePref])}break;
  }});
 /* ---------- Drag & Drop ---------- */
-let pend=null,suppressClick=false;
+let pend=null,suppressClick=false,touchSynth=false,raf=0,lastEv=null;
 function canPlace(ctx){return ctx==='me'?!S.me.locked:ui.tool==='piece'}
 function boardSvg(ctx){return document.querySelector(`.board[data-ctx="${ctx}"] svg`)}
 function toSvg(svg,e){const m=svg.getScreenCTM();if(!m)return{x:-99,y:-99};const p=new DOMPoint(e.clientX,e.clientY).matrixTransform(m.inverse());return{x:p.x,y:p.y}}
 function outlineSVG(cells,color,dash){const e=edgesOf(cells).map(k=>{const [a,b]=k.split('|');return`M${a}L${b}`}).join('');
- return`<path d="${e}" fill="${color}" fill-opacity=".14" stroke="${color}" stroke-width=".1" ${dash?'stroke-dasharray=".2 .14"':''} stroke-linejoin="round"/>`}
+ return`<path d="${e}" fill="none" stroke="${color}" stroke-width=".1" ${dash?'stroke-dasharray=".2 .14"':''} stroke-linejoin="round"/>`}
+// Kann an dieser Stelle ein Ziehen beginnen?
+function dragCandidate(t){if(!t||!t.closest)return false;
+ const chip=t.closest('.chip[data-n]');if(chip)return canPlace(ctxNow());
+ const cell=t.closest('[data-cell]');if(!cell)return false;const b=t.closest('.board');if(!b)return false;const ctx=b.dataset.ctx;if(!canPlace(ctx))return false;
+ return !!boardOf(P(ctx))[cell.dataset.cell]}
+// Bei Berührung auf einem Stein sofort das Scrollen sperren (zuverlässiger als erst beim Bewegen)
+document.addEventListener('touchstart',e=>{if(e.touches.length===1&&dragCandidate(e.target)){e.preventDefault();touchSynth=true}},{passive:false});
+document.addEventListener('touchmove',e=>{if(pend||touchSynth)e.preventDefault()},{passive:false});
 document.addEventListener('pointerdown',e=>{
  if(e.button>0||pend)return;
  const chip=e.target.closest('.chip[data-n]');
  const cell=e.target.closest('[data-cell]');
  if(chip){const ctx=ctxNow();if(!canPlace(ctx))return;const n=chip.dataset.n,Pc=P(ctx);const o=Pc[n]?Pc[n].o:(ui.po[ctx][n]||0);const [w,h]=dims(shape(n,o));
-  pend={kind:'tray',ctx,n,o,grab:[w/2,h/2],x0:e.clientX,y0:e.clientY,touch:e.pointerType==='touch',moved:false};return}
+  pend={kind:'tray',el:chip,ctx,n,o,grab:[w/2,h/2],x0:e.clientX,y0:e.clientY,touch:e.pointerType==='touch',moved:false};return}
  if(cell){const ctx=e.target.closest('.board').dataset.ctx;if(!canPlace(ctx))return;const [x,y]=cell.dataset.cell.split(',').map(Number);
   const at=boardOf(P(ctx))[x+','+y];if(!at)return;const p=P(ctx)[at.n];const pt=toSvg(boardSvg(ctx),e);
-  pend={kind:'board',ctx,n:at.n,o:p.o,grab:[pt.x-p.x,pt.y-p.y],x0:e.clientX,y0:e.clientY,touch:e.pointerType==='touch',moved:false}}
+  pend={kind:'board',el:cell,ctx,n:at.n,o:p.o,grab:[pt.x-p.x,pt.y-p.y],x0:e.clientX,y0:e.clientY,touch:e.pointerType==='touch',moved:false}}
 });
 document.addEventListener('pointermove',e=>{
  if(!pend)return;
- if(!pend.moved){if(Math.hypot(e.clientX-pend.x0,e.clientY-pend.y0)<7)return;
+ if(!pend.moved){if(Math.hypot(e.clientX-pend.x0,e.clientY-pend.y0)<6)return;
   pend.moved=true;ui.drag={ctx:pend.ctx,n:pend.n};ui.sel=pend.n;render();
-  const g=document.getElementById('dragG');if(g)g.innerHTML=pieceSVG(pend.n,shape(pend.n,pend.o),{})}
- dragUpdate(e)});
-function dragUpdate(e){const svg=boardSvg(pend.ctx);if(!svg)return;const pt=toSvg(svg,e);
- const lift=pend.touch?1:0;const fx=pt.x-pend.grab[0],fy=pt.y-pend.grab[1]-lift;
- const g=document.getElementById('dragG'),sg=document.getElementById('snapG');
- if(g)g.setAttribute('transform',`translate(${fx},${fy})`);
+  pend.svg=boardSvg(pend.ctx);pend.g=document.getElementById('dragG');pend.sg=document.getElementById('snapG');
+  if(pend.g)pend.g.innerHTML=pieceSVG(pend.n,shape(pend.n,pend.o),{})}
+ lastEv={clientX:e.clientX,clientY:e.clientY};
+ if(!raf)raf=requestAnimationFrame(()=>{raf=0;if(pend&&pend.moved&&lastEv)dragUpdate(lastEv)})});
+function dragUpdate(e,d=pend){if(!d||!d.svg)return;const pt=toSvg(d.svg,e);
+ const lift=d.touch?1:0;const fx=pt.x-d.grab[0],fy=pt.y-d.grab[1]-lift;
+ if(d.g)d.g.setAttribute('transform',`translate(${fx.toFixed(3)},${fy.toFixed(3)})`);
  const off=pt.x<-.6||pt.y<-.6||pt.x>COLS+.6||pt.y>ROWS+.6;
- pend.off=off;
- if(off){pend.target=null;if(sg)sg.innerHTML='';if(g)g.setAttribute('opacity','.55');return}
- const p=clampPos(pend.n,pend.o,Math.round(fx),Math.round(fy));const why=whyNot(P(pend.ctx),pend.n,p);
- pend.target=p;pend.why=why;if(g)g.setAttribute('opacity','1');
- if(sg)sg.innerHTML=outlineSVG(cellsOf(pend.n,p),why?'#E5484D':T.am,!!why)}
-function dragEnd(commit){const d=pend;pend=null;if(!d||!d.moved)return;
- suppressClick=true;setTimeout(()=>suppressClick=false,450);ui.drag=null;
+ if(off!==d.off){d.off=off;if(d.g)d.g.setAttribute('opacity',off?'.55':'1')}
+ if(off){d.target=null;d.key=null;if(d.sg)d.sg.innerHTML='';return}
+ const p=clampPos(d.n,d.o,Math.round(fx),Math.round(fy));const key=p.x+','+p.y;
+ if(key===d.key)return; // nur neu prüfen, wenn sich das Einrast-Feld ändert
+ d.key=key;const why=whyNot(P(d.ctx),d.n,p);d.target=p;d.why=why;
+ if(d.sg)d.sg.innerHTML=outlineSVG(cellsOf(d.n,p),why?'#E5484D':T.am,!!why)}
+function dragEnd(commit){const d=pend;pend=null;const synth=touchSynth;touchSynth=false;if(raf){cancelAnimationFrame(raf);raf=0}
+ if(!d)return;
+ if(!d.moved){ // war nur ein Tippen: Klick selbst auslösen, weil der Browser ihn wegen der Scroll-Sperre nicht schickt
+  if(commit&&synth&&d.el&&d.el.isConnected)d.el.dispatchEvent(new MouseEvent('click',{bubbles:true}));return}
+ if(lastEv)dragUpdate(lastEv,d);lastEv=null;
+ suppressClick=!synth;if(suppressClick)setTimeout(()=>suppressClick=false,80);ui.drag=null;
  if(commit){const Pc=P(d.ctx);
   if(d.off){if(d.kind==='board'){ui.po[d.ctx][d.n]=Pc[d.n].o;delete Pc[d.n];ui.sel=null;save();toast('Weggenommen')}}
   else if(d.target&&!d.why){Pc[d.n]=d.target;ui.sel=d.n;if(d.ctx==='opp')for(const [cx,cy] of cellsOf(d.n,d.target))delete S.opp.marks[cx+','+cy];save()}
@@ -563,7 +578,7 @@ function dragEnd(commit){const d=pend;pend=null;if(!d||!d.moved)return;
  render()}
 document.addEventListener('pointerup',()=>dragEnd(true));
 document.addEventListener('pointercancel',()=>dragEnd(false));
-document.addEventListener('touchmove',e=>{if(pend)e.preventDefault()},{passive:false});
+document.addEventListener('touchend',()=>{if(!pend)touchSynth=false});
 
 render();
 
