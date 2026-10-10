@@ -18,7 +18,7 @@
  --pri-bg:#ECE9FA;--pri-fg:#16132B;--seg:#2A2645;--rowline:#28243F;--nobg:#2A2645;--grab:#4A4468;--sw:#3A3558;--nav:rgba(16,14,31,.88);--strong:#2B2552;--strong-sub:#C3BAF0;--field:#14122A;--shadow:rgba(0,0,0,.7)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--rock);color:var(--ink);font-family:'Bricolage Grotesque',ui-rounded,system-ui,-apple-system,sans-serif;font-size:16px;line-height:1.45}
-body{padding-bottom:calc(80px + env(safe-area-inset-bottom));-webkit-text-size-adjust:100%}
+body{padding-bottom:calc(60px + env(safe-area-inset-bottom));-webkit-text-size-adjust:100%}
 button{font:inherit;color:inherit;cursor:pointer}
 button:focus-visible,input:focus-visible{outline:3px solid var(--am);outline-offset:2px}
 header{position:sticky;top:0;z-index:6;display:flex;align-items:center;gap:8px;padding:calc(10px + env(safe-area-inset-top)) max(16px,calc((100% - 488px)/2)) 8px;background:var(--nav);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);margin-bottom:10px}
@@ -290,7 +290,9 @@ html:not(.lobby) header h1{font-size:19px}
    Nur transform und opacity werden animiert (GPU), Start erst nach dem Zeichnen. */
 :root{--ios:cubic-bezier(.32,.72,0,1)}
 header{z-index:7}
-#app{position:relative;background:var(--rock);min-height:calc(100vh - 120px)}
+#app{position:relative;background:var(--rock)}
+/* nur während eines Seitenwechsels bildschirmfüllend, damit die alte Seite nicht durchscheint */
+#app.nav-prep,#app.nav-run{min-height:calc(100dvh - 60px)}
 #app.nav-prep,#app.nav-run,.ghost{will-change:transform;backface-visibility:hidden}
 #app.nav-push{z-index:5;box-shadow:-10px 0 24px rgba(0,0,0,.12)}
 #app.nav-pop{z-index:4}
@@ -355,8 +357,25 @@ html:not(.lobby) header h1{justify-content:center;text-align:center;font-size:17
 .cgap{display:block}
 .cbtn span small{display:block;font-size:9.5px;font-weight:500;color:var(--muted);line-height:1.1}
 .holedot{border-style:dashed!important;background:transparent!important}
+.holedot{border-style:dashed!important;border-color:var(--muted)!important;background:radial-gradient(circle,transparent 40%,rgba(0,0,0,.22))!important}
+.home h2{margin:2px 0 6px}.home h3{margin:12px 4px 6px}
+.home .mode{margin-bottom:8px;padding:12px 16px}
+.home .hint{margin-bottom:6px}
+.home .row{margin:6px 0 0}
+.cap.aim{box-shadow:inset 0 0 0 1.5px var(--am)}.capi.aimi{background:var(--am);color:#fff}.capi.aimi svg{color:#fff;opacity:1;margin:0}
+.cap.aim .btn{flex:none;margin-left:auto}
+/* Hinweis-Platz über dem Brett: feste Höhe */
+.slot{height:62px;margin:0 0 8px;display:flex}
+.slot>.cap{flex:1;margin:0;min-width:0;height:100%;box-sizing:border-box;animation:none}
+.slot .cap>div{min-width:0;animation:fadein .2s ease-out}
+.slot .cap b{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:1;overflow:hidden}
+.slot .cap small{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;line-height:1.25}
+.cap.idle{background:transparent;box-shadow:inset 0 0 0 1.5px var(--line)}
+.capi.idlei{background:var(--nobg);color:var(--muted);font-family:Georgia,serif;font-style:italic;font-size:16px}
+.cap.say{background:var(--strong);color:#fff}.cap.say small{color:var(--strong-sub)}.cap.say b{font-size:16px;color:#fff}
+.capi.sayi{background:rgba(255,255,255,.12)}.capi.sayi .dot{width:16px;height:16px;border-color:#fff;margin:0}
 </style></head>
-<body><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><radialGradient id="holeGrad" cx="50%" cy="50%" r="70%"><stop offset="0" stop-color="#000"/><stop offset=".7" stop-color="#14112A"/><stop offset="1" stop-color="#3A3366"/></radialGradient><pattern id="holePat" width=".34" height=".34" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width=".34" height=".34" fill="#0D0A1E"/><rect width=".09" height=".34" fill="#6C4FE6" opacity=".85"/></pattern></defs></svg>
+<body><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><radialGradient id="holeGrad" cx="50%" cy="50%" r="70%"><stop offset="0" stop-color="#000"/><stop offset=".7" stop-color="#14112A"/><stop offset="1" stop-color="#3A3366"/></radialGradient><pattern id="holePat" width=".34" height=".34" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width=".34" height=".34" fill="#0D0A1E"/><rect width=".09" height=".34" fill="#6C4FE6" opacity=".85"/></pattern><radialGradient id="holeShade" cx="50%" cy="50%" r="72%"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset=".55" stop-color="#000" stop-opacity=".05"/><stop offset="1" stop-color="#000" stop-opacity=".36"/></radialGradient></defs></svg>
 <header><button id="backbtn" data-act="back" aria-label="Zurück" hidden><svg class="chevl" viewBox="0 0 11 20" aria-hidden="true"><path d="M9.5 1.5 1.5 10l8 8.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Start</span></button><h1><svg viewBox="0 0 2 2"><polygon points="1,0 2,1 1,2 0,1" fill="#6A4BE0" stroke="#24213B" stroke-width=".12" stroke-linejoin="round"/><path d="M0,1H2" stroke="#fff" stroke-width=".08" opacity=".7"/></svg><span id="htitle">Kristall-Echo</span></h1><button id="helpbtn" data-act="tab" data-tab="rules" aria-label="Spielregeln">?</button><button id="setbtn" data-act="tab" data-tab="settings" aria-label="Einstellungen"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button></header>
 <main id="app"></main>
 <nav id="tabs"></nav>
@@ -557,7 +576,7 @@ const CHEV_R='<svg class="chev" viewBox="0 0 9 16" width="9" height="16" aria-hi
 const CHEV_L='<svg class="chevl" viewBox="0 0 11 20" width="11" height="20" aria-hidden="true"><path d="M9.5 1.5 1.5 10l8 8.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const CHEV_UP='<svg class="chev" viewBox="0 0 16 9" width="16" height="9" aria-hidden="true"><path d="M1.5 7.5 8 1.5l6.5 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const SKEY='kristall-echo-settings';
-const SET={edgeCheck:true,holdMs:170,rayAnim:true,uiAnim:true,confirmGiveup:true,...(store.get(SKEY)||{})};
+const SET={edgeCheck:true,holdMs:170,rayAnim:true,uiAnim:true,confirmGiveup:true,confirmShot:true,...(store.get(SKEY)||{})};
 function saveSet(){store.set(SET,SKEY)}
 const isSolo=()=>S.mode==='solo'||S.mode==='daily';
 const DKEY='kristall-echo-daily';
@@ -601,8 +620,9 @@ function pieceSVG(n,cells,o={}){let f='',ed={};const col=o.color||COLOR[n];
  if(o.ghost)return`<path d="${e}" fill="${T.am}" fill-opacity=".12" stroke="${T.am}" stroke-width=".1" stroke-linejoin="round" opacity=".9"/>`; // aufgedeckte Lösung: lila Fläche, nicht gestrichelt (gestrichelt = Loch)
  // Loch: gestreifte „Leere“ mit leuchtendem Rand, damit es nie wie ein schwarzer Farbstein aussieht
  const hole=col==='schwarz';
+ if(hole){f=`<path d="${cells.map(([x,y,k])=>{const p=polyOf(k).map(([a,b])=>[x+a,y+b]);return'M'+p.map(q=>q.join(',')).join('L')+'Z'}).join('')}" fill="url(#holeShade)"/>`}
  const rim='';
- return`<g>${o.sel?`<path d="${e}" fill="none" stroke="${T.am}" stroke-width=".34" stroke-linejoin="round" opacity=".45" class="pulse"/>`:''}${rim}${f}<path d="${e}" fill="none" stroke="${T.outline}" stroke-width="${hole?'.09':'.07'}" stroke-linejoin="round" stroke-linecap="round"${hole?' stroke-dasharray=".14 .1"':''}/></g>`}
+ return`<g>${o.sel?`<path d="${e}" fill="none" stroke="${T.am}" stroke-width=".34" stroke-linejoin="round" opacity=".45" class="pulse"/>`:''}${rim}${f}<path d="${e}" fill="none" stroke="${T.outline}" stroke-width="${hole?'.055':'.07'}" stroke-linejoin="round" stroke-linecap="round"${hole?' stroke-dasharray=".09 .07" stroke-opacity=".7"':''}/></g>`}
 const MIX={'':'#C4BDDC',rot:'#E5484D',gelb:'#F5C518',blau:'#2F7BEA','rot,gelb':'#F28C28','rot,blau':'#8E44AD','gelb,blau':'#2EAD5B','rot,gelb,blau':'#6E4B2C'};
 function mixColor(c){c=tone(c);const w=c.includes('weiss'),dk=c.includes('dunkel');const base=c.filter(x=>x!=='weiss'&&x!=='dunkel').join(',');
  if(dk&&!base)return '#1F1D27';
@@ -658,7 +678,8 @@ function boardSVG(o){
  for(let n=1;n<=36;n++){const [[ex,ey]]=entry(n);const cx=ex+.5,cy=ey+.5;const st=(o.labels&&o.labels[n])||'';
   // Randprüfung „Ton in Ton“: passt = lila gefüllt, passt nicht = gestrichelter Ring. Ausgewählt = dunkel.
   const ck=o.check&&o.check[n];let txt=st==='used'?T.am:T.muted;
-  if(st==='hl'){s+=`<circle cx="${cx}" cy="${cy}" r=".42" fill="${T.hl}"/>`;txt=T.hlTxt;
+  if(st==='aim'){s+=`<circle cx="${cx}" cy="${cy}" r=".44" fill="none" stroke="${T.am}" stroke-width=".09" class="pulse"/><circle cx="${cx}" cy="${cy}" r=".34" fill="${T.amSoft}"/>`;txt=T.am}
+  else if(st==='hl'){s+=`<circle cx="${cx}" cy="${cy}" r=".42" fill="${T.hl}"/>`;txt=T.hlTxt;
    if(ck)s+=`<circle cx="${cx}" cy="${cy}" r=".47" fill="none" stroke="${T.am}" stroke-width=".07"${ck==='bad'?' stroke-dasharray=".12 .08"':''}/>`}
   else if(ck==='ok'){s+=`<circle cx="${cx}" cy="${cy}" r=".4" fill="${T.am}"/>`;txt='#fff'}
   else if(ck==='bad'){s+=`<circle cx="${cx}" cy="${cy}" r=".37" fill="${T.board}" stroke="${T.am}" stroke-width=".06" stroke-dasharray=".12 .08"/>`;txt=T.am}
@@ -726,21 +747,25 @@ function turnBanner(){if(S.mode!=='duo')return'';const t=S.turn;
  if(!t)return`<div class="turn"><span>Wer fängt an?</span><button class="btn" data-act="turn" data-v="me">Ich</button><button class="btn" data-act="turn" data-v="opp">Gegenüber</button></div>`;
  return t==='me'?`<div class="turn me" data-act="turn" data-v="opp"><b>Du bist dran.</b><span>Frag bei <b>Gegner</b> einen Punkt${OPTS.scan?' oder ein Feld':''}.</span><small>tippen zum Wechseln</small></div>`
   :`<div class="turn opp" data-act="turn" data-v="me"><b>Dein Gegenüber ist dran.</b><span>Beantworte die Frage bei <b>Mein Feld</b>.</span><small>tippen zum Wechseln</small></div>`}
+// Fester Platz für Hinweise über dem Brett: Inhalt wechselt, die Höhe bleibt – nichts springt
+function slot(inner){return`<div class="slot">${inner}</div>`}
+function infoCap(title,sub,ic='i'){return`<div class="cap idle"><span class="capi idlei">${ic}</span><div><b>${title}</b>${sub?`<small>${sub}</small>`:''}</div></div>`}
 function invWarn(Pc){const s=invalidSet(Pc);if(!s.size)return'';const why=new Set([...s].map(n=>whyNot(Pc,n,Pc[n])));
- return`<div class="invwarn">Rot markierte Steine ${why.has('overlap')?'liegen übereinander':''}${why.has('overlap')&&why.has('touch')?' oder ':''}${why.has('touch')?'berühren sich an einer Kante':''}. Verschieb oder dreh sie, dann geht es weiter.</div>`}
+ return`<div class="cap is-bad"><span class="capi bad">!</span><div><b>Steine ${why.has('overlap')?'liegen übereinander':''}${why.has('overlap')&&why.has('touch')?' / ':''}${why.has('touch')?'berühren sich an einer Kante':''}</b><small>Rot markierte verschieben oder drehen.</small></div></div>`}
 function viewMe(){const M=S.me;
  if(!M.locked){const n=NAMES.filter(x=>M.pieces[x]).length,N=NAMES.length;
   return`<div class="topbar">${turnChip()}<span class="tb-info">${N} Steine legen</span>${S.mode==='duo'?`<button class="btn sm quiet" data-act="invite">${icon('qr')} Einladen</button>`:''}</div>
+  ${slot(invWarn(M.pieces)||infoCap(ui.sel&&!M.pieces[ui.sel]?`${LBL[COLOR[ui.sel]]} aufs Feld tippen`:'Steine verstecken',ui.sel&&!M.pieces[ui.sel]?'Oder kurz halten und ziehen.':`Antippen und aufs Feld tippen oder halten und ziehen.`))}
   <div class="board" data-ctx="me">${boardSVG({ctx:'me',pieces:M.pieces,sel:ui.sel,cells:true})}</div>
-  ${toolRow('me')}${invWarn(M.pieces)}
+  ${toolRow('me')}
   ${tray('me',`<button class="btn" data-act="random">Zufällig verteilen</button><button class="btn primary" data-act="lock" ${n===N&&!invalidSet(M.pieces).size?'':'disabled'}>Verdecken (${n}/${N})</button>`)}
-  <p class="hint small">Antippen und aufs Feld tippen, oder kurz halten und ziehen.${OPTS.touch?'':' Steine dürfen sich nur an Ecken berühren.'}</p>`}
+`}
  const labels={};M.answered.forEach(a=>{if(!a.scan){labels[a.n]='used';if(a.out)labels[a.out]='used'}});
  const L=ui.last;if(L&&!L.scan){labels[L.n]='hl';if(L.out)labels[L.out]='hl'}
  let res;
- if(L&&L.scan)res=`<div class="result"><div class="rl">Scan ${cellName(...L.scan)}. Sag:</div><div class="rbig">„Feld ${cellName(...L.scan)}: ${VALNAME[L.val]}.“</div><div class="rdots">${vdot(L.val)}</div></div>`;
- else if(L)res=`<div class="result"><div class="rl">Start ${lab(L.n)}. Sag:</div><div class="rbig">${L.out===0?'„Absorbiert.“':`„Raus bei ${lab(L.out)}${L.out===L.n?' (zurück)':''} – ${colorText(L.colors)}.“`}</div><div class="rdots">${L.out===0?'':dots(L.colors)}</div></div>`;
- else res=`<p class="hint">Dein Gegenüber nennt einen Punkt am Rand${OPTS.scan?' oder ein Feld wie C3':''}. Tipp ihn an, das Handy rechnet die Antwort aus.</p>`;
+ if(L&&L.scan)res=`<div class="cap say"><span class="capi sayi">${vdot(L.val)}</span><div><small>Scan ${cellName(...L.scan)} · sag:</small><b>„Feld ${cellName(...L.scan)}: ${VALNAME[L.val]}.“</b></div></div>`;
+ else if(L)res=`<div class="cap say"><span class="capi sayi">${L.out===0?`<i class="dot" style="background:${CASE}"></i>`:dots(L.colors)}</span><div><small>Start ${lab(L.n)} · sag:</small><b>${L.out===0?'„Absorbiert.“':`„Raus bei ${lab(L.out)}${L.out===L.n?' (zurück)':''} – ${colorText(L.colors)}.“`}</b></div></div>`;
+ else res=infoCap('Frage beantworten',`Tippe den Punkt am Rand an${OPTS.scan?' oder das Feld':''}, den dein Gegenüber nennt.`);res=slot(res);
  const list=M.answered.length?`<h3>Schon beantwortet</h3><ul class="log">${M.answered.map((a,i)=>`<li>${logRow(a,M.answered.length-i)}</li>`).join('')}</ul>`:'';
  return`${S.mode==='duo'?`<div class="topbar">${turnChip()}</div>`:''}${res}
  <div class="board" data-ctx="me">${boardSVG({ctx:'me',pieces:M.pieces,cover:!ui.reveal,coverHint:OPTS.scan?'Punkt am Rand oder Feld antippen':null,labels,cells:OPTS.scan,hlCell:ui.reveal&&L&&L.scan?L.scan:null,ray:ui.reveal&&L&&!L.scan?L:null,anim:ui.anim})}</div>
@@ -765,11 +790,15 @@ function viewOpp(){const O=S.opp,solo=isSolo(),daily=S.mode==='daily',N=NAMES.le
   :`<button class="btn primary sm" data-act="solve" ${all&&!inv&&!done?'':'disabled'}>Lösen</button>`;
  let okc=0,badc=0;if(all)for(const e of O.log){checkEntry(e,O.guess).ok?okc++:badc++}
  const top=`<div class="topbar">${turnChip()}<span class="tb-info">${daily?'Tagesrätsel · ':''}${O.solved?'Gelöst · ':''}${n} ${plural(n,'Frage','Fragen')}${O.fails?` · ${O.fails}✗`:''}</span>${solveBtn}</div>`;
- const scanHint=ui.scanMode?'<div class="cap scanhint"><span class="capi scan">🔍</span><div><b>Feld scannen</b><small>Tippe das Feld an, das du abfragst. Das zählt als Zug.</small></div></div>':'';
+ const aimBar=ui.aim?(ui.aim.n?`<div class="cap aim"><span class="capi aimi">${CHEV_R}</span><div><b>Strahl ab ${lab(ui.aim.n)} schicken?</b><small>Nochmal tippen zum Senden</small></div><button class="btn primary sm" data-act="fire">Senden</button></div>`
+  :`<div class="cap aim"><span class="capi aimi">🔍</span><div><b>Feld ${cellName(...ui.aim.cell)} scannen?</b><small>Nochmal tippen zum Senden</small></div><button class="btn primary sm" data-act="fire">Senden</button></div>`):'';
+ const scanHint=ui.scanMode&&!ui.aim?'<div class="cap scanhint"><span class="capi scan">🔍</span><div><b>Feld scannen</b><small>Tippe das Feld an, das du abfragst. Das zählt als Zug.</small></div></div>':'';
  let check=null;if(SET.edgeCheck&&NAMES.some(k=>O.guess[k])){check={};for(const e of O.log){if(e.scan)continue;const ok=checkEntry(e,O.guess).ok?'ok':'bad';for(const l of [e.n,e.out])if(l){if(check[l]!=='bad')check[l]=ok}}}
- return`${top}${scanHint||cap}
+ if(ui.aim&&ui.aim.n)labels[ui.aim.n]='aim';if(ui.aim&&ui.aim.cell)hlCell=ui.aim.cell;
+ const idle=infoCap(solo?'Strahl schicken':'Antwort eintragen',solo?'Tippe eine Zahl oder einen Buchstaben am Rand an.':'Tippe den gefragten Punkt am Rand an.');
+ return`${top}${slot(aimBar||scanHint||invWarn(O.guess)||cap||idle)}
  <div class="board" data-ctx="opp">${boardSVG({ctx:'opp',pieces:O.guess,sel:ui.sel,marks:O.marks,help,check,scans:O.log.filter(e=>e.scan),hlCell,labels,ray,anim:ui.anim,cells:true,ghost:solo&&(O.revealed||O.solved)?S.secret:null})}</div>
- ${toolRow('opp')}${invWarn(O.guess)}
+ ${toolRow('opp')}
  ${tray('opp')}
  <button class="answers-btn" data-act="answers"><span>Antworten</span><b>${n}</b>${all&&n?`<i class="ok">✓ ${okc}</i><i class="bad">✗ ${badc}</i>`:''}${CHEV_UP}</button>`}
 function answersSheet(){const O=S.opp,solo=isSolo(),all=complete(O.guess),n=O.log.length;
@@ -791,7 +820,7 @@ function viewSettings(){const seg=(act,cur,opts)=>`<div class="seg">${opts.map((
  <h3>Bedienung</h3>
  <p class="hint small">Wie lange du einen Stein halten musst, bevor er sich ziehen lässt. Kürzer ist schneller, länger verhindert versehentliches Ziehen beim Scrollen.</p>
  ${seg('sethold',SET.holdMs,[[110,'Kurz'],[170,'Normal'],[280,'Lang']])}
- <div class="stack">${tg('confirmGiveup','Aufgeben bestätigen','Vor dem Aufgeben einmal nachfragen.')}</div>
+ <div class="stack">${tg('confirmShot','Strahl erst zielen, dann senden','Im Solo-Modus markiert der erste Tipp nur. Erst ein zweiter Tipp oder „Senden“ verbraucht eine Frage.')}${tg('confirmGiveup','Aufgeben bestätigen','Vor dem Aufgeben einmal nachfragen.')}</div>
  <h3>Daten</h3>
  <div class="btngrid"><button class="btn" data-act="cleardaily">Verlauf löschen</button><button class="btn" data-act="resetall">Zurücksetzen</button></div>
  <p class="hint small">Alles wird nur auf diesem Gerät gespeichert. Offline-fähig: ${'serviceWorker' in navigator?'ja':'nein'}.</p>
@@ -850,7 +879,7 @@ function render(){
  const hb=$('#helpbtn');if(hb){hb.classList.toggle('on',ui.tab==='rules');hb.hidden=ui.tab==='rules'}
  const sb=$('#setbtn');if(sb){sb.classList.toggle('on',ui.tab==='settings');sb.hidden=ui.tab==='settings'}
  const v=ui.tab==='settings'?viewSettings():ui.tab==='rules'?viewRules():ui.tab==='days'?viewDays():ui.tab==='home'?viewHome():ui.tab==='me'?viewMe():viewOpp();
- const app=$('#app');
+ const app=$('#app');const stripX=(app.querySelector('.strip')||{}).scrollLeft||0;const sameTab=ui.shown===ui.tab;
  // iOS-Navigation: Push = neue Seite von rechts, alte gleitet 30 % nach links und wird leicht abgedunkelt; Pop umgekehrt.
  // Tab-Wechsel (Mein Feld ↔ Gegner) ist wie bei iOS sofort, ohne Animation.
  const lv=t=>t==='home'?0:GAMEVIEWS.includes(t)?1:2;
@@ -862,6 +891,7 @@ function render(){
   // alte Seite verschieben statt kopieren: kein erneutes Parsen, kein doppelter Aufbau
   while(app.firstChild)ghost.appendChild(app.firstChild);Object.assign(ghost.style,{top:r.top+'px',left:r.left+'px',width:r.width+'px'});document.body.appendChild(ghost)}
  app.innerHTML=v;ui.anim=false;
+ if(sameTab&&stripX){const st=app.querySelector('.strip');if(st)st.scrollLeft=stripX}
  if(dir){const g=ghost;animating(NAV_MS);app.classList.add('nav-'+dir,'nav-prep');
   nextPaint(()=>{app.classList.remove('nav-prep');app.classList.add('nav-run');g.classList.add('run');
    setTimeout(()=>{g.remove();app.classList.remove('nav-push','nav-pop','nav-run')},NAV_MS+40)})}
@@ -1003,7 +1033,7 @@ function stateOf(ctx){return JSON.stringify(ctx==='me'?{p:S.me.pieces}:{p:S.opp.
 function setState(ctx,j){const v=JSON.parse(j);if(ctx==='me')S.me.pieces=v.p;else{S.opp.guess=v.p;S.opp.marks=v.m}}
 function snap(ctx){const h=HIST[ctx],s=stateOf(ctx);if(h.u[h.u.length-1]!==s)h.u.push(s);if(h.u.length>60)h.u.shift();h.r=[]}
 function undoRedo(ctx,dir){const h=HIST[ctx],from=dir==='undo'?h.u:h.r,to=dir==='undo'?h.r:h.u;if(!from.length)return;to.push(stateOf(ctx));setState(ctx,from.pop());
- if(ui.sel&&!P(ctx)[ui.sel]&&!NAMES.includes(ui.sel))ui.sel=null;save();render()}
+ if(ui.sel&&!P(ctx)[ui.sel])ui.sel=null;save();render()}
 function clearHist(){for(const k in HIST){HIST[k].u=[];HIST[k].r=[]}}
 // Stein unter einem Kästchen; der ausgewählte gewinnt, sonst der oberste (zuletzt gezeichnete)
 function pieceAt(Pc,x,y,sel){let hit=null;for(const n of NAMES){const p=Pc[n];if(!p)continue;if(cellsOf(n,p).some(c=>c[0]===x&&c[1]===y)){if(n===sel)return n;hit=n}}return hit}
@@ -1015,13 +1045,20 @@ function onLabel(ctx,n){
  if(ctx==='me'){if(!S.me.locked){toast('Erst Kristalle legen und verdecken');return}
   const r=trace(boardOf(S.me.pieces),n);ui.last={n,...r};S.me.answered.unshift({n,out:r.out,colors:r.colors});S.turn='me';ui.anim=true;save();render();window.scrollTo({top:0,behavior:'smooth'});return}
  const i=known(n);if(i>=0){const e=S.opp.log[i];ui.hl=i;render();toast(e.out===0?`Schon gefragt (#${i+1}): ${lab(e.n)} wurde absorbiert`:`Schon bekannt (#${i+1}): ${lab(e.n)} und ${lab(e.out)} sind verbunden`);return}
- if(isSolo()){if(S.opp.solved||S.opp.revealed)return;const r=trace(boardOf(S.secret),n);S.opp.log.push({n,out:r.out,colors:r.colors});ui.hl=S.opp.log.length-1;ui.anim=true;save();render();toast(r.out===0?'Absorbiert':`Raus bei ${lab(r.out)} – ${colorText(r.colors)}`);return}
+
+ if(isSolo()){if(S.opp.solved||S.opp.revealed)return;
+  // Zielen statt sofort feuern: erster Tipp markiert, zweiter Tipp (oder „Senden“) schickt den Strahl
+  if(SET.confirmShot&&!(ui.aim&&ui.aim.n===n)){ui.aim={n};ui.hl=null;render();return}
+  ui.aim=null;const r=trace(boardOf(S.secret),n);S.opp.log.push({n,out:r.out,colors:r.colors});ui.hl=S.opp.log.length-1;ui.anim=true;save();render();toast(r.out===0?'Absorbiert':`Raus bei ${lab(r.out)} – ${colorText(r.colors)}`);return}
  ask={n,out:null,colors:null};askSheet()}
 function onScan(x,y){const i=S.opp.log.findIndex(e=>e.scan&&e.scan[0]===x&&e.scan[1]===y);
  if(i>=0){ui.hl=i;render();toast(`Schon gescannt (#${i+1})`);return}
- if(isSolo()){if(S.opp.solved||S.opp.revealed)return;const v=scanCell(S.secret,x,y);S.opp.log.push({scan:[x,y],val:v});ui.hl=S.opp.log.length-1;save();render();toast(`Feld ${cellName(x,y)}: ${VALNAME[v]}`);return}
+ if(isSolo()){if(S.opp.solved||S.opp.revealed)return;
+  if(SET.confirmShot&&!(ui.aim&&ui.aim.cell&&ui.aim.cell[0]===x&&ui.aim.cell[1]===y)){ui.aim={cell:[x,y]};ui.scanMode=true;ui.hl=null;render();return}
+  ui.aim=null;const v=scanCell(S.secret,x,y);S.opp.log.push({scan:[x,y],val:v});ui.hl=S.opp.log.length-1;save();render();toast(`Feld ${cellName(x,y)}: ${VALNAME[v]}`);return}
  scanAsk={cell:[x,y],val:null};scanSheet()}
 function onCell(ctx,x,y){
+ if(ui.aim&&!(ui.aim.cell&&ctx==='opp'&&ui.scanMode)){ui.aim=null;if(ctx==='opp'&&!ui.scanMode){render();return}}
  if(ctx==='me'&&S.me.locked){if(!OPTS.scan)return;const v=scanCell(S.me.pieces,x,y);ui.last={scan:[x,y],val:v};S.me.answered.unshift({scan:[x,y],val:v});S.turn='me';save();render();window.scrollTo({top:0,behavior:'smooth'});return}
  if(ctx==='opp'&&ui.scanMode){ui.scanMode=false;onScan(x,y);return}
  const Pc=P(ctx);const atn=pieceAt(Pc,x,y,ui.sel);const at=atn?{n:atn}:null;
@@ -1049,8 +1086,8 @@ document.addEventListener('click',ev=>{
  if(labEl||cell){const ctx=ev.target.closest('.board').dataset.ctx;if(labEl)onLabel(ctx,+labEl.dataset.label);else{const [x,y]=cell.dataset.cell.split(',').map(Number);onCell(ctx,x,y)}return}
  const t=ev.target.closest('[data-act]');if(!t)return;const a=t.dataset.act;
  switch(a){
- case'tab':{const to=t.dataset.tab==='start'?'home':t.dataset.tab;if(SUBPAGES[to]&&!SUBPAGES[ui.tab])ui.back=ui.tab;ui.tab=to;ui.sel=null;ui.scanMode=false;close();render();window.scrollTo(0,0)}break;
- case'back':ui.tab=SUBPAGES[ui.tab]?(ui.back||'home'):'home';ui.back=null;ui.sel=null;ui.scanMode=false;render();window.scrollTo(0,0);break;
+ case'tab':{ui.aim=null;const to=t.dataset.tab==='start'?'home':t.dataset.tab;if(SUBPAGES[to]&&!SUBPAGES[ui.tab])ui.back=ui.tab;ui.tab=to;ui.sel=null;ui.scanMode=false;close();render();window.scrollTo(0,0)}break;
+ case'back':ui.aim=null;ui.tab=SUBPAGES[ui.tab]?(ui.back||'home'):'home';ui.back=null;ui.sel=null;ui.scanMode=false;render();window.scrollTo(0,0);break;
  case'setup':ui.setup={mode:t.dataset.mode,view:'main',opts:{...DEFAULT_OPTS,...(store.get(OKEY)||{})}};setupSheet();break;
  case'scol':ui.setup.opts.color=t.dataset.v;setupSheet();break;
  case'sopt':{const k=t.dataset.k,o=ui.setup.opts;if(k==='house')o.color=o.color==='house'?'orig':'house';else o[k]=!o[k];setupSheet()}break;
@@ -1076,7 +1113,7 @@ document.addEventListener('click',ev=>{
  case'mirv':transform(ctxNow(),flipV);break;
  case'undo':undoRedo(ctxNow(),'undo');break;
  case'redo':undoRedo(ctxNow(),'redo');break;
- case'del':{const Pc=P(ctxNow());if(ui.sel&&Pc[ui.sel]){snap(ctxNow());ui.po[ctxNow()][ui.sel]=Pc[ui.sel].o;delete Pc[ui.sel];save();render()}break}
+ case'del':{const Pc=P(ctxNow());if(ui.sel&&Pc[ui.sel]){snap(ctxNow());ui.po[ctxNow()][ui.sel]=Pc[ui.sel].o;delete Pc[ui.sel];ui.sel=null;save();render()}break}
  case'random':{const R=randomLayout();if(!R){toast('Keine passende Verteilung gefunden – nochmal tippen');break}snap('me');S.me.pieces=R;ui.sel=null;save();render()}break;
  case'lock':{const u=unreachable(S.me.pieces);if(u.length){ui.sel=u[0];render();toast(`${u.map(n=>LBL[COLOR[n]]+' '+SHAPES[SHAPE_OF[n]].name).join(', ')}: von keinem Strahl erreichbar. Bitte anders legen.`);break}
   clearHist();S.me.locked=true;ui.sel=null;ui.reveal=false;ui.last=null;save();render();window.scrollTo(0,0);toast('Verdeckt. Viel Spaß!')}break;
@@ -1112,6 +1149,7 @@ document.addEventListener('click',ev=>{
  case'giveup':if(!t.dataset.ok&&SET.confirmGiveup){sheet(`<h3>Lösung zeigen?</h3><p>Die Kristalle erscheinen gestrichelt auf deinem Feld.</p><div class="row"><button class="btn" data-act="close">Weitersuchen</button><button class="btn primary grow" data-act="giveup" data-ok="1">Zeigen</button></div>`);break}
   S.opp.revealed=true;recordDaily('gaveup');save();close();render();break;
  case'close':close();break;
+ case'fire':{const a=ui.aim;if(!a)break;if(a.n)onLabel('opp',a.n);else onScan(...a.cell)}break;
  case'continue':ui.tab=S.mode==='duo'?(S.me.locked?'opp':'me'):'opp';render();window.scrollTo(0,0);break;
  case'join':sheet(`<h3>Per QR beitreten</h3><p class="small">Halte die Kamera auf den Einladungs-Code deines Gegenübers.</p><div id="scanbox" class="scanbox"></div><div id="vres"></div><div class="row"><button class="btn grow" data-act="close">Abbrechen</button></div>`);startScan(onJoinQR);break;
  case'joinok':if(ui.joinOpts){const o=ui.joinOpts;ui.joinOpts=null;startGame('duo',o);toast('Beigetreten – leg jetzt deine Kristalle')}break;
@@ -1125,7 +1163,7 @@ document.addEventListener('click',ev=>{
   try{[KEY,OKEY,DKEY,SKEY,TKEY].forEach(k=>localStorage.removeItem(k))}catch(e){}location.reload();break;
  case'turn':S.turn=t.dataset.v;save();render();break;
  case'help':S.opp.help=!S.opp.help;save();render();break;
- case'scanmode':ui.scanMode=!ui.scanMode;ui.sel=null;render();break;
+ case'scanmode':ui.scanMode=!ui.scanMode;ui.aim=null;ui.sel=null;render();break;
  case'answers':answersSheet();break;
  case'turnask':sheet(`<h3>Wer fängt an?</h3><div class="row"><button class="btn grow" data-act="turnset" data-v="me">Ich</button><button class="btn grow" data-act="turnset" data-v="opp">Gegenüber</button></div>`);break;
  case'turnset':S.turn=t.dataset.v;save();close();render();break;
