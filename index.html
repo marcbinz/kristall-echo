@@ -78,7 +78,7 @@ nav#tabs button.on{background:var(--pri-bg);color:var(--pri-fg)}
 #sheet{position:fixed;inset:0;z-index:10;display:none}
 #sheet.open{display:block}
 .back{position:absolute;inset:0;background:rgba(36,33,59,.45)}
-.panel{position:absolute;left:0;right:0;bottom:0;max-width:520px;margin:0 auto;background:var(--rock);border-radius:24px 24px 0 0;padding:6px 16px calc(14px + env(safe-area-inset-bottom));max-height:92vh;overflow:auto;animation:up .22s ease-out}
+.panel{position:absolute;left:0;right:0;bottom:0;max-width:520px;margin:0 auto;background:var(--rock);border-radius:24px 24px 0 0;padding:6px 16px calc(14px + env(safe-area-inset-bottom));max-height:92vh;overflow:auto}
 .grab{width:40px;height:5px;border-radius:9px;background:var(--grab);margin:4px auto 6px}
 .panel h3{margin:8px 0}.panel h4{margin:16px 0 8px;font-size:15px}.panel h4 span{color:var(--muted);font-weight:400}
 .panel p{margin:0 0 8px;color:var(--muted)}
@@ -271,7 +271,7 @@ nav#tabs button:not(.gear){flex:1 1 auto;font-size:14.5px}
 .mode.join{border-style:dashed}
 .homestats{display:flex;align-items:center;gap:8px;background:var(--slab);border-radius:16px;padding:10px 14px;margin-top:6px;cursor:pointer}
 .homestats div{flex:1;text-align:center}.homestats b{display:block;font-size:20px;font-weight:800}.homestats span{font-size:12px;color:var(--muted)}
-.btn.ghost{background:var(--slab);color:var(--ink);border:1.5px solid var(--line)}
+.btn.quiet{background:var(--slab);color:var(--ink);border:1.5px solid var(--line)}
 .btn.sm svg{width:16px;height:16px;vertical-align:-3px;margin-right:3px}
 html,body,*{touch-action:manipulation}
 input,select,textarea{font-size:16px}
@@ -285,9 +285,76 @@ header h1{flex:1}
 html:not(.lobby) header h1 svg{display:none}
 html:not(.lobby) header h1{font-size:19px}
 .dh{display:none}
+/* ---------- Animationen nach iOS ----------
+   Navigation 0,35 s · Sheet auf 0,5 s / zu 0,35 s · Kurve cubic-bezier(.32,.72,0,1).
+   Nur transform und opacity werden animiert (GPU), Start erst nach dem Zeichnen. */
+:root{--ios:cubic-bezier(.32,.72,0,1)}
+header{z-index:7}
+#app{position:relative;background:var(--rock);min-height:calc(100vh - 120px)}
+#app.nav-prep,#app.nav-run,.ghost{will-change:transform;backface-visibility:hidden}
+#app.nav-push{z-index:5;box-shadow:-10px 0 24px rgba(0,0,0,.12)}
+#app.nav-pop{z-index:4}
+#app.nav-push.nav-prep{transform:translate3d(100%,0,0)}
+#app.nav-pop.nav-prep{transform:translate3d(-30%,0,0)}
+#app.nav-run{transform:translate3d(0,0,0);transition:transform .35s var(--ios)}
+#app.nav-pop::after{content:'';position:absolute;inset:0;background:#000;opacity:.1;pointer-events:none;transition:opacity .35s var(--ios)}
+#app.nav-pop.nav-run::after{opacity:0}
+.ghost{position:fixed;z-index:4;background:var(--rock);pointer-events:none;padding:0 12px;box-sizing:border-box;transform:translate3d(0,0,0);transition:transform .35s var(--ios)}
+.ghost.push.run{transform:translate3d(-30%,0,0)}
+.ghost.pop{z-index:6;box-shadow:-10px 0 24px rgba(0,0,0,.12)}
+.ghost.pop.run{transform:translate3d(100%,0,0)}
+.ghost.push::after{content:'';position:absolute;inset:0;background:#000;opacity:0;transition:opacity .35s var(--ios)}
+.ghost.push.run::after{opacity:.1}
+#sheet .back{background:rgba(0,0,0,.4);opacity:0;transition:opacity .5s var(--ios)}
+#sheet .panel{transform:translate3d(0,100%,0);transition:transform .5s var(--ios);will-change:transform}
+#sheet.shown .back{opacity:1}
+#sheet.shown .panel{transform:translate3d(0,0,0)}
+#sheet.closing .back{opacity:0;transition-duration:.35s}
+#sheet.closing .panel{transform:translate3d(0,100%,0);transition-duration:.35s}
+.track{will-change:transform;backface-visibility:hidden}
+@keyframes fadein{from{opacity:0}}
+/* Während Übergängen keine teuren Effekte */
+html.animating header,html.animating nav#tabs{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:var(--rock)!important}
+html.animating .pulse{animation-play-state:paused}
+/* Tippen wie bei iOS: sofort abdunkeln, beim Loslassen weich zurück */
+.btn,.mode,.chip,.ibtn,.cbtn,.opt,.preset,.ccard,.sw-btn,.answers-btn,.tchip,.homestats,#backbtn,#helpbtn,#setbtn,nav#tabs button,.numgrid button,.log li,.link,.chosen-st{transition:opacity .25s ease-out,background-color .2s,border-color .2s,color .2s,box-shadow .2s}
+.btn:active,.mode:active,.chip:active,.ibtn:not(:disabled):active,.cbtn:active,.opt:active,.preset:active,.ccard:active,.sw-btn:active,.answers-btn:active,.tchip:active,.homestats:active,#backbtn:active,#helpbtn:active,#setbtn:active,nav#tabs button:active,.numgrid button:active,.log li:active,.link:active,.chosen-st:active{opacity:.5;transition-duration:0s}
+.opt .sw,.opt .sw::after{transition:all .25s var(--ios)}
+g.pop{animation:pop .3s var(--ios);transform-box:fill-box;transform-origin:center}
+@keyframes pop{from{transform:scale(.85);opacity:.6}}
+.result,.cap,.invwarn,.verdict{animation:fadein .25s ease-in-out}
+#toast{transition:opacity .3s var(--ios),transform .5s var(--ios)}
+.budget .bar i{transition:width .3s var(--ios)}
+html.noanim *,html.noanim *::before,html.noanim *::after{animation:none!important;transition:none!important}
+html.noanim .anim{stroke-dashoffset:0}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.anim{stroke-dashoffset:0}}
+nav#tabs{z-index:8}
+/* Sheet-Untermenüs: Höhe morpht, Inhalt wischt seitlich (zwei Ansichten nebeneinander) */
+.svwrap{overflow:hidden;margin:0 -16px}
+.svwrap>.sv{padding:0 16px}
+.track{display:flex;width:200%;align-items:flex-start;transition:transform .35s var(--ios)}
+.track>.sv{flex:0 0 50%;padding:0 16px;min-width:0}
+.track.tr-push{transform:translateX(0)}.track.tr-push.go{transform:translateX(-50%)}
+.track.tr-pop{transform:translateX(-50%)}.track.tr-pop.go{transform:translateX(0)}
+.sv{display:flow-root}
+/* iOS-Navigation: Zurück = Chevron + Text in Akzentfarbe, Listenpfeile grau */
+.chev{flex:none;color:var(--muted);opacity:.55;margin-left:auto}
+.mode.cont .chev{color:#fff;opacity:.9}
+#backbtn{width:auto;height:36px;background:none;box-shadow:none;border-radius:0;display:flex;align-items:center;gap:4px;padding:0 6px 0 0;color:var(--am);font-size:17px;font-weight:500}
+#backbtn .chevl{width:12px;height:21px}
+#backbtn:active{opacity:.35}
+.shead{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px;margin:2px 0 6px;min-height:40px}
+.shead h3{margin:0;text-align:center;font-size:17px;font-weight:700;white-space:nowrap}
+.navback{justify-self:start;display:flex;align-items:center;gap:4px;border:0;background:none;color:var(--am);font-size:17px;font-weight:500;padding:6px 6px 6px 0;margin-left:-2px}
+.navback .chevl{width:11px;height:20px}
+.navback:active{opacity:.35;transition-duration:0s}
+.navback{transition:opacity .25s ease-out}
+html:not(.lobby) header h1{justify-content:center;text-align:center;font-size:17px;font-weight:700}
+.sv{contain:layout paint style}
+.track>.sv{contain:layout paint style}
 </style></head>
 <body>
-<header><button id="backbtn" data-act="back" aria-label="Zurück" hidden><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h1><svg viewBox="0 0 2 2"><polygon points="1,0 2,1 1,2 0,1" fill="#6A4BE0" stroke="#24213B" stroke-width=".12" stroke-linejoin="round"/><path d="M0,1H2" stroke="#fff" stroke-width=".08" opacity=".7"/></svg><span id="htitle">Kristall-Echo</span></h1><button id="helpbtn" data-act="tab" data-tab="rules" aria-label="Spielregeln">?</button><button id="setbtn" data-act="tab" data-tab="settings" aria-label="Einstellungen"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button></header>
+<header><button id="backbtn" data-act="back" aria-label="Zurück" hidden><svg class="chevl" viewBox="0 0 11 20" aria-hidden="true"><path d="M9.5 1.5 1.5 10l8 8.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Start</span></button><h1><svg viewBox="0 0 2 2"><polygon points="1,0 2,1 1,2 0,1" fill="#6A4BE0" stroke="#24213B" stroke-width=".12" stroke-linejoin="round"/><path d="M0,1H2" stroke="#fff" stroke-width=".08" opacity=".7"/></svg><span id="htitle">Kristall-Echo</span></h1><button id="helpbtn" data-act="tab" data-tab="rules" aria-label="Spielregeln">?</button><button id="setbtn" data-act="tab" data-tab="settings" aria-label="Einstellungen"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button></header>
 <main id="app"></main>
 <nav id="tabs"></nav>
 <div id="sheet"></div><div id="toast" role="status" aria-live="polite"></div>
@@ -476,8 +543,12 @@ applyOpts(S.opts);
 const ui={drag:null,tab:'home',sel:null,tool:'piece',hl:null,reveal:false,last:null,anim:false,po:{me:{},opp:{}},setup:null};
 function save(){store.set(S)}
 const $=s=>document.querySelector(s);
+// iOS-Chevrons (SF Symbols „chevron.right/left/up“ nachgebaut)
+const CHEV_R='<svg class="chev" viewBox="0 0 9 16" width="9" height="16" aria-hidden="true"><path d="M1.5 1.5 7.5 8l-6 6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const CHEV_L='<svg class="chevl" viewBox="0 0 11 20" width="11" height="20" aria-hidden="true"><path d="M9.5 1.5 1.5 10l8 8.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const CHEV_UP='<svg class="chev" viewBox="0 0 16 9" width="16" height="9" aria-hidden="true"><path d="M1.5 7.5 8 1.5l6.5 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const SKEY='kristall-echo-settings';
-const SET={edgeCheck:true,holdMs:170,rayAnim:true,confirmGiveup:true,...(store.get(SKEY)||{})};
+const SET={edgeCheck:true,holdMs:170,rayAnim:true,uiAnim:true,confirmGiveup:true,...(store.get(SKEY)||{})};
 function saveSet(){store.set(SET,SKEY)}
 const isSolo=()=>S.mode==='solo'||S.mode==='daily';
 const DKEY='kristall-echo-daily';
@@ -548,8 +619,9 @@ function boardSVG(o){
  if(o.scans)for(const s of o.scans){const [x,y]=s.scan;s.val==='leer'
    ?(svgS=`<circle cx="${x+.5}" cy="${y+.5}" r=".16" fill="none" stroke="#A39DBB" stroke-width=".06"/>`)
    :(svgS=`<circle cx="${x+.5}" cy="${y+.5}" r=".2" fill="${FILL[s.val]}" stroke="${T.outline}" stroke-width=".05"/>`);s2+=svgS}
+ const pop=ui.justPlaced;ui.justPlaced=null;
  const inv=o.pieces&&o.cells&&canPlace(o.ctx)?invalidSet(o.pieces):new Set();const order=o.pieces?[...NAMES.filter(n=>n!==o.sel),...(o.sel?[o.sel]:[])]:[];
- if(o.pieces)for(const n of order){const p=o.pieces[n];if(!p)continue;const g=pieceSVG(n,cellsOf(n,p),{sel:o.sel===n&&!(ui.drag&&ui.drag.n===n)});s+=`<g data-pc="${n}"${ui.drag&&ui.drag.n===n&&ui.drag.ctx===o.ctx?' opacity=".22"':''}>${g}</g>`;
+ if(o.pieces)for(const n of order){const p=o.pieces[n];if(!p)continue;const g=pieceSVG(n,cellsOf(n,p),{sel:o.sel===n&&!(ui.drag&&ui.drag.n===n)});s+=`<g data-pc="${n}"${pop===n?' class="pop"':''}${ui.drag&&ui.drag.n===n&&ui.drag.ctx===o.ctx?' opacity=".22"':''}>${g}</g>`;
   if(inv.has(n)&&!(ui.drag&&ui.drag.n===n))s+=invalidOverlay(n,p)}
  if(o.ghost)for(const n of NAMES){const p=o.ghost[n];if(p)s+=pieceSVG(n,cellsOf(n,p),{ghost:true})}
  s+=s2;if(o.ray)s+=raySVG(o.ray,o.anim);
@@ -607,14 +679,14 @@ function gameStatus(){if(!S.mode)return null;const O=S.opp,n=O.log.length;
 function viewHome(){const g=gameStatus(),last={...DEFAULT_OPTS,...(store.get(OKEY)||{})};const dd=dailyData(),t=dd.mine[today()];
  return`<section class="home">
  <h2>Licht rein, Farbe raus.</h2>
- ${g?`<button class="mode cont" data-act="continue"><span class="ct-l"><small>${g.finished?'Letztes Spiel':'Weiterspielen'}</small><b>${g.title}</b><span>${g.sub}</span></span><span class="chev">›</span></button>`:`<p class="hint">Versteckt Kristalle, schickt Lichtstrahlen ins Feld des anderen und findet aus Ausgang und Farbe heraus, wo alles liegt.</p>`}
+ ${g?`<button class="mode cont" data-act="continue"><span class="ct-l"><small>${g.finished?'Letztes Spiel':'Weiterspielen'}</small><b>${g.title}</b><span>${g.sub}</span></span>${CHEV_R}</button>`:`<p class="hint">Versteckt Kristalle, schickt Lichtstrahlen ins Feld des anderen und findet aus Ausgang und Farbe heraus, wo alles liegt.</p>`}
  <h3>Neues Spiel</h3>
  <button class="mode" data-act="setup" data-mode="duo"><b>Gegeneinander</b><span>Jeder auf seinem Handy. Ihr sagt euch Fragen und Antworten.</span></button>
  <button class="mode" data-act="setup" data-mode="solo"><b>Solo gegen das Handy</b><span>Das Handy versteckt, du suchst.</span></button>
  ${dailyButton()}
  <button class="mode join" data-act="join"><b>${icon('qr')} Per QR beitreten</b><span>Den Einladungs-Code deines Gegenübers scannen.</span></button>
  <p class="hint small">Zuletzt gewählt: ${presetName(last)} · ${RULES.filter(([k])=>ruleOn(last,k)).map(r=>r[1]).join(', ')||'Originalregeln'}</p>
- <div class="homestats" data-act="tab" data-tab="days"><div><b>${streak(dd.mine)}</b><span>Serie</span></div><div><b>${t?(t.st==='solved'?t.q:'–'):'?'}</b><span>heute</span></div><div><b>${Object.values(dd.mine).filter(r=>r.st==='solved').length}</b><span>gelöst</span></div><span class="chev">›</span></div>
+ <div class="homestats" data-act="tab" data-tab="days"><div><b>${streak(dd.mine)}</b><span>Serie</span></div><div><b>${t?(t.st==='solved'?t.q:'–'):'?'}</b><span>heute</span></div><div><b>${Object.values(dd.mine).filter(r=>r.st==='solved').length}</b><span>gelöst</span></div>${CHEV_R}</div>
  <div class="row"><button class="link" data-act="tab" data-tab="rules">Spielregeln</button><button class="link" data-act="tab" data-tab="days">Verlauf</button></div>
  </section>`}
 
@@ -635,7 +707,7 @@ function invWarn(Pc){const s=invalidSet(Pc);if(!s.size)return'';const why=new Se
  return`<div class="invwarn">Rot markierte Steine ${why.has('overlap')?'liegen übereinander':''}${why.has('overlap')&&why.has('touch')?' oder ':''}${why.has('touch')?'berühren sich an einer Kante':''}. Verschieb oder dreh sie, dann geht es weiter.</div>`}
 function viewMe(){const M=S.me;
  if(!M.locked){const n=NAMES.filter(x=>M.pieces[x]).length,N=NAMES.length;
-  return`<div class="topbar">${turnChip()}<span class="tb-info">${N} Steine legen</span>${S.mode==='duo'?`<button class="btn sm ghost" data-act="invite">${icon('qr')} Einladen</button>`:''}</div>
+  return`<div class="topbar">${turnChip()}<span class="tb-info">${N} Steine legen</span>${S.mode==='duo'?`<button class="btn sm quiet" data-act="invite">${icon('qr')} Einladen</button>`:''}</div>
   <div class="board" data-ctx="me">${boardSVG({ctx:'me',pieces:M.pieces,sel:ui.sel,cells:true})}</div>
   ${toolRow('me')}${invWarn(M.pieces)}
   ${tray('me',`<button class="btn" data-act="random">Zufällig verteilen</button><button class="btn primary" data-act="lock" ${n===N&&!invalidSet(M.pieces).size?'':'disabled'}>Verdecken (${n}/${N})</button>`)}
@@ -676,7 +748,7 @@ function viewOpp(){const O=S.opp,solo=isSolo(),daily=S.mode==='daily',N=NAMES.le
  <div class="board" data-ctx="opp">${boardSVG({ctx:'opp',pieces:O.guess,sel:ui.sel,marks:O.marks,help,check,scans:O.log.filter(e=>e.scan),hlCell,labels,ray,anim:ui.anim,cells:true,ghost:solo&&(O.revealed||O.solved)?S.secret:null})}</div>
  ${toolRow('opp')}${invWarn(O.guess)}
  ${tray('opp')}
- <button class="answers-btn" data-act="answers"><span>Antworten</span><b>${n}</b>${all&&n?`<i class="ok">✓ ${okc}</i><i class="bad">✗ ${badc}</i>`:''}<span class="chev up">›</span></button>`}
+ <button class="answers-btn" data-act="answers"><span>Antworten</span><b>${n}</b>${all&&n?`<i class="ok">✓ ${okc}</i><i class="bad">✗ ${badc}</i>`:''}${CHEV_UP}</button>`}
 function answersSheet(){const O=S.opp,solo=isSolo(),all=complete(O.guess),n=O.log.length;
  const list=n?`<ul class="log">${O.log.map((e,i)=>({e,i})).reverse().map(({e,i})=>{const c=all?checkEntry(e,O.guess):null;
    const extra=(c?`<span class="${c.ok?'ok':'bad'}">${c.ok?'✓':'✗'}</span>`:'')+(solo?'':`<button class="x" data-act="rm" data-i="${i}" aria-label="Eintrag löschen">×</button>`);
@@ -691,6 +763,7 @@ function viewSettings(){const seg=(act,cur,opts)=>`<div class="seg">${opts.map((
  <h3>Darstellung</h3>
  ${seg('settheme',themePref,[['auto','Automatisch'],['light','Hell'],['dark','Dunkel']])}
  <div class="stack">${tg('edgeCheck','Randzahlen prüfen','Gefragte Zahlen und Buchstaben am Rand: lila gefüllt, wenn deine Vermutung zur Antwort passt, gestrichelt, wenn nicht.')}
+ ${tg('uiAnim','Animationen','Weiche Übergänge für Seiten, Blätter und Steine.')}
  ${tg('rayAnim','Strahl animieren','Der Lichtstrahl wird gezeichnet statt sofort angezeigt.')}</div>
  <h3>Bedienung</h3>
  <p class="hint small">Wie lange du einen Stein halten musst, bevor er sich ziehen lässt. Kürzer ist schneller, länger verhindert versehentliches Ziehen beim Scrollen.</p>
@@ -729,6 +802,10 @@ function viewRules(){const N=NAMES.length;const leg=NAMES.map(n=>`<span class="l
  <ul><li><b>Wegstreichen:</b> Im Gegner-Feld ein leeres Kästchen antippen. Kurz halten und ziehen streicht mehrere auf einmal (oder hebt sie wieder auf, wenn das erste schon gestrichen war).</li><li><b>Steine:</b> Antippen und aufs Feld tippen, oder kurz halten und ziehen. Wischen scrollt.</li><li>Ein Weg gilt in beide Richtungen: Wenn 3 bei C rauskommt, kommt C bei 3 raus.</li><li>Sobald alle deine Kristalle liegen, zeigt die Liste mit ✓ und ✗, welche Antworten zu deiner Vermutung passen.</li><li>Stellt auf beiden Handys dieselben Optionen ein, sonst passen Antworten und Codes nicht.</li></ul>
  </article>`}
 
+const NAV_MS=350,SHEET_IN_MS=500,SHEET_OUT_MS=350;
+// Flüssig: Animation erst starten, wenn der neue Inhalt fertig gezeichnet ist (zwei Frames), und währenddessen teure Effekte (Blur, Puls) pausieren
+const nextPaint=f=>requestAnimationFrame(()=>requestAnimationFrame(f));
+let animT=null;function animating(ms){const h=document.documentElement;h.classList.add('animating');clearTimeout(animT);animT=setTimeout(()=>h.classList.remove('animating'),ms+60)}
 const SUBPAGES={rules:'Spielregeln',settings:'Einstellungen',days:'Tagesrätsel'};
 const GAMEVIEWS=['me','opp'];
 function render(){
@@ -742,13 +819,29 @@ function render(){
  $('#tabs').innerHTML=tabs.map(([k,l])=>`<button class="${ui.tab===k?'on':''}" data-act="tab" data-tab="${k}">${l}${dot===k?'<i class="tdot"></i>':''}</button>`).join('');
  document.body.classList.toggle('nonav',!tabs.length);
  // Kopfzeile: links zurück (im Spiel und auf Unterseiten), Titel, rechts ? und ⚙
- const back=$('#backbtn');if(back)back.hidden=!(inGame||sub);
+ const back=$('#backbtn');if(back){back.hidden=!(inGame||sub);
+  const to=sub?(ui.back&&GAMEVIEWS.includes(ui.back)?(S.mode==='duo'?'Spiel':S.mode==='daily'?'Rätsel':'Solo'):'Start'):'Start';back.querySelector('span').textContent=to}
  const ttl=$('#htitle');if(ttl)ttl.textContent=sub?SUBPAGES[ui.tab]:inGame?(S.mode==='duo'?'Gegeneinander':S.mode==='daily'?'Tagesrätsel':'Solo'):'Kristall-Echo';
  document.documentElement.classList.toggle('lobby',!inGame&&!sub);
  const hb=$('#helpbtn');if(hb){hb.classList.toggle('on',ui.tab==='rules');hb.hidden=ui.tab==='rules'}
  const sb=$('#setbtn');if(sb){sb.classList.toggle('on',ui.tab==='settings');sb.hidden=ui.tab==='settings'}
  const v=ui.tab==='settings'?viewSettings():ui.tab==='rules'?viewRules():ui.tab==='days'?viewDays():ui.tab==='home'?viewHome():ui.tab==='me'?viewMe():viewOpp();
- $('#app').innerHTML=v;ui.anim=false}
+ const app=$('#app');
+ // iOS-Navigation: Push = neue Seite von rechts, alte gleitet 30 % nach links und wird leicht abgedunkelt; Pop umgekehrt.
+ // Tab-Wechsel (Mein Feld ↔ Gegner) ist wie bei iOS sofort, ohne Animation.
+ const lv=t=>t==='home'?0:GAMEVIEWS.includes(t)?1:2;
+ const motion=SET.uiAnim&&!matchMedia('(prefers-reduced-motion: reduce)').matches;
+ let dir=null;if(motion&&ui.shown!==undefined&&ui.shown!==ui.tab){const a=lv(ui.shown),b=lv(ui.tab);dir=b>a?'push':b<a?'pop':null}
+ document.querySelectorAll('.ghost').forEach(g=>g.remove());app.classList.remove('nav-push','nav-pop','nav-prep','nav-run');
+ let ghost=null;
+ if(dir){const r=app.getBoundingClientRect();ghost=document.createElement('div');ghost.className='ghost '+dir;ghost.setAttribute('aria-hidden','true');
+  // alte Seite verschieben statt kopieren: kein erneutes Parsen, kein doppelter Aufbau
+  while(app.firstChild)ghost.appendChild(app.firstChild);Object.assign(ghost.style,{top:r.top+'px',left:r.left+'px',width:r.width+'px'});document.body.appendChild(ghost)}
+ app.innerHTML=v;ui.anim=false;
+ if(dir){const g=ghost;animating(NAV_MS);app.classList.add('nav-'+dir,'nav-prep');
+  nextPaint(()=>{app.classList.remove('nav-prep');app.classList.add('nav-run');g.classList.add('run');
+   setTimeout(()=>{g.remove();app.classList.remove('nav-push','nav-pop','nav-run')},NAV_MS+40)})}
+ ui.shown=ui.tab;document.documentElement.classList.toggle('noanim',!SET.uiAnim)}
 
 /* ---------- Sheets & toast ---------- */
 let tt;function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('show'),2800)}
@@ -757,11 +850,47 @@ let lockY=null;
 function lockScroll(){if(lockY!==null)return;lockY=window.scrollY;const b=document.body.style;b.position='fixed';b.top=`-${lockY}px`;b.left='0';b.right='0';b.width='100%'}
 function unlockScroll(){if(lockY===null)return;const b=document.body.style;b.position=b.top=b.left=b.right=b.width='';window.scrollTo(0,lockY);lockY=null}
 document.addEventListener('touchmove',e=>{if(lockY!==null&&!e.target.closest('.panel'))e.preventDefault()},{passive:false});
-function sheet(html){$('#toast').classList.remove('show');const w=$('#sheet');const pnl=w.classList.contains('open')&&w.querySelector('.panel');
- // Schon offen: nur den Inhalt tauschen, damit das Blatt nicht neu hereinanimiert und die Scrollposition bleibt
- if(pnl){const st=pnl.scrollTop;pnl.innerHTML=`<div class="grab"></div>${html}`;pnl.scrollTop=st;return}
- lockScroll();w.innerHTML=`<div class="back" data-act="close"></div><div class="panel" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div>`;w.classList.add('open')}
-function close(){stopScan();$('#sheet').classList.remove('open');$('#sheet').innerHTML='';unlockScroll()}
+let closeT=null,morph=null;
+const reduceMotion=()=>!SET.uiAnim||matchMedia('(prefers-reduced-motion: reduce)').matches;
+// Laufende Größen-/Wisch-Animation sofort abschließen (z. B. bei schnellem Tippen)
+function finishMorph(){if(!morph)return;const {pnl,wrap,track,neu,t}=morph;clearTimeout(t);morph=null;
+ if(track&&track.isConnected){neu.classList.remove('new');neu.style.transform='';wrap.appendChild(neu);track.remove()}
+ pnl.style.transition='none';Object.assign(pnl.style,{height:'',transform:''});void pnl.offsetHeight;Object.assign(pnl.style,{transition:'',overflow:''})}
+function sheet(html){$('#toast').classList.remove('show');const w=$('#sheet');
+ const wasClosing=!!closeT;if(closeT){clearTimeout(closeT);closeT=null;w.classList.remove('closing');w.classList.add('shown')}
+ const pnl=!wasClosing&&w.classList.contains('open')&&w.querySelector('.panel');
+ if(pnl){const dir=ui.sheetAnim;ui.sheetAnim=null;finishMorph();
+  const wrap=pnl.querySelector('.svwrap'),oldSv=wrap.querySelector('.sv'),st=pnl.scrollTop;
+  if(reduceMotion()){wrap.innerHTML=`<div class="sv">${html}</div>`;pnl.scrollTop=dir?0:st;return}
+  // Größe „morphen“: alte Höhe festhalten, neuen Inhalt einsetzen, auf neue Höhe animieren
+  // exakt (mit Nachkommastellen) messen, sonst springt das Blatt am Ende um ein, zwei Pixel
+  const oldH=pnl.getBoundingClientRect().height,wrapH=wrap.getBoundingClientRect().height;
+  const chrome=(pnl.scrollHeight>pnl.clientHeight+1?pnl.scrollHeight:oldH)-wrapH,maxH=parseFloat(getComputedStyle(pnl).maxHeight)||innerHeight*.92;
+  const neu=document.createElement('div');neu.className='sv';neu.innerHTML=html;let track=null;
+  if(dir){const old=oldSv;old.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));old.style.transform=`translateY(${-st}px)`;
+   track=document.createElement('div');track.className='track '+(dir==='fwd'?'tr-push':'tr-pop');neu.classList.add('new');
+   wrap.innerHTML='';if(dir==='fwd'){track.append(old,neu)}else{track.append(neu,old)}wrap.appendChild(track);pnl.scrollTop=0}
+  else{wrap.innerHTML='';wrap.appendChild(neu);pnl.scrollTop=st}
+  const target=Math.min(chrome+neu.getBoundingClientRect().height,maxH);
+  if(!dir&&Math.abs(target-oldH)<2)return;
+  // Größe ohne Layout-Animation: Blatt auf die größere Höhe setzen und nur per transform nach unten verschieben,
+  // dann den Versatz auf die Zielhöhe animieren. Alles läuft auf der GPU, wie ein iOS-Detent-Wechsel.
+  const H=Math.max(oldH,target);
+  Object.assign(pnl.style,{transition:'none',overflow:'hidden',height:H+'px',transform:`translate3d(0,${H-oldH}px,0)`});void pnl.offsetHeight;animating(NAV_MS);
+  morph={pnl,wrap,track,neu,t:null};const m=morph;
+  nextPaint(()=>{if(morph!==m)return;Object.assign(pnl.style,{transition:`transform ${NAV_MS}ms var(--ios)`,transform:`translate3d(0,${H-target}px,0)`});if(track)track.classList.add('go');m.t=setTimeout(finishMorph,NAV_MS+30)});return}
+ ui.sheetAnim=null;lockScroll();w.innerHTML=`<div class="back" data-act="close"></div><div class="panel" role="dialog" aria-modal="true"><div class="grab"></div><div class="svwrap"><div class="sv">${html}</div></div></div>`;
+ w.classList.remove('shown');w.classList.add('open');animating(SHEET_IN_MS);nextPaint(()=>w.classList.add('shown'))}
+function close(){stopScan();finishMorph();const w=$('#sheet');if(!w.classList.contains('open')||closeT)return;unlockScroll();
+ const p=w.querySelector('.panel');if(p)p.style.transform='';
+ if(!SET.uiAnim||matchMedia('(prefers-reduced-motion: reduce)').matches){w.classList.remove('open','shown');w.innerHTML='';return}
+ animating(SHEET_OUT_MS);w.classList.add('closing');w.classList.remove('shown');closeT=setTimeout(()=>{closeT=null;w.classList.remove('open','closing');w.innerHTML=''},SHEET_OUT_MS)}
+// Blatt am Griff nach unten wischen schließt es
+(()=>{let y0=null,dy=0,p=null;
+ document.addEventListener('touchstart',e=>{const g=e.target.closest('#sheet .panel');if(!g||closeT)return;const r=g.getBoundingClientRect(),t=e.touches[0];
+  if(t.clientY-r.top>56||g.scrollTop>0)return;p=g;y0=t.clientY;dy=0;p.style.transition='none'},{passive:true});
+ document.addEventListener('touchmove',e=>{if(y0===null)return;dy=Math.max(0,e.touches[0].clientY-y0);p.style.transform=`translateY(${dy}px)`;if(dy>4&&e.cancelable)e.preventDefault()},{passive:false});
+ document.addEventListener('touchend',()=>{if(y0===null)return;p.style.transition='';if(dy>90)close();else p.style.transform='';y0=null;p=null})})();
 const RULES=[['house','Weiß färbt nicht','Weiße Steine lenken nur ab, ohne zu färben.'],['mirror','Spiegeln erlaubt','Steine dürfen auch gewendet werden.'],
  ['touch','Kanten dürfen sich berühren','Steine dürfen direkt aneinanderliegen.'],['noscan','Ohne direkten Scan','Nur Strahlen, keine Feldabfragen wie C3.'],
  ['helper','Logik-Hilfe','Schraffiert Felder, die nach den Antworten sicher leer sind.']];
@@ -771,13 +900,13 @@ function setupSheet(){const u=ui.setup,o=u.opts;if(u.view==='stones')return ston
  const st=stonesOf(o),act=RULES.filter(([k])=>ruleOn(o,k));
  sheet(`<h3>${u.mode==='duo'?'Gegeneinander':'Solo'}: Optionen</h3>
  <h4>Steine</h4>
- <button class="opt stonepick" data-act="stones"><span><b>${presetName(o)}</b><small>${st.length} ${plural(st.length,'Stein','Steine')} · ${blocksOf(st)} Blöcke</small><span class="minis">${st.map(s=>miniShapeSVG(s.shape,s.color,6)).join('')}</span></span><span class="chev">›</span></button>
+ <button class="opt stonepick" data-act="stones"><span><b>${presetName(o)}</b><small>${st.length} ${plural(st.length,'Stein','Steine')} · ${blocksOf(st)} Blöcke</small><span class="minis">${st.map(s=>miniShapeSVG(s.shape,s.color,6)).join('')}</span></span>${CHEV_R}</button>
  <h4>Regeln</h4>
- <button class="opt stonepick" data-act="rules"><span><b>${act.length?`${act.length} ${plural(act.length,'Sonderregel','Sonderregeln')} aktiv`:'Originalregeln'}</b><small>${act.length?'':'Keine Sonderregeln, so wie im Original.'}</small>${act.length?`<span class="rchips">${act.map(([k,t])=>`<i>${t}</i>`).join('')}</span>`:''}</span><span class="chev">›</span></button>
+ <button class="opt stonepick" data-act="rules"><span><b>${act.length?`${act.length} ${plural(act.length,'Sonderregel','Sonderregeln')} aktiv`:'Originalregeln'}</b><small>${act.length?'':'Keine Sonderregeln, so wie im Original.'}</small>${act.length?`<span class="rchips">${act.map(([k,t])=>`<i>${t}</i>`).join('')}</span>`:''}</span>${CHEV_R}</button>
  ${u.mode==='duo'?'<p class="small">Nach dem Start kannst du dein Gegenüber per QR-Code einladen. Dann spielt ihr automatisch mit denselben Einstellungen.</p>':''}${busy?'<p class="small warn">Das laufende Spiel wird beendet.</p>':''}
  <div class="row"><button class="btn" data-act="close">Abbrechen</button><button class="btn primary grow" data-act="start">Spiel starten</button></div>`)}
 function rulesSheet(){const o=ui.setup.opts;
- sheet(`<div class="shead"><button class="back-btn" data-act="sback" aria-label="Zurück">‹</button><h3>Regeln</h3></div>
+ sheet(`<div class="shead"><button class="navback" data-act="sback">${CHEV_L}<span>Optionen</span></button><h3>Regeln</h3><span></span></div>
  <p class="small">Alles aus entspricht den Originalregeln.</p>
  ${RULES.map(([k,t,d])=>{const on=ruleOn(o,k);return`<button class="opt${on?' on':''}" data-act="sopt" data-k="${k}" role="switch" aria-checked="${on}"><span><b>${t}</b><small>${d}</small></span><i class="sw"></i></button>`}).join('')}
  <div class="row"><button class="btn primary grow" data-act="sback">Fertig</button></div>`)}
@@ -790,12 +919,12 @@ function parseOpts(txt){const m=/^KEO1\|([A-Za-z0-9_-]+)$/.exec(txt);if(!m)retur
   const custom=p.p==='custom'?Object.fromEntries(Object.entries(p.x||{}).filter(([k,v])=>{const [sh,col]=k.split('|');return SHAPES[sh]&&STONE_COLORS.includes(col)&&v>0&&v<30})):null;
   return{...DEFAULT_OPTS,color:p.c?'house':'orig',mirror:!!p.m,touch:!!p.t,noscan:!!p.n,helper:!!p.h,preset:p.p,custom}}catch(e){return null}}
 function shareOptsSheet(){const o=ui.setup.opts,st=stonesOf(o);
- sheet(`<div class="shead"><button class="back-btn" data-act="sback" aria-label="Zurück">‹</button><h3>Optionen teilen</h3></div>
+ sheet(`<div class="shead"><button class="navback" data-act="sback">${CHEV_L}<span>Optionen</span></button><h3>Optionen teilen</h3><span></span></div>
  <p class="small">Dein Gegenüber öffnet „Neues Spiel“ und tippt bei den Optionen auf „Scannen“.</p>
  <div class="qr">${qrSVG(optsPayload(o))}</div>
  <p class="small center"><b>${presetName(o)}</b> · ${st.length} ${plural(st.length,'Stein','Steine')} · ${RULES.filter(([k])=>ruleOn(o,k)).map(r=>r[1]).join(', ')||'Originalregeln'}</p>
  <div class="row"><button class="btn primary grow" data-act="sback">Fertig</button></div>`)}
-function scanOptsSheet(){sheet(`<div class="shead"><button class="back-btn" data-act="sback" aria-label="Zurück">‹</button><h3>Optionen scannen</h3></div>
+function scanOptsSheet(){sheet(`<div class="shead"><button class="navback" data-act="sback">${CHEV_L}<span>Optionen</span></button><h3>Optionen scannen</h3><span></span></div>
  <div id="scanbox" class="scanbox"></div><div id="vres"></div>`);startScan(onOptQR)}
 function onJoinQR(txt){const o=parseOpts(txt);const st=$('#scanstat');
  if(!o){if(st)st.textContent=/^KE/.test(txt)?'Das ist kein Einladungs-Code':'Das ist kein Kristall-Echo-Code';return}
@@ -821,7 +950,7 @@ function stonesSheet(){const o=ui.setup.opts;const cur=o.preset||'std';
   <h4>Ausgewählt <span>(${chosen.length} ${plural(chosen.length,'Stein','Steine')}, antippen zum Entfernen)</span></h4>
   <div class="chosen">${chosen.length?chosen.map(st=>`<button class="chosen-st" data-act="csub" data-k="${st.shape}|${st.color}" aria-label="${SHAPES[st.shape].name} ${LBL[st.color]} entfernen">${miniShapeSVG(st.shape,st.color,8)}</button>`).join(''):'<p class="small">Noch nichts ausgewählt.</p>'}</div>
   <div class="row"><button class="link" data-act="cclear">Alle entfernen</button></div>`}
- sheet(`<div class="shead"><button class="back-btn" data-act="sback" aria-label="Zurück">‹</button><h3>Steine</h3></div>
+ sheet(`<div class="shead"><button class="navback" data-act="sback">${CHEV_L}<span>Optionen</span></button><h3>Steine</h3><span></span></div>
  <div class="presets">${Object.entries(PRESETS).map(([k,p])=>card(k,p)).join('')}
  <button class="preset${cur==='custom'?' on':''}" data-act="preset" data-k="custom"><span class="pt"><b>Eigene Auswahl</b><small>Formen und Farben frei kombinieren, bis ${MAX_BLOCKS} Blöcke</small></span></button></div>
  ${builder}
@@ -880,10 +1009,10 @@ function onCell(ctx,x,y){
  if(!ui.sel){toast('Wähle unten erst einen Kristall');return}
  const n=ui.sel;const o=Pc[n]?Pc[n].o:(ui.po[ctx][n]||0);const [w,h]=dims(shape(n,o));
  const p=clampPos(n,o,x-Math.floor((w-1)/2),y-Math.floor((h-1)/2));
- snap(ctx);Pc[n]=p;if(ctx==='opp')for(const [cx,cy] of cellsOf(n,p))delete S.opp.marks[cx+','+cy];save();render()}
+ snap(ctx);Pc[n]=p;ui.justPlaced=n;if(ctx==='opp')for(const [cx,cy] of cellsOf(n,p))delete S.opp.marks[cx+','+cy];save();render()}
 function transform(ctx,f){const n=ui.sel;if(!n)return;const Pc=P(ctx);
  if(!Pc[n]){ui.po[ctx][n]=f(ui.po[ctx][n]||0);render();return}
- const no=f(Pc[n].o);snap(ctx);Pc[n]=clampPos(n,no,Pc[n].x,Pc[n].y);save();render()}
+ const no=f(Pc[n].o);snap(ctx);Pc[n]=clampPos(n,no,Pc[n].x,Pc[n].y);ui.justPlaced=n;save();render()}
 const rotO=o=>(o%4+1)%4+(o>=4?4:0);
 // Spiegeln so, wie man es sieht: links↔rechts bzw. oben↔unten (Form ist erst gespiegelt, dann gedreht gespeichert)
 const flipH=o=>(o>=4?0:4)+(4-o%4)%4, flipV=o=>(o>=4?0:4)+(6-o%4)%4;
@@ -901,11 +1030,11 @@ document.addEventListener('click',ev=>{
  case'setup':ui.setup={mode:t.dataset.mode,view:'main',opts:{...DEFAULT_OPTS,...(store.get(OKEY)||{})}};setupSheet();break;
  case'scol':ui.setup.opts.color=t.dataset.v;setupSheet();break;
  case'sopt':{const k=t.dataset.k,o=ui.setup.opts;if(k==='house')o.color=o.color==='house'?'orig':'house';else o[k]=!o[k];setupSheet()}break;
- case'rules':ui.setup.view='rules';setupSheet();break;
- case'stones':ui.setup.view='stones';setupSheet();break;
- case'sback':stopScan();ui.setup.view='main';setupSheet();break;
- case'oshare':ui.setup.view='oshare';setupSheet();break;
- case'oscan':ui.setup.view='oscan';setupSheet();break;
+ case'rules':ui.sheetAnim='fwd';ui.setup.view='rules';setupSheet();break;
+ case'stones':ui.sheetAnim='fwd';ui.setup.view='stones';setupSheet();break;
+ case'sback':stopScan();ui.sheetAnim='back';ui.setup.view='main';setupSheet();break;
+ case'oshare':ui.sheetAnim='fwd';ui.setup.view='oshare';setupSheet();break;
+ case'oscan':ui.sheetAnim='fwd';ui.setup.view='oscan';setupSheet();break;
  case'preset':{const o=ui.setup.opts,k=t.dataset.k;if(k==='custom'&&o.preset!=='custom'&&!o.custom)o.custom=countsOf(stonesOf(o));o.preset=k;delete o.trans;delete o.schwarz;setupSheet()}break;
  case'cadd':{const o=ui.setup.opts,k=t.dataset.k,c=o.custom=o.custom||{};const used=blocksOf(customStones(c)),a=shapeArea(k.split('|')[0]);
   if(used+a>MAX_BLOCKS){toast(`Maximal ${MAX_BLOCKS} Blöcke`);break}c[k]=(c[k]||0)+1;setupSheet()}break;
@@ -1146,7 +1275,7 @@ function dragEnd(commit){const d=pend;pend=null;if(raf){cancelAnimationFrame(raf
  if(commit&&(d.off?d.kind==='board':!!d.target))snap(d.ctx);
  if(commit){const Pc=P(d.ctx);
   if(d.off){if(d.kind==='board'){ui.po[d.ctx][d.n]=Pc[d.n].o;delete Pc[d.n];ui.sel=null;save();toast('Weggenommen')}}
-  else if(d.target){Pc[d.n]=d.target;ui.sel=d.n;if(d.ctx==='opp')for(const [cx,cy] of cellsOf(d.n,d.target))delete S.opp.marks[cx+','+cy];save()}}
+  else if(d.target){Pc[d.n]=d.target;ui.sel=d.n;ui.justPlaced=d.n;if(d.ctx==='opp')for(const [cx,cy] of cellsOf(d.n,d.target))delete S.opp.marks[cx+','+cy];save()}}
  render()}
 document.addEventListener('pointerup',()=>{if(pend&&pend.touch&&pend.moved)return;dragEnd(true)});
 document.addEventListener('pointercancel',()=>{if(pend&&pend.touch&&pend.moved)return;dragEnd(false)});
