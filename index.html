@@ -352,8 +352,11 @@ nav#tabs{z-index:8}
 html:not(.lobby) header h1{justify-content:center;text-align:center;font-size:17px;font-weight:700}
 .sv{contain:layout paint style}
 .track>.sv{contain:layout paint style}
+.cgap{display:block}
+.cbtn span small{display:block;font-size:9.5px;font-weight:500;color:var(--muted);line-height:1.1}
+.holedot{border-style:dashed!important;background:transparent!important}
 </style></head>
-<body>
+<body><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><radialGradient id="holeGrad" cx="50%" cy="50%" r="70%"><stop offset="0" stop-color="#000"/><stop offset=".7" stop-color="#14112A"/><stop offset="1" stop-color="#3A3366"/></radialGradient><pattern id="holePat" width=".34" height=".34" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width=".34" height=".34" fill="#0D0A1E"/><rect width=".09" height=".34" fill="#6C4FE6" opacity=".85"/></pattern></defs></svg>
 <header><button id="backbtn" data-act="back" aria-label="Zurück" hidden><svg class="chevl" viewBox="0 0 11 20" aria-hidden="true"><path d="M9.5 1.5 1.5 10l8 8.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Start</span></button><h1><svg viewBox="0 0 2 2"><polygon points="1,0 2,1 1,2 0,1" fill="#6A4BE0" stroke="#24213B" stroke-width=".12" stroke-linejoin="round"/><path d="M0,1H2" stroke="#fff" stroke-width=".08" opacity=".7"/></svg><span id="htitle">Kristall-Echo</span></h1><button id="helpbtn" data-act="tab" data-tab="rules" aria-label="Spielregeln">?</button><button id="setbtn" data-act="tab" data-tab="settings" aria-label="Einstellungen"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button></header>
 <main id="app"></main>
 <nav id="tabs"></nav>
@@ -382,15 +385,20 @@ const SHAPES={
 };
 const SHAPE_ORDER=Object.keys(SHAPES);
 // Reihenfolge nur anhängen (Index steckt im Lösungs-Code); Anzeige-Reihenfolge siehe PICK_COLORS
-const STONE_COLORS=['rot','gelb','blau','weiss','trans','schwarz','orange','lila','gruen','rosa','hellgelb','hellblau','hellorange','helllila','hellgruen'];
+const STONE_COLORS=['rot','gelb','blau','weiss','trans','schwarz','orange','lila','gruen','rosa','hellgelb','hellblau','hellorange','helllila','hellgruen','dunkelrot','dunkelgelb','dunkelblau','dunkelorange','dunkellila','dunkelgruen','schwarzton'];
 // In Schwarz wirkt jede Form wie ihr Rechteck – deshalb nur je eine Form pro Rechteckgröße anbieten
 const BLACK_SHAPES=['sq1','tri1','raute3','dia2','hex4']; // füllen ihr Rechteck: 1×1, 2×1, 3×1, 2×2, 3×2
-const PICK_COLORS=['rot','gelb','blau','orange','gruen','lila','rosa','hellgelb','hellblau','hellorange','hellgruen','helllila','weiss','trans','schwarz'];
+const PICK_COLORS=['rot','gelb','blau','orange','gruen','lila','rosa','hellgelb','hellblau','hellorange','hellgruen','helllila','dunkelrot','dunkelgelb','dunkelblau','dunkelorange','dunkelgruen','dunkellila','weiss','schwarzton','trans','schwarz'];
+const DARK_COLORS=['dunkelrot','dunkelgelb','dunkelblau','dunkelorange','dunkellila','dunkelgruen'];
 const LIGHT_COLORS=['rosa','hellgelb','hellblau','hellorange','helllila','hellgruen'];
 // Welche Grundanteile ein Stein beisteuert. Helle Steine bringen ihr „Weiß“ selbst mit, auch bei „Weiß färbt nicht“.
 const COMPS={rot:['rot'],gelb:['gelb'],blau:['blau'],orange:['rot','gelb'],lila:['rot','blau'],gruen:['gelb','blau'],
- rosa:['rot','weiss'],hellgelb:['gelb','weiss'],hellblau:['blau','weiss'],hellorange:['rot','gelb','weiss'],helllila:['rot','blau','weiss'],hellgruen:['gelb','blau','weiss'],trans:[],schwarz:[]};
-function compsOf(color){return color==='weiss'?(OPTS.color==='orig'?['weiss']:[]):(COMPS[color]||[])}
+ rosa:['rot','weiss'],hellgelb:['gelb','weiss'],hellblau:['blau','weiss'],hellorange:['rot','gelb','weiss'],helllila:['rot','blau','weiss'],hellgruen:['gelb','blau','weiss'],
+ dunkelrot:['rot','dunkel'],dunkelgelb:['gelb','dunkel'],dunkelblau:['blau','dunkel'],dunkelorange:['rot','gelb','dunkel'],dunkellila:['rot','blau','dunkel'],dunkelgruen:['gelb','blau','dunkel'],trans:[],schwarz:[]};
+// Hell und Dunkel heben sich gegenseitig auf
+function tone(c){return c.includes('weiss')&&c.includes('dunkel')?c.filter(x=>x!=='weiss'&&x!=='dunkel'):c}
+// Weiß hellt auf, Schwarz dunkelt ab – beide nur, solange die Regel „Weiß und Schwarz färben nicht“ aus ist
+function compsOf(color){if(color==='weiss')return OPTS.color==='orig'?['weiss']:[];if(color==='schwarzton')return OPTS.color==='orig'?['dunkel']:[];return COMPS[color]||[]}
 const MAX_BLOCKS=20; // ein Viertel des Felds
 function shapeArea(s){return SHAPES[s].cells.reduce((a,c)=>a+(c[2]==='F'?1:.5),0)}
 const ST=(id,shape,color)=>({id,shape,color});
@@ -399,11 +407,11 @@ const XT=ST('trans','tri1','trans'),XB=ST('schwarz','tri1','schwarz');
 const PRESETS={
  std:{name:'Standard',desc:'Die 5 Steine aus dem Original',stones:STD},
  std_t:{name:'Standard + Transparent',desc:'Mit dem farblosen Ablenker',stones:[...STD,XT]},
- std_b:{name:'Standard + Schwarz',desc:'Mit dem Strahl-Schlucker',stones:[...STD,XB]},
- std_tb:{name:'Standard + beide',desc:'Transparent und Schwarz',stones:[...STD,XT,XB]},
+ std_b:{name:'Standard + Loch',desc:'Mit dem Strahl-Schlucker',stones:[...STD,XB]},
+ std_tb:{name:'Standard + beide',desc:'Transparent und Loch',stones:[...STD,XT,XB]},
  easy:{name:'Einsteiger',desc:'Nur 3 Steine, gut zum Lernen',stones:[ST('rot','raute3','rot'),ST('gelb','tri2','gelb'),ST('blau','tri4','blau')]},
  geo:{name:'Geometrie',desc:'Sanduhr, Trapez, kleine Raute, Quadrat',stones:[ST('g2-rot','sand2','rot'),ST('g2-gelb','trap3','gelb'),ST('g2-blauR','raute2','blau'),ST('g2-blauT','tri4','blau'),ST('g2-weissQ','sq1','weiss'),ST('g2-weissD','dia2','weiss')]},
- max:{name:'Profi',desc:'Standard plus Trapez, Quadrat, Transparent, Schwarz',stones:[...STD,ST('x-gelb','trap3','gelb'),ST('x-schwarz','sq1','schwarz'),XT]},
+ max:{name:'Profi',desc:'Standard plus Trapez, Quadrat, Transparent, Loch',stones:[...STD,ST('x-gelb','trap3','gelb'),ST('x-schwarz','sq1','schwarz'),XT]},
 };
 // Eigene Auswahl: {"shape|color":anzahl} -> Steinliste in fester Reihenfolge
 function customStones(c){const out=[];for(const sh of SHAPE_ORDER)for(const col of STONE_COLORS){const k=sh+'|'+col,n=(c&&c[k])||0;for(let i=0;i<n;i++)out.push(ST(`${sh}-${col}-${i}`,sh,col))}return out}
@@ -419,9 +427,10 @@ function applyOpts(o){OPTS={...DEFAULT_OPTS,...(o||{})};if(o&&!o.preset&&(o.tran
  STONES=stonesOf(OPTS);for(const k in BASE){delete BASE[k];delete COLOR[k];delete SHAPE_OF[k]}
  for(const s of STONES){BASE[s.id]=SHAPES[s.shape].cells;COLOR[s.id]=s.color;SHAPE_OF[s.id]=s.shape}
  NAMES=STONES.map(s=>s.id);
- TINT=['rot','gelb','blau','weiss']}
+ TINT=['rot','gelb','blau','weiss','dunkel']}
 function hasColor(c){return STONES.some(s=>s.color===c)}
 function hasLight(){return STONES.some(s=>LIGHT_COLORS.includes(s.color))}
+function hasDark(){return STONES.some(s=>DARK_COLORS.includes(s.color))||(OPTS.color==='orig'&&hasColor('schwarzton'))}
 function stoneSig(o=OPTS){if(o.preset&&o.preset!=='custom')return o.preset;return stonesOf(o).map(s=>SHAPE_ORDER.indexOf(s.shape).toString(36)+STONE_COLORS.indexOf(s.color).toString(36)).join('')}
 applyOpts();
 function lab(n){if(n===0)return'–';if(n<=18)return String(n);if(n<=28)return String.fromCharCode(73+(28-n));return String.fromCharCode(65+(36-n))}
@@ -458,7 +467,7 @@ function labelAt(x,y){if(y===-1)return x+1;if(x===COLS)return 11+y;if(y===ROWS)r
 function mirrorD(k,d){const back=(k==='SW'||k==='NE');return back?{E:'S',S:'E',W:'N',N:'W'}[d]:{E:'N',N:'E',W:'S',S:'W'}[d]}
 // out=0 means absorbed
 function trace(b,n){let [pos,d]=entry(n);const pts=[[pos[0]+.5,pos[1]+.5]],hit=[],ids=new Set(),pcs=[[]];
- const cur=()=>TINT.filter(c=>hit.includes(c));const P_=p=>{pts.push(p);pcs.push(cur())};
+ const cur=()=>tone(TINT.filter(c=>hit.includes(c)));const P_=p=>{pts.push(p);pcs.push(cur())};
  const done=out=>({out,colors:out===0?[]:cur(),pts,pcs,ids});
  for(let g=0;g<1000;g++){const nx=pos[0]+DIR[d][0],ny=pos[1]+DIR[d][1];
   if(nx<0||ny<0||nx>=COLS||ny>=ROWS){P_([nx+.5,ny+.5]);return done(labelAt(nx,ny))}
@@ -487,7 +496,7 @@ function dailyOpts(date){const r=mulberry32(hashStr('KE-opts-'+date));
  return o}
 function seededLayout(seed){const old=RNG;RNG=mulberry32(hashStr(seed));try{return randomLayout()}finally{RNG=old}}
 // Logik-Hilfe: nur sichere Schlüsse
-function colorlessDeflectors(){return(OPTS.color==='house'&&hasColor('weiss'))||hasColor('trans')}
+function colorlessDeflectors(){return(OPTS.color==='house'&&(hasColor('weiss')||hasColor('schwarzton')))||hasColor('trans')}
 function sureEmpty(log){const s=new Set();const straight=!colorlessDeflectors();
  for(const e of log){
   if(e.scan){if(e.val==='leer')s.add(e.scan.join(','));continue}
@@ -510,15 +519,15 @@ function encode(P){return NAMES.map(n=>`${P[n].x}${P[n].y}${P[n].o}`).join(' ')}
 function decode(s){const d=(s||'').replace(/\D/g,'');if(d.length!==NAMES.length*3)return null;const P={};
  for(let i=0;i<NAMES.length;i++){const x=+d[i*3],y=+d[i*3+1],o=+d[i*3+2];if(o>7)return null;const n=NAMES[i],p={x,y,o};if(whyNot(P,n,p)==='out'||whyNot(P,n,p)==='overlap')return null;P[n]=p}return P}
 
-const LBL={rot:'Rot',gelb:'Gelb',blau:'Blau',weiss:'Weiß',trans:'Transparent',schwarz:'Schwarz',orange:'Orange',lila:'Lila',gruen:'Grün',rosa:'Rosa',hellgelb:'Hellgelb',hellblau:'Hellblau',hellorange:'Hellorange',helllila:'Helllila',hellgruen:'Hellgrün'};
-const SHORT={...LBL,trans:'Transp.',hellorange:'Hellor.',hellgruen:'Hellgrün',hellgelb:'Hellgelb'};
-const FILL={rot:'#E5484D',gelb:'#F5C518',blau:'#2F7BEA',weiss:'#FFFFFF',trans:'#CDEFF5',schwarz:'#2B2838',orange:'#F28C28',lila:'#8E44AD',gruen:'#2EAD5B',rosa:'#F2A4A6',hellgelb:'#FAE28B',hellblau:'#97BDF4',hellorange:'#F9C593',helllila:'#C7A1D6',hellgruen:'#96D6AD'};
+const LBL={rot:'Rot',gelb:'Gelb',blau:'Blau',weiss:'Weiß',trans:'Transparent',schwarz:'Loch',orange:'Orange',lila:'Lila',gruen:'Grün',rosa:'Rosa',hellgelb:'Hellgelb',hellblau:'Hellblau',hellorange:'Hellorange',helllila:'Helllila',hellgruen:'Hellgrün',dunkelrot:'Dunkelrot',dunkelgelb:'Dunkelgelb',dunkelblau:'Dunkelblau',dunkelorange:'Dunkelorange',dunkellila:'Dunkellila',dunkelgruen:'Dunkelgrün',schwarzton:'Schwarz'};
+const SHORT={...LBL,trans:'Transp.',hellorange:'Hellor.',hellgruen:'Hellgrün',hellgelb:'Hellgelb',dunkelrot:'Dkl.rot',dunkelgelb:'Dkl.gelb',dunkelblau:'Dkl.blau',dunkelorange:'Dkl.or.',dunkellila:'Dkl.lila',dunkelgruen:'Dkl.grün'};
+const FILL={rot:'#E5484D',gelb:'#F5C518',blau:'#2F7BEA',weiss:'#FFFFFF',trans:'#CDEFF5',schwarz:'#2B2838',orange:'#F28C28',lila:'#8E44AD',gruen:'#2EAD5B',rosa:'#F2A4A6',hellgelb:'#FAE28B',hellblau:'#97BDF4',hellorange:'#F9C593',helllila:'#C7A1D6',hellgruen:'#96D6AD',dunkelrot:'#8E2A2E',dunkelgelb:'#9A7B0C',dunkelblau:'#1B4A8F',dunkelorange:'#94551A',dunkellila:'#552969',dunkelgruen:'#1B6B39',schwarzton:'#1F1D27'};
 const VALNAME={leer:'leer',...LBL};
 const CASE='#16132B';
 const TL={hl:'#24213B',hlTxt:'#fff',outline:'#24213B',board:'#FBFAFE',grid:'#DCD7EA',edge:'#24213B',am:'#6A4BE0',amSoft:'#E3DCFB',muted:'#6E6987'};
 const TD={hl:'#ECE9FA',hlTxt:'#16132B',outline:'#D4CFEA',board:'#1A1730',grid:'#2E2A4A',edge:'#8E88B0',am:'#9B85FF',amSoft:'#2F2760',muted:'#9D98B8'};
 let T=TL;
-const fillOf=c=>c==='schwarz'&&T===TD?'#07060D':FILL[c];
+const fillOf=c=>c==='schwarz'?'none':FILL[c];
 const TKEY='kristall-echo-theme';
 let themePref=(()=>{try{return localStorage.getItem(TKEY)||'auto'}catch(e){return'auto'}})();
 const darkMQ=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null;
@@ -557,20 +566,28 @@ function fmtDate(k,withYear){const [y,m,d]=k.split('-');return`${+d}.${+m}.${wit
 function dailyData(){const d=store.get(DKEY)||{};d.mine=d.mine||{};d.partner=d.partner||{};return d}
 function saveDaily(d){store.set(d,DKEY)}
 function recordDaily(st){if(S.mode!=='daily'||S.replay)return;const d=dailyData();if(d.mine[S.date])return;d.mine[S.date]={q:S.opp.log.length,f:S.opp.fails,st};saveDaily(d)}
-const MIXNAME={'':'farblos',rot:'Rot',gelb:'Gelb',blau:'Blau','rot,gelb':'Orange','rot,blau':'Lila','gelb,blau':'Grün','rot,gelb,blau':'Schwarz',
- weiss:'Weiß','rot,weiss':'Rosa','gelb,weiss':'Hellgelb','blau,weiss':'Hellblau','rot,gelb,weiss':'Hellorange','rot,blau,weiss':'Helllila','gelb,blau,weiss':'Hellgrün','rot,gelb,blau,weiss':'Grau'};
+const MIXNAME={'':'farblos',rot:'Rot',gelb:'Gelb',blau:'Blau','rot,gelb':'Orange','rot,blau':'Lila','gelb,blau':'Grün','rot,gelb,blau':'Braun',
+ weiss:'Weiß','rot,weiss':'Rosa','gelb,weiss':'Hellgelb','blau,weiss':'Hellblau','rot,gelb,weiss':'Hellorange','rot,blau,weiss':'Helllila','gelb,blau,weiss':'Hellgrün','rot,gelb,blau,weiss':'Hellbraun',
+ 'rot,dunkel':'Dunkelrot','gelb,dunkel':'Dunkelgelb','blau,dunkel':'Dunkelblau','rot,gelb,dunkel':'Dunkelorange','rot,blau,dunkel':'Dunkellila','gelb,blau,dunkel':'Dunkelgrün','rot,gelb,blau,dunkel':'Dunkelbraun',dunkel:'Schwarz'};
 const BASEMIX=[[],['rot'],['gelb'],['blau'],['rot','gelb'],['rot','blau'],['gelb','blau'],['rot','gelb','blau']];
 // Raster 4 Spalten: Neutral | Rot→Orange | Gelb→Grün | Blau→Lila; Reihen: hell/normal Grundfarbe, hell/normal Mischung
-const MIX_ORIG=[[],['rot','weiss'],['gelb','weiss'],['blau','weiss'],
- ['weiss'],['rot'],['gelb'],['blau'],
- ['rot','gelb','blau','weiss'],['rot','gelb','weiss'],['gelb','blau','weiss'],['rot','blau','weiss'],
- ['rot','gelb','blau'],['rot','gelb'],['gelb','blau'],['rot','blau']];
-const MIX_HOUSE=[[],['rot'],['gelb'],['blau'],['rot','gelb','blau'],['rot','gelb'],['gelb','blau'],['rot','blau']];
-function mixes(){return OPTS.color==='orig'||hasLight()?MIX_ORIG:MIX_HOUSE}
-const colorText=c=>MIXNAME[c.filter(x=>TINT.includes(x)).join(',')]||'?';
+// Raster 4 Spalten: Neutral | Rot→Orange | Gelb→Grün | Blau→Lila. Reihen je nach Spiel: hell / normal / dunkel, erst Grundfarben, dann Mischungen.
+const D_='dunkel',W_='weiss';
+function mixes(){const light=OPTS.color==='orig'||hasLight(),dark=hasDark();const rows=[];
+ const prim=[['rot'],['gelb'],['blau']],sec=[['rot','gelb'],['gelb','blau'],['rot','blau']];
+ if(light)rows.push([[],...prim.map(m=>[...m,W_])]);
+ rows.push([light?(OPTS.color==='orig'?[W_]:null):[],...prim]);
+ if(dark)rows.push([OPTS.color==='orig'&&hasColor('schwarzton')?[D_]:null,...prim.map(m=>[...m,D_])]);
+ if(light)rows.push([['rot','gelb','blau',W_],...sec.map(m=>[...m,W_])]);
+ rows.push([['rot','gelb','blau'],...sec]);
+ if(dark)rows.push([['rot','gelb','blau',D_],...sec.map(m=>[...m,D_])]);
+ return rows.flat()}
+// Zweizeilige Farbnamen für enge Raster: kleiner Zusatz oben (hell/dunkel/tief), Grundname darunter
+function nameHTML(n){const m=/^(Dunkel|Hell|Tief)(.+)$/.exec(n);return m?`<small>${m[1].toLowerCase()}</small>${m[2].replace(/^./,x=>x.toUpperCase())}`:`<small>&nbsp;</small>${n}`}
+const colorText=c=>MIXNAME[tone(c).filter(x=>TINT.includes(x)).join(',')]||'?';
 const dots=c=>c.length?`<i class="dot" style="background:${mixColor(c)}"></i>`:'<i class="dot none"></i>';
 const ans=(out,c)=>out===0?'absorbiert':`raus bei ${lab(out)}, ${colorText(c)}`;
-const vdot=v=>v==='leer'?'<i class="dot none"></i>':`<i class="dot" style="background:${FILL[v]}"></i>`;
+const vdot=v=>v==='leer'?'<i class="dot none"></i>':`<i class="dot${v==='schwarz'?' holedot':''}" style="background:${v==='schwarz'?'transparent':FILL[v]}"></i>`;
 const plural=(n,a,b)=>n===1?a:b;
 function presetName(o){if(o.preset==='custom')return'Eigene Auswahl';const k=o.preset||(o.trans&&o.schwarz?'std_tb':o.trans?'std_t':o.schwarz?'std_b':'std');return(PRESETS[k]||PRESETS.std).name}
 function optSummary(o=OPTS){const t=RULES.filter(([k])=>ruleOn(o,k)).map(r=>r[1]);const p=presetName(o);if(p!=='Standard')t.push('Steine: '+p);return t.length?t.join(', '):'Originalregeln'}
@@ -581,10 +598,16 @@ function pieceSVG(n,cells,o={}){let f='',ed={};const col=o.color||COLOR[n];
   f+=`<polygon points="${p.map(q=>q.join(',')).join(' ')}" fill="${fillOf(col)}" stroke="${fillOf(col)}" stroke-width=".03"/>`;
   p.forEach((q,i)=>{const r=p[(i+1)%p.length];const kk=[q.join(','),r.join(',')].sort().join('|');ed[kk]=(ed[kk]||0)+1})}
  let e='';for(const [kk,c] of Object.entries(ed))if(c===1){const [a,b]=kk.split('|');e+=`M${a}L${b}`}
- if(o.ghost)return`<path d="${e}" fill="none" stroke="${T.outline}" stroke-width=".08" stroke-dasharray=".18 .12" opacity=".8"/>`;
- return`<g>${o.sel?`<path d="${e}" fill="none" stroke="${T.am}" stroke-width=".34" stroke-linejoin="round" opacity=".45" class="pulse"/>`:''}${f}<path d="${e}" fill="none" stroke="${T.outline}" stroke-width=".07" stroke-linejoin="round" stroke-linecap="round"/></g>`}
-const MIX={'':'#C4BDDC',rot:'#E5484D',gelb:'#F5C518',blau:'#2F7BEA','rot,gelb':'#F28C28','rot,blau':'#8E44AD','gelb,blau':'#2EAD5B','rot,gelb,blau':'#3A3550'};
-function mixColor(c){const w=c.includes('weiss');const base=c.filter(x=>x!=='weiss').join(',');if(!w)return MIX[base];if(!base)return '#FFFFFF';
+ if(o.ghost)return`<path d="${e}" fill="${T.am}" fill-opacity=".12" stroke="${T.am}" stroke-width=".1" stroke-linejoin="round" opacity=".9"/>`; // aufgedeckte Lösung: lila Fläche, nicht gestrichelt (gestrichelt = Loch)
+ // Loch: gestreifte „Leere“ mit leuchtendem Rand, damit es nie wie ein schwarzer Farbstein aussieht
+ const hole=col==='schwarz';
+ const rim='';
+ return`<g>${o.sel?`<path d="${e}" fill="none" stroke="${T.am}" stroke-width=".34" stroke-linejoin="round" opacity=".45" class="pulse"/>`:''}${rim}${f}<path d="${e}" fill="none" stroke="${T.outline}" stroke-width="${hole?'.09':'.07'}" stroke-linejoin="round" stroke-linecap="round"${hole?' stroke-dasharray=".14 .1"':''}/></g>`}
+const MIX={'':'#C4BDDC',rot:'#E5484D',gelb:'#F5C518',blau:'#2F7BEA','rot,gelb':'#F28C28','rot,blau':'#8E44AD','gelb,blau':'#2EAD5B','rot,gelb,blau':'#6E4B2C'};
+function mixColor(c){c=tone(c);const w=c.includes('weiss'),dk=c.includes('dunkel');const base=c.filter(x=>x!=='weiss'&&x!=='dunkel').join(',');
+ if(dk&&!base)return '#1F1D27';
+ if(dk){const h=MIX[base]||MIX[''];const n=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));return '#'+n.map(v=>Math.round(v*.55).toString(16).padStart(2,'0')).join('')}
+ if(!w)return MIX[base];if(!base)return '#FFFFFF';
  const h=MIX[base];const n=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));return '#'+n.map(v=>Math.round(v+(255-v)*.5).toString(16).padStart(2,'0')).join('')}
 function raySVG(r,anim){anim=anim&&SET.rayAnim;if(!r||!r.pts||r.pts.length<2)return'';const p=r.pts.map(a=>a.slice()),pc=r.pcs||p.map(()=>[]);
  const mid=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2];p[0]=mid(p[0],p[1]);if(r.out!==0)p[p.length-1]=mid(p[p.length-1],p[p.length-2]);
@@ -777,9 +800,10 @@ function viewSettings(){const seg=(act,cur,opts)=>`<div class="seg">${opts.map((
 function viewRules(){const N=NAMES.length;const leg=NAMES.map(n=>`<span class="lg">${miniSVG(n,0,11)}${SHORT[COLOR[n]]}</span>`).join('');
  const sec=STONES.some(s=>['orange','lila','gruen'].includes(s.color)),lt=hasLight();
  const colorRule=(OPTS.color==='orig'
-  ?'<li>Jeder farbige Stein färbt ihn, auch Weiß. Farben mischen sich: Rot+Gelb = Orange, Rot+Blau = Lila, Gelb+Blau = Grün, alle drei = Schwarz. Mit Weiß wird es hell: Rosa, Hellgelb, Hellblau, Hellorange, Helllila, Hellgrün, Grau. Nur Weiß ergibt Weiß.</li>'
-  :'<li>Rot, Gelb und Blau färben ihn, Weiß lenkt nur ab. Farben mischen sich: Rot+Gelb = Orange, Rot+Blau = Lila, Gelb+Blau = Grün, alle drei = Schwarz.</li>')
+  ?'<li>Jeder farbige Stein färbt ihn. Weiß hellt auf, Schwarz dunkelt ab. Rot+Gelb = Orange, Rot+Blau = Lila, Gelb+Blau = Grün, alle drei = Braun. Mit Weiß wird es hell (Rosa, Hellblau …, Hellbraun), mit Schwarz dunkel. Nur Weiß ergibt Weiß, nur Schwarz ergibt Schwarz.</li>'
+  :'<li>Rot, Gelb und Blau färben ihn, Weiß und Schwarz lenken nur ab. Rot+Gelb = Orange, Rot+Blau = Lila, Gelb+Blau = Grün, alle drei = Braun.</li>')
   +(sec?'<li>Ein Stein in Mischfarbe färbt wie seine Bestandteile: Orange wirkt wie Rot+Gelb, Lila wie Rot+Blau, Grün wie Gelb+Blau.</li>':'')
+  +(hasDark()?'<li>Dunkle Steine machen den Strahl dunkel (Dunkelblau wirkt wie Blau+Dunkel). <b>Hell und Dunkel heben sich auf:</b> berührt ein Strahl beides, bleibt der normale Ton.</li>':'')
   +(lt?`<li>Helle Steine (Rosa, Hellblau …) machen den Strahl immer hell${OPTS.color==='house'?', auch wenn Weiß sonst nicht färbt':''}. Hellblau wirkt wie Blau+Weiß.</li>`:'');
  return`<article class="rules">
  <h2>So geht's</h2>
@@ -791,7 +815,7 @@ function viewRules(){const N=NAMES.length;const leg=NAMES.map(n=>`<span class="l
  <h3>Ein Zug</h3>
  <ol><li>Du nennst einen Punkt vom Rand, z.&nbsp;B. „7“ oder „C“${OPTS.scan?', oder ein Feld wie „C3“ (direkter Scan)':''}.</li><li>Dein Gegenüber tippt ihn bei <b>Mein Feld</b> an. Das Handy rechnet und zeigt die Antwort.</li><li>Du tippst bei <b>Gegner</b> dasselbe an und trägst die Antwort ein.</li></ol>
  <h3>Wie der Strahl läuft</h3>
- <ul><li>Geradeaus von Kästchen zu Kästchen.</li><li>Schräge Kante: biegt um 90° ab. Gerade Kante: prallt zurück.</li>${colorRule}<li>Jede Farbe zählt nur einmal. Ohne Kontakt bleibt er farblos.</li>${hasColor('trans')?'<li><b>Transparent</b> lenkt ab, färbt aber nicht.</li>':''}${hasColor('schwarz')?'<li><b>Schwarz</b> schluckt den Strahl. Antwort: „absorbiert“. Beim Lösen zählt beim schwarzen Stein nur, welches Rechteck er abdeckt, nicht Form oder Drehung.</li>':''}</ul>
+ <ul><li>Geradeaus von Kästchen zu Kästchen.</li><li>Schräge Kante: biegt um 90° ab. Gerade Kante: prallt zurück.</li>${colorRule}<li>Jede Farbe zählt nur einmal. Ohne Kontakt bleibt er farblos.</li>${hasColor('trans')?'<li><b>Transparent</b> lenkt ab, färbt aber nicht.</li>':''}${hasColor('schwarz')?'<li><b>Loch</b> schluckt den Strahl. Antwort: „absorbiert“. Beim Lösen zählt beim Loch nur, welches Rechteck es abdeckt, nicht Form oder Drehung.</li>':''}</ul>
  ${OPTS.scan?'<h3>Direkter Scan</h3><p>Statt eines Strahls fragst du nach einem Feld, z.&nbsp;B. „C3“. Die Antwort ist die Farbe des Steins dort oder „leer“.</p>':''}
  <h3>Lösen</h3>
  <p>Leg deine Vermutung im Gegner-Feld und tippe <b>Lösung prüfen</b>. Du bekommst einen QR-Code. Dein Gegenüber scannt ihn bei <b>Mein Feld → Lösung prüfen</b>. Der Zahlencode darunter funktioniert genauso, z.&nbsp;B. per Nachricht. Nach Originalregel gilt: richtig = gewonnen, falsch = verloren.</p>
@@ -891,7 +915,7 @@ function close(){stopScan();finishMorph();const w=$('#sheet');if(!w.classList.co
   if(t.clientY-r.top>56||g.scrollTop>0)return;p=g;y0=t.clientY;dy=0;p.style.transition='none'},{passive:true});
  document.addEventListener('touchmove',e=>{if(y0===null)return;dy=Math.max(0,e.touches[0].clientY-y0);p.style.transform=`translateY(${dy}px)`;if(dy>4&&e.cancelable)e.preventDefault()},{passive:false});
  document.addEventListener('touchend',()=>{if(y0===null)return;p.style.transition='';if(dy>90)close();else p.style.transform='';y0=null;p=null})})();
-const RULES=[['house','Weiß färbt nicht','Weiße Steine lenken nur ab, ohne zu färben.'],['mirror','Spiegeln erlaubt','Steine dürfen auch gewendet werden.'],
+const RULES=[['house','Weiß und Schwarz färben nicht','Weiße und schwarze Steine lenken nur ab, ohne aufzuhellen oder abzudunkeln.'],['mirror','Spiegeln erlaubt','Steine dürfen auch gewendet werden.'],
  ['touch','Kanten dürfen sich berühren','Steine dürfen direkt aneinanderliegen.'],['noscan','Ohne direkten Scan','Nur Strahlen, keine Feldabfragen wie C3.'],
  ['helper','Logik-Hilfe','Schraffiert Felder, die nach den Antworten sicher leer sind.']];
 const ruleOn=(o,k)=>k==='house'?o.color==='house':!!o[k];
@@ -942,9 +966,9 @@ function stonesSheet(){const o=ui.setup.opts;const cur=o.preset||'std';
   const pc=ui.setup.pick||'rot';const chosen=customStones(c);
   builder=`<div class="budget${used>=MAX_BLOCKS?' full':''}"><div class="bar"><i style="width:${pct}%"></i></div><span><b>${used}</b> / ${MAX_BLOCKS} Blöcke</span></div>
   <h4>Farbe</h4>
-  <div class="swatches">${PICK_COLORS.map(col=>`<button class="sw-btn${pc===col?' on':''}" data-act="pickcol" data-c="${col}" aria-label="${LBL[col]}"><i style="background:${fillOf(col)}"></i><span>${col==='rosa'?'<small>hellrot</small>Rosa':LIGHT_COLORS.includes(col)?`<small>hell</small>${LBL[col].slice(4).replace(/^./,m=>m.toUpperCase())}`:col==='trans'?'Transp.':LBL[col]}</span></button>`).join('')}</div>
+  <div class="swatches">${PICK_COLORS.map(col=>`<button class="sw-btn${pc===col?' on':''}" data-act="pickcol" data-c="${col}" aria-label="${LBL[col]}"><i class="${col==='schwarz'?'holedot':''}" style="background:${col==='schwarz'?'transparent':fillOf(col)}"></i><span>${col==='rosa'?'<small>hellrot</small>Rosa':DARK_COLORS.includes(col)?`<small>dunkel</small>${LBL[col].slice(6).replace(/^./,m=>m.toUpperCase())}`:col==='schwarz'?'<small>Spezial</small>Loch':LIGHT_COLORS.includes(col)?`<small>hell</small>${LBL[col].slice(4).replace(/^./,m=>m.toUpperCase())}`:col==='trans'?'Transp.':LBL[col]}</span></button>`).join('')}</div>
   <h4>Form in ${LBL[pc]}</h4>
-  ${pc==='schwarz'?'<p class="small">Schwarz schluckt jeden Strahl, der eines seiner Kästchen berührt. Von außen sieht man daher nur, welches Rechteck er abdeckt, nicht seine Form oder Drehung. Deshalb gibt es Schwarz nur in Formen, die ihr Rechteck ausfüllen: 1×1, 2×1, 3×1, 2×2 und 3×2.</p>':''}
+  ${pc==='schwarz'?'<p class="small">Das Loch schluckt jeden Strahl, der eines seiner Kästchen berührt. Von außen sieht man daher nur, welches Rechteck es abdeckt, nicht seine Form oder Drehung. Deshalb gibt es das Loch nur in Formen, die ihr Rechteck ausfüllen: 1×1, 2×1, 3×1, 2×2 und 3×2.</p>':''}
   <div class="shgrid">${SHAPE_ORDER.filter(sh=>pc!=='schwarz'||BLACK_SHAPES.includes(sh)).map(sh=>{const a=shapeArea(sh),k=sh+'|'+pc,n=c[k]||0,blocked=used+a>MAX_BLOCKS;const [w]=dims(SHAPES[sh].cells);
    return`<div class="ccard${n?' on':''}${blocked&&!n?' dis':''}" data-act="cadd" data-k="${k}" role="button" aria-label="${SHAPES[sh].name} ${LBL[pc]}: ${n}">${miniShapeSVG(sh,pc,Math.min(11,46/w))}<span class="cname">${SHAPES[sh].name}<small>${a} ${plural(a,'Block','Blöcke')}</small></span>${n?`<span class="cnt">${n}</span><span class="csub" data-act="csub" data-k="${k}" aria-label="weniger">−</span>`:''}</div>`}).join('')}</div>
   <h4>Ausgewählt <span>(${chosen.length} ${plural(chosen.length,'Stein','Steine')}, antippen zum Entfernen)</span></h4>
@@ -962,7 +986,7 @@ function askSheet(){const a=ask;const ab=a.out===0;
  <div class="numgrid">${LABEL_ORDER.map(k=>`<button class="${a.out===k?'on':''}" data-act="aout" data-k="${k}">${lab(k)}</button>`).join('')}</div>
  ${hasColor('schwarz')?`<button class="btn wide${ab?' sel':''}" data-act="aout" data-k="0">Absorbiert</button>`:''}
  ${ab?'':`<h4>Welche Farbe kam raus?</h4>
- <div class="row colors">${mixes().map((m,i)=>`<button class="cbtn${a.colors&&a.colors.join()===m.join()?' on':''}" data-act="acol" data-i="${i}">${dots(m)}<span>${colorText(m)}</span></button>`).join('')}</div>`}
+ <div class="row colors">${mixes().map((m,i)=>m?`<button class="cbtn${a.colors&&a.colors.join()===m.join()?' on':''}" data-act="acol" data-i="${i}">${dots(m)}<span>${nameHTML(colorText(m))}</span></button>`:'<span class="cgap"></span>').join('')}</div>`}
  <div class="row"><button class="btn" data-act="close">Abbrechen</button><button class="btn primary grow" data-act="asave" ${a.out!=null&&(ab||a.colors)?'':'disabled'}>${a.out==null?'Ausgang wählen':ab?'Speichern: absorbiert':!a.colors?'Farbe wählen':`Speichern: ${lab(a.out)}, ${colorText(a.colors)}`}</button></div>`)}
 let scanAsk=null;
 function scanSheet(){const s=scanAsk;const vals=['leer',...PICK_COLORS.filter(c=>hasColor(c))];
