@@ -21,7 +21,7 @@ html,body{margin:0;background:var(--rock);color:var(--ink);font-family:'Bricolag
 body{padding-bottom:calc(60px + env(safe-area-inset-bottom));-webkit-text-size-adjust:100%}
 button{font:inherit;color:inherit;cursor:pointer}
 button:focus-visible,input:focus-visible{outline:3px solid var(--am);outline-offset:2px}
-header{position:sticky;top:0;z-index:6;display:flex;align-items:center;gap:8px;padding:calc(10px + env(safe-area-inset-top)) max(16px,calc((100% - 488px)/2)) 8px;background:var(--nav);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);margin-bottom:10px}
+header{position:fixed;top:0;left:0;right:0;z-index:6;display:flex;align-items:center;gap:8px;padding:calc(10px + env(safe-area-inset-top)) max(16px,calc((100% - 488px)/2)) 8px;background:var(--nav);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);margin-bottom:10px}
 h1{white-space:nowrap;margin-right:auto!important;font-size:24px;font-weight:800;letter-spacing:-.03em;margin:0;display:flex;align-items:center;gap:8px}
 h1 svg{width:26px;height:26px}
 
@@ -144,7 +144,7 @@ html.standalone #toast{bottom:calc(60px + max(6px,calc(env(safe-area-inset-botto
 .scanbox .finder{position:absolute;inset:16%;border:3px solid #fff;border-radius:16px;box-shadow:0 0 0 999px rgba(0,0,0,.28);pointer-events:none}
 .scanstat{position:absolute;left:0;right:0;bottom:10px;text-align:center;color:#fff;font-size:13px;font-weight:600;margin:0;text-shadow:0 1px 3px rgba(0,0,0,.6)}
 .panel .ok{color:var(--ok)}
-html,body{overflow-x:hidden}
+html,body{overflow-x:clip}
 h1{min-width:0;font-size:clamp(19px,6vw,24px);overflow:hidden;text-overflow:ellipsis}
 #newbtn,#themebtn{flex:none}
 .panel .verdict,.panel .verdict.ok,.panel .verdict.bad{color:#fff}
@@ -374,6 +374,24 @@ html:not(.lobby) header h1{justify-content:center;text-align:center;font-size:17
 .capi.idlei{background:var(--nobg);color:var(--muted);font-family:Georgia,serif;font-style:italic;font-size:16px}
 .cap.say{background:var(--strong);color:#fff}.cap.say small{color:var(--strong-sub)}.cap.say b{font-size:16px;color:#fff}
 .capi.sayi{background:rgba(255,255,255,.12)}.capi.sayi .dot{width:16px;height:16px;border-color:#fff;margin:0}
+.mode.dcard{display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto auto;align-items:center;column-gap:10px;border-color:var(--am);background:linear-gradient(135deg,var(--am-soft),var(--slab))}
+.dcard .dc-top{grid-column:1;display:flex;align-items:center;gap:8px}
+.dcard .dc-top small{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--am)}
+.dcard .streak{font-size:12px;font-weight:700;background:var(--am);color:#fff;border-radius:99px;padding:1px 8px}
+.dcard b{grid-column:1;font-size:18px}.dcard>span:not(.dc-top){grid-column:1;color:var(--muted);font-size:13px}
+.dcard .chev{grid-column:2;grid-row:1/4}
+table.days tr[data-act]{cursor:pointer}table.days tr[data-act]:active{opacity:.5}
+table.days td.chv{width:20px;text-align:right}table.days td.chv .chev{opacity:.4}
+table.days .tag{font-style:normal;font-size:11px;background:var(--am-soft);color:var(--am);border-radius:99px;padding:1px 6px}
+.muted{color:var(--muted)}
+.opt.static{cursor:default}
+/* Kopfzeile ist fest; Inhalt beginnt darunter (Höhe misst das Skript) */
+main#app{padding-top:var(--hh,70px)}
+html{overscroll-behavior:none}body{overscroll-behavior-y:none}
+.tchip.thinking{display:inline-flex;align-items:center;gap:4px}
+.dots3{display:inline-flex;gap:2px;font-style:normal}.dots3 b{width:4px;height:4px;border-radius:50%;background:currentColor;animation:blink 1.2s infinite}
+.dots3 b:nth-child(2){animation-delay:.2s}.dots3 b:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
 </style></head>
 <body><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><radialGradient id="holeGrad" cx="50%" cy="50%" r="70%"><stop offset="0" stop-color="#000"/><stop offset=".7" stop-color="#14112A"/><stop offset="1" stop-color="#3A3366"/></radialGradient><pattern id="holePat" width=".34" height=".34" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width=".34" height=".34" fill="#0D0A1E"/><rect width=".09" height=".34" fill="#6C4FE6" opacity=".85"/></pattern><radialGradient id="holeShade" cx="50%" cy="50%" r="72%"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset=".55" stop-color="#000" stop-opacity=".05"/><stop offset="1" stop-color="#000" stop-opacity=".36"/></radialGradient></defs></svg>
 <header><button id="backbtn" data-act="back" aria-label="Zurück" hidden><svg class="chevl" viewBox="0 0 11 20" aria-hidden="true"><path d="M9.5 1.5 1.5 10l8 8.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Start</span></button><h1><svg viewBox="0 0 2 2"><polygon points="1,0 2,1 1,2 0,1" fill="#6A4BE0" stroke="#24213B" stroke-width=".12" stroke-linejoin="round"/><path d="M0,1H2" stroke="#fff" stroke-width=".08" opacity=".7"/></svg><span id="htitle">Kristall-Echo</span></h1><button id="helpbtn" data-act="tab" data-tab="rules" aria-label="Spielregeln">?</button><button id="setbtn" data-act="tab" data-tab="settings" aria-label="Einstellungen"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button></header>
@@ -538,6 +556,94 @@ function encode(P){return NAMES.map(n=>`${P[n].x}${P[n].y}${P[n].o}`).join(' ')}
 function decode(s){const d=(s||'').replace(/\D/g,'');if(d.length!==NAMES.length*3)return null;const P={};
  for(let i=0;i<NAMES.length;i++){const x=+d[i*3],y=+d[i*3+1],o=+d[i*3+2];if(o>7)return null;const n=NAMES[i],p={x,y,o};if(whyNot(P,n,p)==='out'||whyNot(P,n,p)==='overlap')return null;P[n]=p}return P}
 
+/* ---------- Computer-Gegner: Deduktion per Kandidaten-Suche ----------
+   Läuft im Web Worker. Sucht Aufstellungen, die zu allen bisherigen Antworten passen
+   (simuliertes Ausglühen mit schnellem Strahlen-Rechner), fragt dann das, was die Kandidaten
+   am stärksten trennt (höchste Entropie), und rät erst, wenn eine Gegenprobe keine Alternative findet. */
+let cpuPool=[],cpuPoolId=null,cpuCache=null,cpuLastSingle=null,cpuStable=0;
+const CPU_LEVELS={
+ easy:{size:4,ms:300,iters:2500,verify:2,randomQ:.5,minQ:6,stable:0},
+ medium:{size:16,ms:900,iters:5000,verify:16,randomQ:.08,minQ:6,stable:1},
+ hard:{size:40,ms:1700,iters:8000,verify:30,randomQ:0,minQ:4,stable:1}};
+const C_DX=[0,1,0,-1],C_DY=[-1,0,1,0]; // N E S W
+const C_KIND={F:0,NW:1,NE:2,SW:3,SE:4};
+const C_LEG=[[1,1,1,1],[1,0,0,1],[1,1,0,0],[0,0,1,1],[0,1,1,0]]; // [kind][Seite N,E,S,W]
+const C_MIR=[null,[1,0,3,2],[3,2,1,0],[3,2,1,0],[1,0,3,2]]; // „/“ für NW,SE · „\“ für NE,SW
+const C_BIT={rot:1,gelb:2,blau:4,weiss:8,dunkel:16};
+function cpuSetup(){ // Formen und Farben einmal vorrechnen
+ const pieces=NAMES.map(n=>{const sh=[];for(let o=0;o<8;o++){const c=shape(n,o);const [w,h]=dims(c);
+   const ed={};for(const [x,y,k] of c){const p=polyOf(k).map(([a,b])=>[x+a,y+b]);p.forEach((q,i)=>{const r=p[(i+1)%p.length];const kk=[q.join(','),r.join(',')].sort().join('|');ed[kk]=(ed[kk]||0)+1})}
+   const edges=Object.keys(ed).filter(k=>ed[k]===1).map(k=>k.split('|').map(s=>s.split(',').map(Number)));
+   sh.push({cells:c.map(([x,y,k])=>[x,y,C_KIND[k]]),w,h,edges})}
+  let mask=0;for(const k of compsOf(COLOR[n]))mask|=C_BIT[k];
+  return{n,sh,mask,black:COLOR[n]==='schwarz',color:COLOR[n]}});
+ cpuCache={pieces,optsKey:JSON.stringify(OPTS)}}
+function cpuGrid(P){const pc=new Int8Array(COLS*ROWS).fill(-1),kd=new Uint8Array(COLS*ROWS);
+ cpuCache.pieces.forEach((pi,i)=>{const p=P[pi.n];if(!p)return;for(const [x,y,k] of pi.sh[p.o].cells){const j=(y+p.y)*COLS+x+p.x;pc[j]=i;kd[j]=k}});return{pc,kd}}
+function cpuEntry(n){if(n<=10)return[n-1,-1,2];if(n<=18)return[COLS,n-11,3];if(n<=28)return[COLS-1-(n-19),ROWS,0];return[-1,ROWS-1-(n-29),1]}
+function cpuRay(g,n){let [x,y,d]=cpuEntry(n);let m=0;const P=cpuCache.pieces;
+ for(let s=0;s<600;s++){const nx=x+C_DX[d],ny=y+C_DY[d];
+  if(nx<0||ny<0||nx>=COLS||ny>=ROWS){if((m&24)===24)m&=~24;return labelAt(nx,ny)*64+m}
+  const j=ny*COLS+nx,pi=g.pc[j];if(pi<0){x=nx;y=ny;continue}
+  const pc=P[pi];if(pc.black)return 0;m|=pc.mask;const k=g.kd[j],side=(d+2)%4;
+  if(C_LEG[k][side]){d=(d+2)%4;const inside=x>=0&&y>=0&&x<COLS&&y<ROWS;
+   if(!inside){if((m&24)===24)m&=~24;return labelAt(x,y)*64+m}
+   const cj=y*COLS+x;if(g.pc[cj]>=0&&g.kd[cj])d=C_MIR[g.kd[cj]][d];continue}
+  d=C_MIR[k][d];x=nx;y=ny}
+ return 0}
+function cpuMaskOf(colors){let m=0;for(const c of colors)m|=C_BIT[c]||0;return m}
+function cpuPrepLog(log){return log.map(e=>e.scan?{scan:e.scan,val:e.val}:{n:e.n,key:e.out===0?0:e.out*64+cpuMaskOf(e.colors)})}
+function cpuCost(P,L){const g=cpuGrid(P);let c=0;for(const e of L){if(e.scan){const pi=g.pc[e.scan[1]*COLS+e.scan[0]];const v=pi<0?'leer':cpuCache.pieces[pi].color;if(v!==e.val)c++}else if(cpuRay(g,e.n)!==e.key)c++}return c}
+// gültig? (im Feld, keine Überlappung, Kantenregel)
+function cpuValid(P,i,p){const pi=cpuCache.pieces[i],s=pi.sh[p.o];if(p.x<0||p.y<0||p.x+s.w>COLS||p.y+s.h>ROWS)return false;
+ const occ=new Set();cpuCache.pieces.forEach((q,j)=>{if(j===i||!P[q.n])return;const pp=P[q.n];for(const [x,y] of q.sh[pp.o].cells)occ.add((y+pp.y)*COLS+x+pp.x)});
+ for(const [x,y] of s.cells)if(occ.has((y+p.y)*COLS+x+p.x))return false;
+ if(OPTS.touch)return true;
+ const mine=new Set(s.edges.map(([a,b])=>[a[0]+p.x,a[1]+p.y,b[0]+p.x,b[1]+p.y].join()));
+ for(let j=0;j<cpuCache.pieces.length;j++){if(j===i)continue;const q=cpuCache.pieces[j],pp=P[q.n];if(!pp)continue;
+  for(const [a,b] of q.sh[pp.o].edges)if(mine.has([a[0]+pp.x,a[1]+pp.y,b[0]+pp.x,b[1]+pp.y].join()))return false}
+ return true}
+function cpuMove(P){const N=cpuCache.pieces.length,i=Math.floor(Math.random()*N),n=cpuCache.pieces[i].n,p=P[n],t=Math.random(),no=Math.floor(Math.random()*(OPTS.mirror?8:4));let q;
+ if(t<.55)q={x:p.x+Math.round((Math.random()-.5)*3.2),y:p.y+Math.round((Math.random()-.5)*3.2),o:p.o};
+ else if(t<.78)q={x:p.x,y:p.y,o:no};
+ else{const s=cpuCache.pieces[i].sh[no];q={x:Math.floor(Math.random()*(COLS-s.w+1)),y:Math.floor(Math.random()*(ROWS-s.h+1)),o:no}}
+ const s=cpuCache.pieces[i].sh[q.o];q.x=Math.max(0,Math.min(q.x,COLS-s.w));q.y=Math.max(0,Math.min(q.y,ROWS-s.h));
+ if(!cpuValid(P,i,q))return null;return{...P,[n]:q}}
+function cpuRepair(P,L,iters){let cost=cpuCost(P,L),T=1.2;
+ for(let it=0;it<iters&&cost>0;it++){const Q=cpuMove(P);if(!Q)continue;const c=cpuCost(Q,L);if(c<=cost||Math.random()<Math.exp((cost-c)/T)){P=Q;cost=c}T=Math.max(.08,T*.9993)}
+ return{P,cost}}
+function cpuKey(P){return NAMES.map(n=>keyOf(n,P[n])).join('|')}
+function cpuAns(P,q){if(q.scan){const g=cpuGrid(P),pi=g.pc[q.scan[1]*COLS+q.scan[0]];return pi<0?'leer':cpuCache.pieces[pi].color}return cpuRay(cpuGrid(P),q.n)}
+function cpuThink(d){applyOpts(d.opts);if(!cpuCache||cpuCache.optsKey!==JSON.stringify(OPTS))cpuSetup();
+ const cfg=CPU_LEVELS[d.level]||CPU_LEVELS.medium,L=cpuPrepLog(d.log),t0=Date.now(),nq=d.log.length;
+ if(cpuPoolId!==d.gid){cpuPool=[];cpuPoolId=d.gid;cpuLastSingle=null;cpuStable=0}
+ const keep=[],seen=new Set(),seeds=[];
+ for(const P of cpuPool){if(cpuCost(P,L)===0){const k=cpuKey(P);if(!seen.has(k)){seen.add(k);keep.push(P)}}else seeds.push(P)}
+ const tryOne=()=>{const seed=seeds.length?seeds.pop():randomLayout();if(!seed)return;const r=cpuRepair(seed,L,cfg.iters);
+  if(r.cost===0&&!unreachable(r.P).length){const k=cpuKey(r.P);if(!seen.has(k)){seen.add(k);keep.push(r.P);return true}}return false};
+ while(Date.now()-t0<cfg.ms&&keep.length<cfg.size)tryOne();
+ // Gegenprobe vor dem Raten: findet eine frische Suche noch eine andere passende Aufstellung?
+ if(keep.length===1&&nq>=cfg.minQ){let alt=false;for(let v=0;v<cfg.verify&&!alt;v++)alt=tryOne();
+  if(!alt){const k=cpuKey(keep[0]);cpuStable=k===cpuLastSingle?cpuStable+1:0;cpuLastSingle=k;
+   // erst raten, wenn derselbe Kandidat auch eine Runde später noch der einzige ist
+   if(cpuStable>=cfg.stable){cpuPool=keep;return{type:'guess',P:keep[0],pool:1}}}}
+ if(keep.length!==1){cpuStable=0;cpuLastSingle=null}
+ cpuPool=keep;
+ if(d.level==='easy'&&keep.length&&keep.length<=2&&nq>=cfg.minQ+3&&Math.random()<.5)return{type:'guess',P:keep[0],pool:keep.length};
+ const asked=new Set();for(const e of d.log){if(e.scan)asked.add('s'+e.scan.join(','));else{asked.add('r'+e.n);if(e.out)asked.add('r'+e.out)}}
+ const qs=[];for(let n=1;n<=36;n++)if(!asked.has('r'+n))qs.push({n});
+ if(OPTS.scan)for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++)if(!asked.has('s'+x+','+y))qs.push({scan:[x,y]});
+ if(!qs.length)return{type:'guess',P:keep[0]||randomLayout(),pool:keep.length};
+ const rays=qs.filter(q=>!q.scan);
+ if(keep.length<2||Math.random()<cfg.randomQ){const pick=rays.length?rays:qs;return{type:'ask',q:pick[Math.floor(Math.random()*pick.length)],pool:keep.length}}
+ let best=null,bH=-1;
+ for(const q of qs){const cnt=new Map();for(const P of keep){const a=cpuAns(P,q);cnt.set(a,(cnt.get(a)||0)+1)}
+  let H=0;for(const v of cnt.values()){const p=v/keep.length;H-=p*Math.log2(p)}
+  if(q.scan)H*=.97;H+=Math.random()*1e-3;if(H>bH){bH=H;best=q}}
+ return{type:'ask',q:best,pool:keep.length,h:bH}}
+
+const LOGIC_SRC="const COLS=10,ROWS=8;\n// ---- Formen (aus ganzen und halben K\u00e4stchen) ----\nconst SHAPES={\n raute3:{name:'Raute',cells:[[0,0,'SE'],[1,0,'F'],[2,0,'NW']]},\n tri2:{name:'Dreieck klein',cells:[[0,0,'SW'],[0,1,'F'],[1,1,'SW']]},\n tri4:{name:'Dreieck gro\u00df',cells:[[1,0,'SE'],[2,0,'SW'],[0,1,'SE'],[1,1,'F'],[2,1,'F'],[3,1,'SW']]},\n dia2:{name:'Diamant',cells:[[0,0,'SE'],[1,0,'SW'],[0,1,'NE'],[1,1,'NW']]},\n tri1:{name:'Spitze',cells:[[0,0,'SE'],[1,0,'SW']]},\n sq1:{name:'Quadrat',cells:[[0,0,'F']]},\n trap3:{name:'Trapez',cells:[[0,0,'SE'],[1,0,'F'],[2,0,'SW']]},\n sand2:{name:'Sanduhr',cells:[[0,0,'NE'],[1,0,'NW'],[0,1,'SE'],[1,1,'SW']]},\n raute2:{name:'Raute klein',cells:[[0,0,'SE'],[1,0,'NW']]},\n pfeil2:{name:'Pfeil',cells:[[0,0,'NE'],[1,0,'SW'],[0,1,'SE'],[1,1,'NW']]},\n hex4:{name:'Sechseck',cells:[[0,0,'SE'],[1,0,'F'],[2,0,'SW'],[0,1,'NE'],[1,1,'F'],[2,1,'NW']]},\n blitz3:{name:'Blitz',cells:[[0,0,'SE'],[1,0,'F'],[1,1,'F'],[2,1,'NW']]},\n};\nconst SHAPE_ORDER=Object.keys(SHAPES);\n// Reihenfolge nur anh\u00e4ngen (Index steckt im L\u00f6sungs-Code); Anzeige-Reihenfolge siehe PICK_COLORS\nconst STONE_COLORS=['rot','gelb','blau','weiss','trans','schwarz','orange','lila','gruen','rosa','hellgelb','hellblau','hellorange','helllila','hellgruen','dunkelrot','dunkelgelb','dunkelblau','dunkelorange','dunkellila','dunkelgruen','schwarzton'];\n// In Schwarz wirkt jede Form wie ihr Rechteck \u2013 deshalb nur je eine Form pro Rechteckgr\u00f6\u00dfe anbieten\nconst BLACK_SHAPES=['sq1','tri1','raute3','dia2','hex4']; // f\u00fcllen ihr Rechteck: 1\u00d71, 2\u00d71, 3\u00d71, 2\u00d72, 3\u00d72\nconst PICK_COLORS=['rot','gelb','blau','orange','gruen','lila','rosa','hellgelb','hellblau','hellorange','hellgruen','helllila','dunkelrot','dunkelgelb','dunkelblau','dunkelorange','dunkelgruen','dunkellila','weiss','schwarzton','trans','schwarz'];\nconst DARK_COLORS=['dunkelrot','dunkelgelb','dunkelblau','dunkelorange','dunkellila','dunkelgruen'];\nconst LIGHT_COLORS=['rosa','hellgelb','hellblau','hellorange','helllila','hellgruen'];\n// Welche Grundanteile ein Stein beisteuert. Helle Steine bringen ihr \u201eWei\u00df\u201c selbst mit, auch bei \u201eWei\u00df f\u00e4rbt nicht\u201c.\nconst COMPS={rot:['rot'],gelb:['gelb'],blau:['blau'],orange:['rot','gelb'],lila:['rot','blau'],gruen:['gelb','blau'],\n rosa:['rot','weiss'],hellgelb:['gelb','weiss'],hellblau:['blau','weiss'],hellorange:['rot','gelb','weiss'],helllila:['rot','blau','weiss'],hellgruen:['gelb','blau','weiss'],\n dunkelrot:['rot','dunkel'],dunkelgelb:['gelb','dunkel'],dunkelblau:['blau','dunkel'],dunkelorange:['rot','gelb','dunkel'],dunkellila:['rot','blau','dunkel'],dunkelgruen:['gelb','blau','dunkel'],trans:[],schwarz:[]};\n// Hell und Dunkel heben sich gegenseitig auf\nfunction tone(c){return c.includes('weiss')&&c.includes('dunkel')?c.filter(x=>x!=='weiss'&&x!=='dunkel'):c}\n// Wei\u00df hellt auf, Schwarz dunkelt ab \u2013 beide nur, solange die Regel \u201eWei\u00df und Schwarz f\u00e4rben nicht\u201c aus ist\nfunction compsOf(color){if(color==='weiss')return OPTS.color==='orig'?['weiss']:[];if(color==='schwarzton')return OPTS.color==='orig'?['dunkel']:[];return COMPS[color]||[]}\nconst MAX_BLOCKS=20; // ein Viertel des Felds\nfunction shapeArea(s){return SHAPES[s].cells.reduce((a,c)=>a+(c[2]==='F'?1:.5),0)}\nconst ST=(id,shape,color)=>({id,shape,color});\nconst STD=[ST('rot','raute3','rot'),ST('gelb','tri2','gelb'),ST('blau','tri4','blau'),ST('weissR','dia2','weiss'),ST('weissT','tri4','weiss')];\nconst XT=ST('trans','tri1','trans'),XB=ST('schwarz','tri1','schwarz');\nconst PRESETS={\n std:{name:'Standard',desc:'Die 5 Steine aus dem Original',stones:STD},\n std_t:{name:'Standard + Transparent',desc:'Mit dem farblosen Ablenker',stones:[...STD,XT]},\n std_b:{name:'Standard + Loch',desc:'Mit dem Strahl-Schlucker',stones:[...STD,XB]},\n std_tb:{name:'Standard + beide',desc:'Transparent und Loch',stones:[...STD,XT,XB]},\n easy:{name:'Einsteiger',desc:'Nur 3 Steine, gut zum Lernen',stones:[ST('rot','raute3','rot'),ST('gelb','tri2','gelb'),ST('blau','tri4','blau')]},\n geo:{name:'Geometrie',desc:'Sanduhr, Trapez, kleine Raute, Quadrat',stones:[ST('g2-rot','sand2','rot'),ST('g2-gelb','trap3','gelb'),ST('g2-blauR','raute2','blau'),ST('g2-blauT','tri4','blau'),ST('g2-weissQ','sq1','weiss'),ST('g2-weissD','dia2','weiss')]},\n max:{name:'Profi',desc:'Standard plus Trapez, Quadrat, Transparent, Loch',stones:[...STD,ST('x-gelb','trap3','gelb'),ST('x-schwarz','sq1','schwarz'),XT]},\n};\n// Eigene Auswahl: {\"shape|color\":anzahl} -> Steinliste in fester Reihenfolge\nfunction customStones(c){const out=[];for(const sh of SHAPE_ORDER)for(const col of STONE_COLORS){const k=sh+'|'+col,n=(c&&c[k])||0;for(let i=0;i<n;i++)out.push(ST(`${sh}-${col}-${i}`,sh,col))}return out}\nfunction stonesOf(o){if(o.preset==='custom')return customStones(o.custom);\n if(!o.preset&&(o.trans||o.schwarz))return PRESETS[o.trans&&o.schwarz?'std_tb':o.trans?'std_t':'std_b'].stones; // alte Spielst\u00e4nde\n return(PRESETS[o.preset]||PRESETS.std).stones}\nfunction blocksOf(stones){return stones.reduce((a,s)=>a+shapeArea(s.shape),0)}\nconst BASE={},COLOR={},SHAPE_OF={};\nconst DEFAULT_OPTS={color:'orig',mirror:false,touch:false,noscan:false,preset:'std',custom:null,helper:false};\n\nlet OPTS={...DEFAULT_OPTS},NAMES=[],TINT=[],STONES=[];\nfunction applyOpts(o){OPTS={...DEFAULT_OPTS,...(o||{})};if(o&&!o.preset&&(o.trans||o.schwarz))OPTS.preset=null;OPTS.scan=!OPTS.noscan; // Direkter Scan ist Standard\n STONES=stonesOf(OPTS);for(const k in BASE){delete BASE[k];delete COLOR[k];delete SHAPE_OF[k]}\n for(const s of STONES){BASE[s.id]=SHAPES[s.shape].cells;COLOR[s.id]=s.color;SHAPE_OF[s.id]=s.shape}\n NAMES=STONES.map(s=>s.id);\n TINT=['rot','gelb','blau','weiss','dunkel']}\nfunction hasColor(c){return STONES.some(s=>s.color===c)}\nfunction hasLight(){return STONES.some(s=>LIGHT_COLORS.includes(s.color))}\nfunction hasDark(){return STONES.some(s=>DARK_COLORS.includes(s.color))||(OPTS.color==='orig'&&hasColor('schwarzton'))}\nfunction stoneSig(o=OPTS){if(o.preset&&o.preset!=='custom')return o.preset;return stonesOf(o).map(s=>SHAPE_ORDER.indexOf(s.shape).toString(36)+STONE_COLORS.indexOf(s.color).toString(36)).join('')}\napplyOpts();\nfunction lab(n){if(n===0)return'\u2013';if(n<=18)return String(n);if(n<=28)return String.fromCharCode(73+(28-n));return String.fromCharCode(65+(36-n))}\nfunction cellName(x,y){return String.fromCharCode(65+y)+(x+1)}\nconst LABEL_ORDER=[...Array.from({length:18},(_,i)=>i+1),36,35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19];\nconst ROT={NW:'NE',NE:'SE',SE:'SW',SW:'NW',F:'F'},MIR={NW:'NE',NE:'NW',SW:'SE',SE:'SW',F:'F'};\nfunction norm(c){const mx=Math.min(...c.map(a=>a[0])),my=Math.min(...c.map(a=>a[1]));return c.map(([x,y,k])=>[x-mx,y-my,k])}\nfunction rotCW(c){const h=Math.max(...c.map(a=>a[1]))+1;return norm(c.map(([x,y,k])=>[h-1-y,x,ROT[k]]))}\nfunction mir(c){const w=Math.max(...c.map(a=>a[0]))+1;return norm(c.map(([x,y,k])=>[w-1-x,y,MIR[k]]))}\nfunction shape(n,o){let c=BASE[n].map(a=>a.slice());if(o>=4)c=mir(c);for(let i=0;i<o%4;i++)c=rotCW(c);return c}\nfunction dims(c){return [Math.max(...c.map(a=>a[0]))+1,Math.max(...c.map(a=>a[1]))+1]}\nfunction cellsOf(n,p){return shape(n,p.o).map(([x,y,k])=>[x+p.x,y+p.y,k])}\nfunction boardOf(P){const b={};for(const n of NAMES){const p=P&&P[n];if(!p)continue;for(const [x,y,k] of cellsOf(n,p))b[x+','+y]={n,k}}return b}\nconst CORN={NW:[0,0],NE:[1,0],SW:[0,1],SE:[1,1]};\nfunction polyOf(k){if(k==='F')return[[0,0],[1,0],[1,1],[0,1]];const a=CORN[k];return[a,[1-a[0],a[1]],[a[0],1-a[1]]]}\n// outer edges of a piece as unit segments\nfunction edgesOf(cells){const ed={};for(const [x,y,k] of cells){const p=polyOf(k).map(([a,b])=>[x+a,y+b]);\n p.forEach((q,i)=>{const r=p[(i+1)%p.length];const kk=[q.join(','),r.join(',')].sort().join('|');ed[kk]=(ed[kk]||0)+1})}\n return Object.keys(ed).filter(k=>ed[k]===1)}\n// null = ok, otherwise reason\nfunction whyNot(P,n,p){const cells=cellsOf(n,p);\n if(!cells.every(([x,y])=>x>=0&&y>=0&&x<COLS&&y<ROWS))return'out';\n const o={...P};delete o[n];const b=boardOf(o);\n if(cells.some(([x,y])=>b[x+','+y]))return'overlap';\n if(OPTS.touch)return null; // Option: Kantenkontakt erlaubt\n const mine=new Set(edgesOf(cells));\n for(const m of NAMES){if(m===n||!o[m])continue;if(edgesOf(cellsOf(m,o[m])).some(e=>mine.has(e)))return'touch'}\n return null}\nfunction fits(P,n,p){return !whyNot(P,n,p)}\nfunction clampPos(n,o,x,y){const [w,h]=dims(shape(n,o));return {x:Math.max(0,Math.min(x,COLS-w)),y:Math.max(0,Math.min(y,ROWS-h)),o}}\nconst DIR={N:[0,-1],S:[0,1],E:[1,0],W:[-1,0]},OPP={N:'S',S:'N',E:'W',W:'E'};\nfunction entry(n){if(n<=10)return[[n-1,-1],'S'];if(n<=18)return[[COLS,n-11],'W'];if(n<=28)return[[COLS-1-(n-19),ROWS],'N'];return[[-1,ROWS-1-(n-29)],'E']}\nfunction labelAt(x,y){if(y===-1)return x+1;if(x===COLS)return 11+y;if(y===ROWS)return 19+(COLS-1-x);return 29+(ROWS-1-y)}\nfunction mirrorD(k,d){const back=(k==='SW'||k==='NE');return back?{E:'S',S:'E',W:'N',N:'W'}[d]:{E:'N',N:'E',W:'S',S:'W'}[d]}\n// out=0 means absorbed\nfunction trace(b,n){let [pos,d]=entry(n);const pts=[[pos[0]+.5,pos[1]+.5]],hit=[],ids=new Set(),pcs=[[]];\n const cur=()=>tone(TINT.filter(c=>hit.includes(c)));const P_=p=>{pts.push(p);pcs.push(cur())};\n const done=out=>({out,colors:out===0?[]:cur(),pts,pcs,ids});\n for(let g=0;g<1000;g++){const nx=pos[0]+DIR[d][0],ny=pos[1]+DIR[d][1];\n  if(nx<0||ny<0||nx>=COLS||ny>=ROWS){P_([nx+.5,ny+.5]);return done(labelAt(nx,ny))}\n  const c=b[nx+','+ny];\n  if(!c){pos=[nx,ny];P_([nx+.5,ny+.5]);continue}\n  ids.add(c.n);\n  if(COLOR[c.n]==='schwarz'){P_([(pos[0]+nx)/2+.5,(pos[1]+ny)/2+.5]);return done(0)}\n  for(const k of compsOf(COLOR[c.n]))if(!hit.includes(k))hit.push(k);\n  const side=OPP[d];\n  if(c.k==='F'||c.k.includes(side)){P_([(pos[0]+nx)/2+.5,(pos[1]+ny)/2+.5]);d=OPP[d];\n   {const pc=b[pos[0]+','+pos[1]];if(pc&&pc.k!=='F'){d=mirrorD(pc.k,d)}P_([pos[0]+.5,pos[1]+.5]);}\n   if(pos[0]<0||pos[1]<0||pos[0]>=COLS||pos[1]>=ROWS)return done(labelAt(pos[0],pos[1]));\n   continue}\n  d=mirrorD(c.k,d);pos=[nx,ny];P_([nx+.5,ny+.5]);\n }}\nfunction unreachable(P){const b=boardOf(P),seen=new Set();for(let n=1;n<=36;n++)for(const i of trace(b,n).ids)seen.add(i);return NAMES.filter(n=>P[n]&&!seen.has(n))}\nfunction scanCell(P,x,y){const c=boardOf(P)[x+','+y];return c?COLOR[c.n]:'leer'}\nlet RNG=Math.random;\nfunction rand(n){return Math.floor(RNG()*n)}\nfunction mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}\nfunction hashStr(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}\n// Tagesr\u00e4tsel: Optionen aus dem Datum gew\u00fcrfelt \u2013 zuf\u00e4llig, aber f\u00fcr alle gleich. Logik-Hilfe bleibt aus (fair).\nfunction dailyOpts(date){const r=mulberry32(hashStr('KE-opts-'+date));\n const o={...DEFAULT_OPTS,color:r()<.65?'orig':'house',mirror:r()<.3,touch:r()<.3,noscan:r()<.2,helper:false};\n const p=r(),W=[['std',.3],['std_t',.15],['std_b',.15],['std_tb',.1],['geo',.18],['max',.12]];let acc=0;o.preset='std';for(const [k,w] of W){acc+=w;if(p<acc){o.preset=k;break}}\n return o}\nfunction seededLayout(seed){const old=RNG;RNG=mulberry32(hashStr(seed));try{return randomLayout()}finally{RNG=old}}\n// Logik-Hilfe: nur sichere Schl\u00fcsse\nfunction colorlessDeflectors(){return(OPTS.color==='house'&&(hasColor('weiss')||hasColor('schwarzton')))||hasColor('trans')}\nfunction sureEmpty(log){const s=new Set();const straight=!colorlessDeflectors();\n for(const e of log){\n  if(e.scan){if(e.val==='leer')s.add(e.scan.join(','));continue}\n  if(straight&&e.out!==0&&e.colors.length===0){const r=trace({},e.n);if(r.out!==e.out)continue;\n   for(const [x,y] of r.pts.map(p=>[p[0]-.5,p[1]-.5]))if(x>=0&&y>=0&&x<COLS&&y<ROWS)s.add(x+','+y)}}\n return s}\nfunction randomLayout(){const no=OPTS.mirror?8:4;\n for(let t=0;t<2000;t++){const P={};let ok=true;\n  for(const n of NAMES){let done=false;for(let i=0;i<120;i++){const o=rand(no);const [w,h]=dims(shape(n,o));const p={x:rand(COLS-w+1),y:rand(ROWS-h+1),o};if(fits(P,n,p)){P[n]=p;done=true;break}}if(!done){ok=false;break}}\n  if(ok&&!unreachable(P).length)return P}}\n// Schwarz schluckt jeden Strahl, der eines seiner K\u00e4stchen betritt. Von au\u00dfen ist dadurch nur sein\n// umschlie\u00dfendes Rechteck erkennbar (L\u00fccken in Ecken liegen immer im \u201eSchatten\u201c). Gel\u00f6st ist also: gleiches Rechteck.\nfunction footprint(n,p){return cellsOf(n,p).map(a=>a[0]+','+a[1]).sort().join(';')}\nfunction bboxKey(n,p){const c=cellsOf(n,p),xs=c.map(a=>a[0]),ys=c.map(a=>a[1]);return[Math.min(...xs),Math.min(...ys),Math.max(...xs),Math.max(...ys)].join(',')}\nfunction keyOf(n,p){if(COLOR[n]==='schwarz')return'B:'+bboxKey(n,p);\n return cellsOf(n,p).map(a=>a.join(',')).sort().join(';')}\nfunction same(a,b){return NAMES.every(n=>a[n]&&b[n]&&keyOf(n,a[n])===keyOf(n,b[n]))}\nfunction complete(P){return NAMES.every(n=>P&&P[n])}\nfunction encode(P){return NAMES.map(n=>`${P[n].x}${P[n].y}${P[n].o}`).join(' ')}\nfunction decode(s){const d=(s||'').replace(/\\D/g,'');if(d.length!==NAMES.length*3)return null;const P={};\n for(let i=0;i<NAMES.length;i++){const x=+d[i*3],y=+d[i*3+1],o=+d[i*3+2];if(o>7)return null;const n=NAMES[i],p={x,y,o};if(whyNot(P,n,p)==='out'||whyNot(P,n,p)==='overlap')return null;P[n]=p}return P}\n";
+const SOLVER_SRC="/* ---------- Computer-Gegner: Deduktion per Kandidaten-Suche ----------\n   L\u00e4uft im Web Worker. Sucht Aufstellungen, die zu allen bisherigen Antworten passen\n   (simuliertes Ausgl\u00fchen mit schnellem Strahlen-Rechner), fragt dann das, was die Kandidaten\n   am st\u00e4rksten trennt (h\u00f6chste Entropie), und r\u00e4t erst, wenn eine Gegenprobe keine Alternative findet. */\nlet cpuPool=[],cpuPoolId=null,cpuCache=null,cpuLastSingle=null,cpuStable=0;\nconst CPU_LEVELS={\n easy:{size:4,ms:300,iters:2500,verify:2,randomQ:.5,minQ:6,stable:0},\n medium:{size:16,ms:900,iters:5000,verify:16,randomQ:.08,minQ:6,stable:1},\n hard:{size:40,ms:1700,iters:8000,verify:30,randomQ:0,minQ:4,stable:1}};\nconst C_DX=[0,1,0,-1],C_DY=[-1,0,1,0]; // N E S W\nconst C_KIND={F:0,NW:1,NE:2,SW:3,SE:4};\nconst C_LEG=[[1,1,1,1],[1,0,0,1],[1,1,0,0],[0,0,1,1],[0,1,1,0]]; // [kind][Seite N,E,S,W]\nconst C_MIR=[null,[1,0,3,2],[3,2,1,0],[3,2,1,0],[1,0,3,2]]; // \u201e/\u201c f\u00fcr NW,SE \u00b7 \u201e\\\u201c f\u00fcr NE,SW\nconst C_BIT={rot:1,gelb:2,blau:4,weiss:8,dunkel:16};\nfunction cpuSetup(){ // Formen und Farben einmal vorrechnen\n const pieces=NAMES.map(n=>{const sh=[];for(let o=0;o<8;o++){const c=shape(n,o);const [w,h]=dims(c);\n   const ed={};for(const [x,y,k] of c){const p=polyOf(k).map(([a,b])=>[x+a,y+b]);p.forEach((q,i)=>{const r=p[(i+1)%p.length];const kk=[q.join(','),r.join(',')].sort().join('|');ed[kk]=(ed[kk]||0)+1})}\n   const edges=Object.keys(ed).filter(k=>ed[k]===1).map(k=>k.split('|').map(s=>s.split(',').map(Number)));\n   sh.push({cells:c.map(([x,y,k])=>[x,y,C_KIND[k]]),w,h,edges})}\n  let mask=0;for(const k of compsOf(COLOR[n]))mask|=C_BIT[k];\n  return{n,sh,mask,black:COLOR[n]==='schwarz',color:COLOR[n]}});\n cpuCache={pieces,optsKey:JSON.stringify(OPTS)}}\nfunction cpuGrid(P){const pc=new Int8Array(COLS*ROWS).fill(-1),kd=new Uint8Array(COLS*ROWS);\n cpuCache.pieces.forEach((pi,i)=>{const p=P[pi.n];if(!p)return;for(const [x,y,k] of pi.sh[p.o].cells){const j=(y+p.y)*COLS+x+p.x;pc[j]=i;kd[j]=k}});return{pc,kd}}\nfunction cpuEntry(n){if(n<=10)return[n-1,-1,2];if(n<=18)return[COLS,n-11,3];if(n<=28)return[COLS-1-(n-19),ROWS,0];return[-1,ROWS-1-(n-29),1]}\nfunction cpuRay(g,n){let [x,y,d]=cpuEntry(n);let m=0;const P=cpuCache.pieces;\n for(let s=0;s<600;s++){const nx=x+C_DX[d],ny=y+C_DY[d];\n  if(nx<0||ny<0||nx>=COLS||ny>=ROWS){if((m&24)===24)m&=~24;return labelAt(nx,ny)*64+m}\n  const j=ny*COLS+nx,pi=g.pc[j];if(pi<0){x=nx;y=ny;continue}\n  const pc=P[pi];if(pc.black)return 0;m|=pc.mask;const k=g.kd[j],side=(d+2)%4;\n  if(C_LEG[k][side]){d=(d+2)%4;const inside=x>=0&&y>=0&&x<COLS&&y<ROWS;\n   if(!inside){if((m&24)===24)m&=~24;return labelAt(x,y)*64+m}\n   const cj=y*COLS+x;if(g.pc[cj]>=0&&g.kd[cj])d=C_MIR[g.kd[cj]][d];continue}\n  d=C_MIR[k][d];x=nx;y=ny}\n return 0}\nfunction cpuMaskOf(colors){let m=0;for(const c of colors)m|=C_BIT[c]||0;return m}\nfunction cpuPrepLog(log){return log.map(e=>e.scan?{scan:e.scan,val:e.val}:{n:e.n,key:e.out===0?0:e.out*64+cpuMaskOf(e.colors)})}\nfunction cpuCost(P,L){const g=cpuGrid(P);let c=0;for(const e of L){if(e.scan){const pi=g.pc[e.scan[1]*COLS+e.scan[0]];const v=pi<0?'leer':cpuCache.pieces[pi].color;if(v!==e.val)c++}else if(cpuRay(g,e.n)!==e.key)c++}return c}\n// g\u00fcltig? (im Feld, keine \u00dcberlappung, Kantenregel)\nfunction cpuValid(P,i,p){const pi=cpuCache.pieces[i],s=pi.sh[p.o];if(p.x<0||p.y<0||p.x+s.w>COLS||p.y+s.h>ROWS)return false;\n const occ=new Set();cpuCache.pieces.forEach((q,j)=>{if(j===i||!P[q.n])return;const pp=P[q.n];for(const [x,y] of q.sh[pp.o].cells)occ.add((y+pp.y)*COLS+x+pp.x)});\n for(const [x,y] of s.cells)if(occ.has((y+p.y)*COLS+x+p.x))return false;\n if(OPTS.touch)return true;\n const mine=new Set(s.edges.map(([a,b])=>[a[0]+p.x,a[1]+p.y,b[0]+p.x,b[1]+p.y].join()));\n for(let j=0;j<cpuCache.pieces.length;j++){if(j===i)continue;const q=cpuCache.pieces[j],pp=P[q.n];if(!pp)continue;\n  for(const [a,b] of q.sh[pp.o].edges)if(mine.has([a[0]+pp.x,a[1]+pp.y,b[0]+pp.x,b[1]+pp.y].join()))return false}\n return true}\nfunction cpuMove(P){const N=cpuCache.pieces.length,i=Math.floor(Math.random()*N),n=cpuCache.pieces[i].n,p=P[n],t=Math.random(),no=Math.floor(Math.random()*(OPTS.mirror?8:4));let q;\n if(t<.55)q={x:p.x+Math.round((Math.random()-.5)*3.2),y:p.y+Math.round((Math.random()-.5)*3.2),o:p.o};\n else if(t<.78)q={x:p.x,y:p.y,o:no};\n else{const s=cpuCache.pieces[i].sh[no];q={x:Math.floor(Math.random()*(COLS-s.w+1)),y:Math.floor(Math.random()*(ROWS-s.h+1)),o:no}}\n const s=cpuCache.pieces[i].sh[q.o];q.x=Math.max(0,Math.min(q.x,COLS-s.w));q.y=Math.max(0,Math.min(q.y,ROWS-s.h));\n if(!cpuValid(P,i,q))return null;return{...P,[n]:q}}\nfunction cpuRepair(P,L,iters){let cost=cpuCost(P,L),T=1.2;\n for(let it=0;it<iters&&cost>0;it++){const Q=cpuMove(P);if(!Q)continue;const c=cpuCost(Q,L);if(c<=cost||Math.random()<Math.exp((cost-c)/T)){P=Q;cost=c}T=Math.max(.08,T*.9993)}\n return{P,cost}}\nfunction cpuKey(P){return NAMES.map(n=>keyOf(n,P[n])).join('|')}\nfunction cpuAns(P,q){if(q.scan){const g=cpuGrid(P),pi=g.pc[q.scan[1]*COLS+q.scan[0]];return pi<0?'leer':cpuCache.pieces[pi].color}return cpuRay(cpuGrid(P),q.n)}\nfunction cpuThink(d){applyOpts(d.opts);if(!cpuCache||cpuCache.optsKey!==JSON.stringify(OPTS))cpuSetup();\n const cfg=CPU_LEVELS[d.level]||CPU_LEVELS.medium,L=cpuPrepLog(d.log),t0=Date.now(),nq=d.log.length;\n if(cpuPoolId!==d.gid){cpuPool=[];cpuPoolId=d.gid;cpuLastSingle=null;cpuStable=0}\n const keep=[],seen=new Set(),seeds=[];\n for(const P of cpuPool){if(cpuCost(P,L)===0){const k=cpuKey(P);if(!seen.has(k)){seen.add(k);keep.push(P)}}else seeds.push(P)}\n const tryOne=()=>{const seed=seeds.length?seeds.pop():randomLayout();if(!seed)return;const r=cpuRepair(seed,L,cfg.iters);\n  if(r.cost===0&&!unreachable(r.P).length){const k=cpuKey(r.P);if(!seen.has(k)){seen.add(k);keep.push(r.P);return true}}return false};\n while(Date.now()-t0<cfg.ms&&keep.length<cfg.size)tryOne();\n // Gegenprobe vor dem Raten: findet eine frische Suche noch eine andere passende Aufstellung?\n if(keep.length===1&&nq>=cfg.minQ){let alt=false;for(let v=0;v<cfg.verify&&!alt;v++)alt=tryOne();\n  if(!alt){const k=cpuKey(keep[0]);cpuStable=k===cpuLastSingle?cpuStable+1:0;cpuLastSingle=k;\n   // erst raten, wenn derselbe Kandidat auch eine Runde sp\u00e4ter noch der einzige ist\n   if(cpuStable>=cfg.stable){cpuPool=keep;return{type:'guess',P:keep[0],pool:1}}}}\n if(keep.length!==1){cpuStable=0;cpuLastSingle=null}\n cpuPool=keep;\n if(d.level==='easy'&&keep.length&&keep.length<=2&&nq>=cfg.minQ+3&&Math.random()<.5)return{type:'guess',P:keep[0],pool:keep.length};\n const asked=new Set();for(const e of d.log){if(e.scan)asked.add('s'+e.scan.join(','));else{asked.add('r'+e.n);if(e.out)asked.add('r'+e.out)}}\n const qs=[];for(let n=1;n<=36;n++)if(!asked.has('r'+n))qs.push({n});\n if(OPTS.scan)for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++)if(!asked.has('s'+x+','+y))qs.push({scan:[x,y]});\n if(!qs.length)return{type:'guess',P:keep[0]||randomLayout(),pool:keep.length};\n const rays=qs.filter(q=>!q.scan);\n if(keep.length<2||Math.random()<cfg.randomQ){const pick=rays.length?rays:qs;return{type:'ask',q:pick[Math.floor(Math.random()*pick.length)],pool:keep.length}}\n let best=null,bH=-1;\n for(const q of qs){const cnt=new Map();for(const P of keep){const a=cpuAns(P,q);cnt.set(a,(cnt.get(a)||0)+1)}\n  let H=0;for(const v of cnt.values()){const p=v/keep.length;H-=p*Math.log2(p)}\n  if(q.scan)H*=.97;H+=Math.random()*1e-3;if(H>bH){bH=H;best=q}}\n return{type:'ask',q:best,pool:keep.length,h:bH}}\n";
 const LBL={rot:'Rot',gelb:'Gelb',blau:'Blau',weiss:'Weiß',trans:'Transparent',schwarz:'Loch',orange:'Orange',lila:'Lila',gruen:'Grün',rosa:'Rosa',hellgelb:'Hellgelb',hellblau:'Hellblau',hellorange:'Hellorange',helllila:'Helllila',hellgruen:'Hellgrün',dunkelrot:'Dunkelrot',dunkelgelb:'Dunkelgelb',dunkelblau:'Dunkelblau',dunkelorange:'Dunkelorange',dunkellila:'Dunkellila',dunkelgruen:'Dunkelgrün',schwarzton:'Schwarz'};
 const SHORT={...LBL,trans:'Transp.',hellorange:'Hellor.',hellgruen:'Hellgrün',hellgelb:'Hellgelb',dunkelrot:'Dkl.rot',dunkelgelb:'Dkl.gelb',dunkelblau:'Dkl.blau',dunkelorange:'Dkl.or.',dunkellila:'Dkl.lila',dunkelgruen:'Dkl.grün'};
 const FILL={rot:'#E5484D',gelb:'#F5C518',blau:'#2F7BEA',weiss:'#FFFFFF',trans:'#CDEFF5',schwarz:'#2B2838',orange:'#F28C28',lila:'#8E44AD',gruen:'#2EAD5B',rosa:'#F2A4A6',hellgelb:'#FAE28B',hellblau:'#97BDF4',hellorange:'#F9C593',helllila:'#C7A1D6',hellgruen:'#96D6AD',dunkelrot:'#8E2A2E',dunkelgelb:'#9A7B0C',dunkelblau:'#1B4A8F',dunkelorange:'#94551A',dunkellila:'#552969',dunkelgruen:'#1B6B39',schwarzton:'#1F1D27'};
@@ -563,7 +669,7 @@ if(darkMQ){const f=()=>{if(themePref==='auto'){applyTheme();render()}};darkMQ.ad
 const KEY='kristall-echo-v2',OKEY='kristall-echo-opts';
 let mem=null;
 const store={get(k=KEY){try{return JSON.parse(localStorage.getItem(k))}catch(e){return k===KEY?mem:null}},set(v,k=KEY){if(k===KEY)mem=v;try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
-function fresh(mode,opts){applyOpts(opts);const date=mode==='daily'?today():null;return{mode,date,turn:null,opts:{...OPTS},me:{pieces:{},locked:false,answered:[]},opp:{guess:{},marks:{},log:[],fails:0,solved:false,revealed:false},secret:mode==='solo'?randomLayout():mode==='daily'?seededLayout('KE-daily-'+date):null}}
+function fresh(mode,opts,day){applyOpts(opts);const date=mode==='daily'?(day||today()):null;return{mode,date,turn:null,opts:{...OPTS},me:{pieces:{},locked:false,answered:[]},opp:{guess:{},marks:{},log:[],fails:0,solved:false,revealed:false},cpu:mode==='cpu'?{log:[]}:null,gid:Date.now()+Math.random(),secret:mode==='solo'||mode==='cpu'?randomLayout():mode==='daily'?seededLayout('KE-daily-'+date):null}}
 let S=store.get()||{mode:null};
 // Migration alter Spielstände (vor den Optionen): Hausregel + Spiegeln wie bisher
 if(S.mode&&!S.opts)S.opts={color:'house',mirror:true,touch:true,noscan:true,trans:false,schwarz:false};
@@ -578,13 +684,15 @@ const CHEV_UP='<svg class="chev" viewBox="0 0 16 9" width="16" height="9" aria-h
 const SKEY='kristall-echo-settings';
 const SET={edgeCheck:true,holdMs:170,rayAnim:true,uiAnim:true,confirmGiveup:true,confirmShot:true,...(store.get(SKEY)||{})};
 function saveSet(){store.set(SET,SKEY)}
-const isSolo=()=>S.mode==='solo'||S.mode==='daily';
+const isSolo=()=>S.mode==='solo'||S.mode==='daily'||S.mode==='cpu';
+const isCpu=()=>S.mode==='cpu';
+const CPU_NAME={easy:'Leicht',medium:'Mittel',hard:'Schwer'};
 const DKEY='kristall-echo-daily';
 function today(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function fmtDate(k,withYear){const [y,m,d]=k.split('-');return`${+d}.${+m}.${withYear?y:''}`}
 function dailyData(){const d=store.get(DKEY)||{};d.mine=d.mine||{};d.partner=d.partner||{};return d}
 function saveDaily(d){store.set(d,DKEY)}
-function recordDaily(st){if(S.mode!=='daily'||S.replay)return;const d=dailyData();if(d.mine[S.date])return;d.mine[S.date]={q:S.opp.log.length,f:S.opp.fails,st};saveDaily(d)}
+function recordDaily(st){if(S.mode!=='daily'||S.replay||S.practice)return;const d=dailyData();if(d.mine[S.date])return;d.mine[S.date]={q:S.opp.log.length,f:S.opp.fails,st};saveDaily(d)}
 const MIXNAME={'':'farblos',rot:'Rot',gelb:'Gelb',blau:'Blau','rot,gelb':'Orange','rot,blau':'Lila','gelb,blau':'Grün','rot,gelb,blau':'Braun',
  weiss:'Weiß','rot,weiss':'Rosa','gelb,weiss':'Hellgelb','blau,weiss':'Hellblau','rot,gelb,weiss':'Hellorange','rot,blau,weiss':'Helllila','gelb,blau,weiss':'Hellgrün','rot,gelb,blau,weiss':'Hellbraun',
  'rot,dunkel':'Dunkelrot','gelb,dunkel':'Dunkelgelb','blau,dunkel':'Dunkelblau','rot,gelb,dunkel':'Dunkelorange','rot,blau,dunkel':'Dunkellila','gelb,blau,dunkel':'Dunkelgrün','rot,gelb,blau,dunkel':'Dunkelbraun',dunkel:'Schwarz'};
@@ -712,26 +820,30 @@ function toolRow(ctx){const Pc=P(ctx),has=ui.sel!=null,placed=has&&Pc[ui.sel],h=
  const extra=ctx==='opp'?(OPTS.scan?b('scanmode','Feld scannen',!(isSolo()&&(S.opp.solved||S.opp.revealed)),ui.scanMode?' on':''):'')+(OPTS.helper?b('help','Logik-Hilfe',true,S.opp.help?' on':''):''):'';
  return`<div class="toolrow"><div>${b('rot','Drehen',has)}${OPTS.mirror?b('mirh','Spiegeln links/rechts',has)+b('mirv','Spiegeln oben/unten',has):''}${b('del','Wegnehmen',placed)}</div>${extra?`<div>${extra}</div>`:''}<div>${b('undo','Rückgängig',h.u.length)}${b('redo','Wiederholen',h.r.length)}</div></div>`}
 
-function dailyButton(){const r=dailyData().mine[today()];
- return`<button class="mode daily" data-act="daily"><b>Tagesrätsel ${fmtDate(today())}</b><span>${r?(r.st==='solved'?`Heute gelöst mit ${r.q} ${plural(r.q,'Frage','Fragen')}. Lösung ansehen.`:'Heute aufgegeben. Lösung ansehen.'):'Jeden Tag ein neues Feld, für alle gleich. Vergleicht eure Fragen.'}<br><small class="dopts">Heute: ${optSummary(applyDailyPreview())}</small></span></button>`}
+function dailyButton(){const d=today(),r=dailyData().mine[d],sk=streak(dailyData().mine);
+ const status=r?(r.st==='solved'?`Gelöst mit ${r.q} ${plural(r.q,'Frage','Fragen')}${r.f?` · ${r.f}✗`:''}`:'Aufgegeben'):'Neues Rätsel wartet';
+ return`<button class="mode dcard" data-act="daily"><span class="dc-top"><small>Tagesrätsel</small>${sk?`<span class="streak">Serie ${sk}</span>`:''}</span>
+ <b>${r?status:'Heute: '+fmtDate(d)}</b><span>${r?'Lösung ansehen':status} · ${optSummary(applyDailyPreview())}</span>${CHEV_R}</button>`}
 function applyDailyPreview(){const o={...dailyOpts(today())};o.scan=!o.noscan;return o}
 const HOME_ICON='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>';
 function gameStatus(){if(!S.mode)return null;const O=S.opp,n=O.log.length;
  if(S.mode==='duo'){const me=S.me.locked?'Feld verdeckt':'Steine legen';const t=S.turn==='me'?' · du bist dran':S.turn==='opp'?' · Gegenüber ist dran':'';return{title:'Gegeneinander',sub:`${me} · ${n} ${plural(n,'Frage','Fragen')}${t}`}}
+ if(S.mode==='cpu'){const w=S.winner;return{title:`Gegen den Computer · ${CPU_NAME[S.level]}`,sub:w?(w==='me'?'Gewonnen':'Verloren'):!S.me.locked?'Steine legen':`Du ${n} · Computer ${S.cpu.log.length} Fragen${S.turn==='cpu'?' · Computer ist dran':' · du bist dran'}`,finished:!!w}}
  const done=O.solved?'gelöst':O.revealed?'aufgelöst':`${n} ${plural(n,'Frage','Fragen')}`;
- return{title:S.mode==='daily'?`Tagesrätsel ${fmtDate(S.date)}`:'Solo',sub:done,finished:O.solved||O.revealed}}
+ return{title:S.mode==='daily'?`Tagesrätsel ${fmtDate(S.date)}${S.practice?' · Übung':''}`:'Solo',sub:done,finished:O.solved||O.revealed}}
 function viewHome(){const g=gameStatus(),last={...DEFAULT_OPTS,...(store.get(OKEY)||{})};const dd=dailyData(),t=dd.mine[today()];
  return`<section class="home">
  <h2>Licht rein, Farbe raus.</h2>
  ${g?`<button class="mode cont" data-act="continue"><span class="ct-l"><small>${g.finished?'Letztes Spiel':'Weiterspielen'}</small><b>${g.title}</b><span>${g.sub}</span></span>${CHEV_R}</button>`:`<p class="hint">Versteckt Kristalle, schickt Lichtstrahlen ins Feld des anderen und findet aus Ausgang und Farbe heraus, wo alles liegt.</p>`}
  <h3>Neues Spiel</h3>
  <button class="mode" data-act="setup" data-mode="duo"><b>Gegeneinander</b><span>Jeder auf seinem Handy. Ihr sagt euch Fragen und Antworten.</span></button>
- <button class="mode" data-act="setup" data-mode="solo"><b>Solo gegen das Handy</b><span>Das Handy versteckt, du suchst.</span></button>
+ <button class="mode" data-act="setup" data-mode="cpu"><b>Gegen den Computer</b><span>Ihr versteckt beide, fragt abwechselnd. Wer zuerst löst, gewinnt.</span></button>
+ <button class="mode" data-act="setup" data-mode="solo"><b>Solo-Rätsel</b><span>Das Handy versteckt, du suchst in Ruhe.</span></button>
  ${dailyButton()}
  <button class="mode join" data-act="join"><b>${icon('qr')} Per QR beitreten</b><span>Den Einladungs-Code deines Gegenübers scannen.</span></button>
  <p class="hint small">Zuletzt gewählt: ${presetName(last)} · ${RULES.filter(([k])=>ruleOn(last,k)).map(r=>r[1]).join(', ')||'Originalregeln'}</p>
- <div class="homestats" data-act="tab" data-tab="days"><div><b>${streak(dd.mine)}</b><span>Serie</span></div><div><b>${t?(t.st==='solved'?t.q:'–'):'?'}</b><span>heute</span></div><div><b>${Object.values(dd.mine).filter(r=>r.st==='solved').length}</b><span>gelöst</span></div>${CHEV_R}</div>
- <div class="row"><button class="link" data-act="tab" data-tab="rules">Spielregeln</button><button class="link" data-act="tab" data-tab="days">Verlauf</button></div>
+ <div class="hide-homestats" hidden><div><b>${streak(dd.mine)}</b><span>Serie</span></div><div><b>${t?(t.st==='solved'?t.q:'–'):'?'}</b><span>heute</span></div><div><b>${Object.values(dd.mine).filter(r=>r.st==='solved').length}</b><span>gelöst</span></div>${CHEV_R}</div>
+ <div class="row"><button class="link" data-act="tab" data-tab="rules">Spielregeln</button><button class="link" data-act="tab" data-tab="days">Tagesrätsel-Archiv</button></div>
  </section>`}
 
 
@@ -740,7 +852,8 @@ function logRow(e,num,extra=''){
  if(e.out===0)return`<span class="no">${num}</span><span>${lab(e.n)}</span><span class="dots"><i class="dot" style="background:${CASE}"></i></span><span class="ct">absorbiert</span>${extra}`;
  return`<span class="no">${num}</span><span>${lab(e.n)} ↔ ${lab(e.out)}</span><span class="dots">${dots(e.colors)}</span><span class="ct">${colorText(e.colors)}</span>${extra}`}
 
-function turnChip(){if(S.mode!=='duo')return'';const t=S.turn;
+function turnChip(){if(S.mode==='cpu'){if(S.winner)return`<span class="tchip ${S.winner==='me'?'me':'opp'}">${S.winner==='me'?'Gewonnen':'Verloren'}</span>`;if(!S.me.locked)return'';return S.turn==='cpu'?`<span class="tchip opp thinking">Computer denkt<i class="dots3"><b></b><b></b><b></b></i></span>`:`<span class="tchip me">Du bist dran</span>`}
+ if(S.mode!=='duo')return'';const t=S.turn;
  if(!t)return`<button class="tchip ask" data-act="turnask">Wer fängt an?</button>`;
  return t==='me'?`<button class="tchip me" data-act="turn" data-v="opp">Du bist dran</button>`:`<button class="tchip opp" data-act="turn" data-v="me">Gegenüber ist dran</button>`}
 function turnBanner(){if(S.mode!=='duo')return'';const t=S.turn;
@@ -752,7 +865,19 @@ function slot(inner){return`<div class="slot">${inner}</div>`}
 function infoCap(title,sub,ic='i'){return`<div class="cap idle"><span class="capi idlei">${ic}</span><div><b>${title}</b>${sub?`<small>${sub}</small>`:''}</div></div>`}
 function invWarn(Pc){const s=invalidSet(Pc);if(!s.size)return'';const why=new Set([...s].map(n=>whyNot(Pc,n,Pc[n])));
  return`<div class="cap is-bad"><span class="capi bad">!</span><div><b>Steine ${why.has('overlap')?'liegen übereinander':''}${why.has('overlap')&&why.has('touch')?' / ':''}${why.has('touch')?'berühren sich an einer Kante':''}</b><small>Rot markierte verschieben oder drehen.</small></div></div>`}
-function viewMe(){const M=S.me;
+function viewMeCpu(){const M=S.me,C=S.cpu,last=C.log[C.log.length-1];
+ const labels={};C.log.forEach(e=>{if(!e.scan){labels[e.n]='used';if(e.out)labels[e.out]='used'}});
+ let ray=null,hlCell=null,info;
+ if(S.winner){info=S.cpu.guess?`<div class="cap ${S.winReason==='cpu-solved'?'is-bad':'is-ok'}"><span class="capi ${S.winReason==='cpu-solved'?'bad':'ok'}">${S.winReason==='cpu-solved'?'!':'✓'}</span><div><b>${S.winReason==='cpu-solved'?'Der Computer hat dein Feld gelöst':'Der Computer hat falsch geraten'}</b><small>Sein Tipp ist lila eingezeichnet.</small></div></div>`:infoCap('Spiel vorbei',S.winner==='me'?'Du hast gewonnen.':'Der Computer hat gewonnen.')}
+ else if(S.turn==='cpu')info=infoCap('Der Computer denkt …','Er sucht Aufstellungen, die zu seinen bisherigen Antworten passen.','…');
+ else if(last){if(last.scan){hlCell=last.scan}else{labels[last.n]='hl';if(last.out)labels[last.out]='hl';ray=trace(boardOf(M.pieces),last.n)}
+  info=`<div class="cap say"><span class="capi sayi">${last.scan?vdot(last.val):last.out===0?`<i class="dot" style="background:${CASE}"></i>`:dots(last.colors)}</span><div><small>Computer fragte ${last.scan?'Feld '+cellName(...last.scan):lab(last.n)}</small><b>${last.scan?VALNAME[last.val]:last.out===0?'Absorbiert':`Raus bei ${lab(last.out)} – ${colorText(last.colors)}`}</b></div></div>`}
+ else info=infoCap('Dein Feld','Hier siehst du, was der Computer fragt. Er kennt deine Steine nicht.');
+ const list=C.log.length?`<h3>Fragen des Computers</h3><ul class="log">${C.log.map((e,i)=>({e,i})).reverse().map(({e,i})=>`<li>${logRow(e,i+1)}</li>`).join('')}</ul>`:'';
+ return`<div class="topbar">${turnChip()}<span class="tb-info">Du ${S.opp.log.length} · Computer ${C.log.length}</span>${S.winner?'<button class="btn primary sm" data-act="rematch">Revanche</button>':''}</div>${slot(info)}
+ <div class="board" data-ctx="me">${boardSVG({ctx:'me',pieces:M.pieces,labels,ray,hlCell,anim:ui.anim,ghost:S.cpu.guess||null,scans:C.log.filter(e=>e.scan)})}</div>
+ ${list}`}
+function viewMe(){const M=S.me;if(isCpu()&&M.locked)return viewMeCpu();
  if(!M.locked){const n=NAMES.filter(x=>M.pieces[x]).length,N=NAMES.length;
   return`<div class="topbar">${turnChip()}<span class="tb-info">${N} Steine legen</span>${S.mode==='duo'?`<button class="btn sm quiet" data-act="invite">${icon('qr')} Einladen</button>`:''}</div>
   ${slot(invWarn(M.pieces)||infoCap(ui.sel&&!M.pieces[ui.sel]?`${LBL[COLOR[ui.sel]]} aufs Feld tippen`:'Steine verstecken',ui.sel&&!M.pieces[ui.sel]?'Oder kurz halten und ziehen.':`Antippen und aufs Feld tippen oder halten und ziehen.`))}
@@ -787,9 +912,9 @@ function viewOpp(){const O=S.opp,solo=isSolo(),daily=S.mode==='daily',N=NAMES.le
    cap=`<div class="cap ${c.ok?'is-ok':'is-bad'}">${icon}<div><b>#${ui.hl+1} Soll: ${lab(e.n)} ${ans(e.out,e.colors)}</b><small>Deine Vermutung: ${lab(e.n)} ${ans(c.r.out,c.r.colors)}</small></div></div>`}}
  const n=O.log.length,all=complete(O.guess),inv=invalidSet(O.guess).size,done=solo&&(O.solved||O.revealed);
  const solveBtn=daily&&done?`<button class="btn primary sm" data-act="tab" data-tab="days">Verlauf</button>`:solo&&O.solved?`<button class="btn primary sm" data-act="new" data-mode="solo">Neues Rätsel</button>`
-  :`<button class="btn primary sm" data-act="solve" ${all&&!inv&&!done?'':'disabled'}>Lösen</button>`;
+  :isCpu()&&S.winner?`<button class="btn primary sm" data-act="rematch">Revanche</button>`:`<button class="btn primary sm" data-act="solve" ${all&&!inv&&!done&&!(isCpu()&&S.turn!=='me')?'':'disabled'}>Lösen</button>`;
  let okc=0,badc=0;if(all)for(const e of O.log){checkEntry(e,O.guess).ok?okc++:badc++}
- const top=`<div class="topbar">${turnChip()}<span class="tb-info">${daily?'Tagesrätsel · ':''}${O.solved?'Gelöst · ':''}${n} ${plural(n,'Frage','Fragen')}${O.fails?` · ${O.fails}✗`:''}</span>${solveBtn}</div>`;
+ const top=`<div class="topbar">${turnChip()}<span class="tb-info">${isCpu()?`Du ${n} · Computer ${S.cpu.log.length}`:`${daily?`${fmtDate(S.date)}${S.practice?' · Übung':S.replay?' · Lösung':''} · `:''}${O.solved?'Gelöst · ':''}${n} ${plural(n,'Frage','Fragen')}${O.fails?` · ${O.fails}✗`:''}`}</span>${solveBtn}</div>`;
  const aimBar=ui.aim?(ui.aim.n?`<div class="cap aim"><span class="capi aimi">${CHEV_R}</span><div><b>Strahl ab ${lab(ui.aim.n)} schicken?</b><small>Nochmal tippen zum Senden</small></div><button class="btn primary sm" data-act="fire">Senden</button></div>`
   :`<div class="cap aim"><span class="capi aimi">🔍</span><div><b>Feld ${cellName(...ui.aim.cell)} scannen?</b><small>Nochmal tippen zum Senden</small></div><button class="btn primary sm" data-act="fire">Senden</button></div>`):'';
  const scanHint=ui.scanMode&&!ui.aim?'<div class="cap scanhint"><span class="capi scan">🔍</span><div><b>Feld scannen</b><small>Tippe das Feld an, das du abfragst. Das zählt als Zug.</small></div></div>':'';
@@ -849,6 +974,7 @@ function viewRules(){const N=NAMES.length;const leg=NAMES.map(n=>`<span class="l
  <h3>Lösen</h3>
  <p>Leg deine Vermutung im Gegner-Feld und tippe <b>Lösung prüfen</b>. Du bekommst einen QR-Code. Dein Gegenüber scannt ihn bei <b>Mein Feld → Lösung prüfen</b>. Der Zahlencode darunter funktioniert genauso, z.&nbsp;B. per Nachricht. Nach Originalregel gilt: richtig = gewonnen, falsch = verloren.</p>
  ${S.mode==='duo'?'<h3>Wer ist dran?</h3><p>Oben steht, wer gerade fragt. Die App wechselt automatisch, sobald eine Antwort eingetragen oder beantwortet ist. Falls es mal nicht stimmt: einfach antippen.</p>':''}
+ <h3>Gegen den Computer</h3><p>Ihr versteckt beide eure Steine und fragt abwechselnd, du fängst an. Die Antworten auf seine Fragen rechnet die App aus deinem Feld. Wer zuerst richtig löst, gewinnt – wer falsch rät, verliert. Leicht rät früh und manchmal daneben, Schwer rät erst, wenn es sicher ist.</p>
  <h3>Tagesrätsel</h3><p>Jeden Tag gibt es ein neues Feld mit gewürfelten Optionen, für alle gleich. Gezählt wird nur der erste Versuch. Im <b>Verlauf</b> seht ihr eure Ergebnisse und könnt sie per QR-Code vergleichen.</p>
  ${OPTS.helper?'<h3>Logik-Hilfe</h3><p>Schraffiert Felder, die sicher leer sind: gescannte leere Felder und, wenn kein Stein farblos ablenken kann, alle Felder auf dem geraden Weg eines farblosen Strahls.</p>':''}
  <h3>Tipps</h3>
@@ -864,17 +990,17 @@ const GAMEVIEWS=['me','opp'];
 function render(){
  // Zwei Ebenen: Lobby (Start + Unterseiten) und Spiel (eigene Leiste nur bei 2 Ansichten)
  if(GAMEVIEWS.includes(ui.tab)&&!S.mode)ui.tab='home';
- if(S.mode&&S.mode!=='duo'&&ui.tab==='me')ui.tab='opp';
+ if(S.mode&&S.mode!=='duo'&&S.mode!=='cpu'&&ui.tab==='me')ui.tab='opp';
  if(!GAMEVIEWS.includes(ui.tab)&&!SUBPAGES[ui.tab])ui.tab='home';
  const inGame=GAMEVIEWS.includes(ui.tab),sub=SUBPAGES[ui.tab];
- const tabs=inGame&&S.mode==='duo'?[['me','Mein Feld'],['opp','Gegner']]:[];
- const dot=S.mode==='duo'&&S.turn?(S.turn==='me'?'opp':'me'):null;
+ const tabs=inGame&&S.mode==='duo'?[['me','Mein Feld'],['opp','Gegner']]:inGame&&S.mode==='cpu'?[['me','Mein Feld'],['opp','Computer']]:[];
+ const dot=S.mode==='duo'&&S.turn?(S.turn==='me'?'opp':'me'):S.mode==='cpu'&&S.me.locked&&S.turn==='me'&&!S.winner?'opp':null;
  $('#tabs').innerHTML=tabs.map(([k,l])=>`<button class="${ui.tab===k?'on':''}" data-act="tab" data-tab="${k}">${l}${dot===k?'<i class="tdot"></i>':''}</button>`).join('');
  document.body.classList.toggle('nonav',!tabs.length);
  // Kopfzeile: links zurück (im Spiel und auf Unterseiten), Titel, rechts ? und ⚙
  const back=$('#backbtn');if(back){back.hidden=!(inGame||sub);
   const to=sub?(ui.back&&GAMEVIEWS.includes(ui.back)?(S.mode==='duo'?'Spiel':S.mode==='daily'?'Rätsel':'Solo'):'Start'):'Start';back.querySelector('span').textContent=to}
- const ttl=$('#htitle');if(ttl)ttl.textContent=sub?SUBPAGES[ui.tab]:inGame?(S.mode==='duo'?'Gegeneinander':S.mode==='daily'?'Tagesrätsel':'Solo'):'Kristall-Echo';
+ const ttl=$('#htitle');if(ttl)ttl.textContent=sub?SUBPAGES[ui.tab]:inGame?(S.mode==='duo'?'Gegeneinander':S.mode==='cpu'?'Computer · '+CPU_NAME[S.level]:S.mode==='daily'?'Tagesrätsel':'Solo'):'Kristall-Echo';
  document.documentElement.classList.toggle('lobby',!inGame&&!sub);
  const hb=$('#helpbtn');if(hb){hb.classList.toggle('on',ui.tab==='rules');hb.hidden=ui.tab==='rules'}
  const sb=$('#setbtn');if(sb){sb.classList.toggle('on',ui.tab==='settings');sb.hidden=ui.tab==='settings'}
@@ -889,13 +1015,13 @@ function render(){
  let ghost=null;
  if(dir){const r=app.getBoundingClientRect();ghost=document.createElement('div');ghost.className='ghost '+dir;ghost.setAttribute('aria-hidden','true');
   // alte Seite verschieben statt kopieren: kein erneutes Parsen, kein doppelter Aufbau
-  while(app.firstChild)ghost.appendChild(app.firstChild);Object.assign(ghost.style,{top:r.top+'px',left:r.left+'px',width:r.width+'px'});document.body.appendChild(ghost)}
+  while(app.firstChild)ghost.appendChild(app.firstChild);Object.assign(ghost.style,{top:r.top+'px',left:r.left+'px',width:r.width+'px',paddingTop:getComputedStyle(app).paddingTop});document.body.appendChild(ghost)}
  app.innerHTML=v;ui.anim=false;
  if(sameTab&&stripX){const st=app.querySelector('.strip');if(st)st.scrollLeft=stripX}
  if(dir){const g=ghost;animating(NAV_MS);app.classList.add('nav-'+dir,'nav-prep');
   nextPaint(()=>{app.classList.remove('nav-prep');app.classList.add('nav-run');g.classList.add('run');
    setTimeout(()=>{g.remove();app.classList.remove('nav-push','nav-pop','nav-run')},NAV_MS+40)})}
- ui.shown=ui.tab;document.documentElement.classList.toggle('noanim',!SET.uiAnim)}
+ ui.shown=ui.tab;document.documentElement.classList.toggle('noanim',!SET.uiAnim);syncHeader()}
 
 /* ---------- Sheets & toast ---------- */
 let tt;function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('show'),2800)}
@@ -952,7 +1078,8 @@ const ruleOn=(o,k)=>k==='house'?o.color==='house':!!o[k];
 function setupSheet(){const u=ui.setup,o=u.opts;if(u.view==='stones')return stonesSheet();if(u.view==='rules')return rulesSheet();if(u.view==='oshare')return shareOptsSheet();if(u.view==='oscan')return scanOptsSheet();
  const busy=S.mode&&(S.opp.log.length||S.me.answered.length)&&!(isSolo()&&(S.opp.solved||S.opp.revealed));
  const st=stonesOf(o),act=RULES.filter(([k])=>ruleOn(o,k));
- sheet(`<h3>${u.mode==='duo'?'Gegeneinander':'Solo'}: Optionen</h3>
+ sheet(`<h3>${u.mode==='duo'?'Gegeneinander':u.mode==='cpu'?'Gegen den Computer':'Solo'}: Optionen</h3>
+ ${u.mode==='cpu'?`<h4>Computer</h4><div class="seg">${['easy','medium','hard'].map(l=>`<button class="${u.level===l?'on':''}" data-act="slevel" data-v="${l}">${CPU_NAME[l]}</button>`).join('')}</div>`:''}
  <h4>Steine</h4>
  <button class="opt stonepick" data-act="stones"><span><b>${presetName(o)}</b><small>${st.length} ${plural(st.length,'Stein','Steine')} · ${blocksOf(st)} Blöcke</small><span class="minis">${st.map(s=>miniShapeSVG(s.shape,s.color,6)).join('')}</span></span>${CHEV_R}</button>
  <h4>Regeln</h4>
@@ -1047,15 +1174,17 @@ function onLabel(ctx,n){
  const i=known(n);if(i>=0){const e=S.opp.log[i];ui.hl=i;render();toast(e.out===0?`Schon gefragt (#${i+1}): ${lab(e.n)} wurde absorbiert`:`Schon bekannt (#${i+1}): ${lab(e.n)} und ${lab(e.out)} sind verbunden`);return}
 
  if(isSolo()){if(S.opp.solved||S.opp.revealed)return;
+  if(isCpu()){if(S.winner)return;if(!S.me.locked){toast('Erst deine Steine verdecken');return}if(S.turn!=='me'){toast('Der Computer ist dran');return}}
   // Zielen statt sofort feuern: erster Tipp markiert, zweiter Tipp (oder „Senden“) schickt den Strahl
   if(SET.confirmShot&&!(ui.aim&&ui.aim.n===n)){ui.aim={n};ui.hl=null;render();return}
-  ui.aim=null;const r=trace(boardOf(S.secret),n);S.opp.log.push({n,out:r.out,colors:r.colors});ui.hl=S.opp.log.length-1;ui.anim=true;save();render();toast(r.out===0?'Absorbiert':`Raus bei ${lab(r.out)} – ${colorText(r.colors)}`);return}
+  ui.aim=null;const r=trace(boardOf(S.secret),n);S.opp.log.push({n,out:r.out,colors:r.colors});ui.hl=S.opp.log.length-1;ui.anim=true;save();render();toast(r.out===0?'Absorbiert':`Raus bei ${lab(r.out)} – ${colorText(r.colors)}`);if(isCpu())cpuTurn();return}
  ask={n,out:null,colors:null};askSheet()}
 function onScan(x,y){const i=S.opp.log.findIndex(e=>e.scan&&e.scan[0]===x&&e.scan[1]===y);
  if(i>=0){ui.hl=i;render();toast(`Schon gescannt (#${i+1})`);return}
  if(isSolo()){if(S.opp.solved||S.opp.revealed)return;
+  if(isCpu()){if(S.winner)return;if(!S.me.locked){toast('Erst deine Steine verdecken');return}if(S.turn!=='me'){toast('Der Computer ist dran');return}}
   if(SET.confirmShot&&!(ui.aim&&ui.aim.cell&&ui.aim.cell[0]===x&&ui.aim.cell[1]===y)){ui.aim={cell:[x,y]};ui.scanMode=true;ui.hl=null;render();return}
-  ui.aim=null;const v=scanCell(S.secret,x,y);S.opp.log.push({scan:[x,y],val:v});ui.hl=S.opp.log.length-1;save();render();toast(`Feld ${cellName(x,y)}: ${VALNAME[v]}`);return}
+  ui.aim=null;const v=scanCell(S.secret,x,y);S.opp.log.push({scan:[x,y],val:v});ui.hl=S.opp.log.length-1;save();render();toast(`Feld ${cellName(x,y)}: ${VALNAME[v]}`);if(isCpu())cpuTurn();return}
  scanAsk={cell:[x,y],val:null};scanSheet()}
 function onCell(ctx,x,y){
  if(ui.aim&&!(ui.aim.cell&&ctx==='opp'&&ui.scanMode)){ui.aim=null;if(ctx==='opp'&&!ui.scanMode){render();return}}
@@ -1078,7 +1207,7 @@ const rotO=o=>(o%4+1)%4+(o>=4?4:0);
 // Spiegeln so, wie man es sieht: links↔rechts bzw. oben↔unten (Form ist erst gespiegelt, dann gedreht gespeichert)
 const flipH=o=>(o>=4?0:4)+(4-o%4)%4, flipV=o=>(o>=4?0:4)+(6-o%4)%4;
 function ctxNow(){return ui.tab==='me'?'me':'opp'}
-function startGame(m,opts){clearHist();store.set(opts,OKEY);S=fresh(m,opts);Object.assign(ui,{tab:m==='duo'?'me':'opp',sel:null,tool:'piece',hl:null,reveal:false,last:null,po:{me:{},opp:{}}});save();close();render();window.scrollTo(0,0)}
+function startGame(m,opts,level){clearHist();store.set(opts,OKEY);S=fresh(m,opts);if(m==='cpu'){S.level=level||'medium';store.set(S.level,'kristall-echo-cpulevel')}Object.assign(ui,{tab:m==='duo'||m==='cpu'?'me':'opp',sel:null,tool:'piece',hl:null,reveal:false,last:null,po:{me:{},opp:{}}});save();close();render();window.scrollTo(0,0)}
 
 document.addEventListener('click',ev=>{
  if(suppressClick){suppressClick=false;return}
@@ -1088,8 +1217,9 @@ document.addEventListener('click',ev=>{
  switch(a){
  case'tab':{ui.aim=null;const to=t.dataset.tab==='start'?'home':t.dataset.tab;if(SUBPAGES[to]&&!SUBPAGES[ui.tab])ui.back=ui.tab;ui.tab=to;ui.sel=null;ui.scanMode=false;close();render();window.scrollTo(0,0)}break;
  case'back':ui.aim=null;ui.tab=SUBPAGES[ui.tab]?(ui.back||'home'):'home';ui.back=null;ui.sel=null;ui.scanMode=false;render();window.scrollTo(0,0);break;
- case'setup':ui.setup={mode:t.dataset.mode,view:'main',opts:{...DEFAULT_OPTS,...(store.get(OKEY)||{})}};setupSheet();break;
+ case'setup':ui.setup={mode:t.dataset.mode,level:store.get('kristall-echo-cpulevel')||'medium',view:'main',opts:{...DEFAULT_OPTS,...(store.get(OKEY)||{})}};setupSheet();break;
  case'scol':ui.setup.opts.color=t.dataset.v;setupSheet();break;
+ case'slevel':ui.setup.level=t.dataset.v;setupSheet();break;
  case'sopt':{const k=t.dataset.k,o=ui.setup.opts;if(k==='house')o.color=o.color==='house'?'orig':'house';else o[k]=!o[k];setupSheet()}break;
  case'rules':ui.sheetAnim='fwd';ui.setup.view='rules';setupSheet();break;
  case'stones':ui.sheetAnim='fwd';ui.setup.view='stones';setupSheet();break;
@@ -1104,7 +1234,7 @@ document.addEventListener('click',ev=>{
  case'pickcol':ui.setup.pick=t.dataset.c;setupSheet();break;
  case'start':{const o=ui.setup.opts;const keep=S.opts;applyOpts(o);
   const err=!STONES.length?'Wähl mindestens einen Stein aus.':!randomLayout()?'Diese Steine passen so nicht aufs Feld. Nimm weniger oder erlaube Kantenkontakt.':null;
-  if(err){applyOpts(keep);toast(err);break}startGame(ui.setup.mode,o)}break;
+  if(err){applyOpts(keep);toast(err);break}startGame(ui.setup.mode,o,ui.setup.level)}break;
  case'new':startGame(t.dataset.mode,S.opts||DEFAULT_OPTS);break;
  case'newmenu':sheet(`<h3>Neues Spiel</h3><div class="stack">${dailyButton()}<button class="mode" data-act="setup" data-mode="duo"><b>Gegeneinander</b><span>Jeder auf seinem Handy.</span></button><button class="mode" data-act="setup" data-mode="solo"><b>Solo gegen das Handy</b><span>Das Handy versteckt, du suchst.</span></button></div><div class="row"><button class="btn grow" data-act="close">Abbrechen</button></div>`);break;
  case'pick':ui.sel=ui.sel===t.dataset.n?null:t.dataset.n;render();break;
@@ -1116,7 +1246,7 @@ document.addEventListener('click',ev=>{
  case'del':{const Pc=P(ctxNow());if(ui.sel&&Pc[ui.sel]){snap(ctxNow());ui.po[ctxNow()][ui.sel]=Pc[ui.sel].o;delete Pc[ui.sel];ui.sel=null;save();render()}break}
  case'random':{const R=randomLayout();if(!R){toast('Keine passende Verteilung gefunden – nochmal tippen');break}snap('me');S.me.pieces=R;ui.sel=null;save();render()}break;
  case'lock':{const u=unreachable(S.me.pieces);if(u.length){ui.sel=u[0];render();toast(`${u.map(n=>LBL[COLOR[n]]+' '+SHAPES[SHAPE_OF[n]].name).join(', ')}: von keinem Strahl erreichbar. Bitte anders legen.`);break}
-  clearHist();S.me.locked=true;ui.sel=null;ui.reveal=false;ui.last=null;save();render();window.scrollTo(0,0);toast('Verdeckt. Viel Spaß!')}break;
+  clearHist();S.me.locked=true;ui.sel=null;ui.reveal=false;ui.last=null;if(isCpu()){S.turn='me';ui.tab='opp'}save();render();window.scrollTo(0,0);toast(isCpu()?'Los geht’s – du fängst an':'Verdeckt. Viel Spaß!')}break;
  case'unlock':if(!t.dataset.ok&&S.me.answered.length){sheet(`<h3>Kristalle neu legen?</h3><p>Du hast schon ${S.me.answered.length} Fragen beantwortet. Wenn du umlegst, stimmen die alten Antworten nicht mehr.</p><div class="row"><button class="btn" data-act="close">Abbrechen</button><button class="btn primary grow" data-act="unlock" data-ok="1">Trotzdem neu legen</button></div>`);break}
   S.me.locked=false;S.me.answered=[];ui.last=null;close();save();render();break;
  case'reveal':ui.reveal=!ui.reveal;render();break;
@@ -1129,8 +1259,9 @@ document.addEventListener('click',ev=>{
  case'sval':scanAsk.val=t.dataset.v;scanSheet();break;
  case'ssave':if(S.mode==='duo')S.turn='opp';S.opp.log.push({scan:scanAsk.cell,val:scanAsk.val});ui.hl=S.opp.log.length-1;save();close();render();break;
  case'solve':{if(!complete(S.opp.guess))break;if(S.mode==='duo')S.turn='opp',save();
+  if(isCpu()){if(S.winner||S.turn!=='me')break;const ok=same(S.opp.guess,S.secret);S.winner=ok?'me':'cpu';S.winReason=ok?'me-solved':'me-wrong';S.turn=null;S.opp.solved=ok;S.opp.revealed=true;save();render();cpuResult();break}
   if(isSolo()){if(same(S.opp.guess,S.secret)){S.opp.solved=true;ui.hl=null;recordDaily('solved');save();render();const q=S.opp.log.length;
-   const next=S.mode==='daily'?`<button class="btn" data-act="share">Teilen</button><button class="btn primary grow" data-act="tab" data-tab="days">Zum Verlauf</button>`:`<button class="btn" data-act="close">Ansehen</button><button class="btn primary grow" data-act="new" data-mode="solo">Nächstes Rätsel</button>`;
+   const next=S.mode==='daily'&&!S.practice?`<button class="btn" data-act="share">Teilen</button><button class="btn primary grow" data-act="tab" data-tab="days">Zum Verlauf</button>`:`<button class="btn" data-act="close">Ansehen</button><button class="btn primary grow" data-act="new" data-mode="solo">Nächstes Rätsel</button>`;
    sheet(`<h3 class="win">Gefunden!</h3><p>Mit <b>${q} ${plural(q,'Frage','Fragen')}</b>${S.opp.fails?` und ${S.opp.fails} ${plural(S.opp.fails,'Fehlversuch','Fehlversuchen')}`:''}.</p><div class="row">${next}</div>`)}
    else{S.opp.fails++;save();render();toast('Stimmt noch nicht. Schau dir die ✗ in der Liste an.')}break}
   {const code=encode(S.opp.guess);sheet(`<h3>Dein Lösungs-Code</h3><p>Zeig den QR-Code deinem Gegenüber. Es scannt ihn bei <b>Mein Feld → Lösung prüfen</b>.</p>
@@ -1147,10 +1278,11 @@ document.addEventListener('click',ev=>{
  case'rescan':startScan(startScan.h||onQR);break;
  case'vcheck':doVerify();break;
  case'giveup':if(!t.dataset.ok&&SET.confirmGiveup){sheet(`<h3>Lösung zeigen?</h3><p>Die Kristalle erscheinen gestrichelt auf deinem Feld.</p><div class="row"><button class="btn" data-act="close">Weitersuchen</button><button class="btn primary grow" data-act="giveup" data-ok="1">Zeigen</button></div>`);break}
-  S.opp.revealed=true;recordDaily('gaveup');save();close();render();break;
+  S.opp.revealed=true;recordDaily('gaveup');if(isCpu()){S.winner='cpu';S.winReason='giveup';S.turn=null}save();close();render();if(isCpu())cpuResult();break;
  case'close':close();break;
+ case'rematch':startGame('cpu',S.opts,S.level);break;
  case'fire':{const a=ui.aim;if(!a)break;if(a.n)onLabel('opp',a.n);else onScan(...a.cell)}break;
- case'continue':ui.tab=S.mode==='duo'?(S.me.locked?'opp':'me'):'opp';render();window.scrollTo(0,0);break;
+ case'continue':ui.tab=S.mode==='duo'||S.mode==='cpu'?(S.me.locked&&!(isCpu()&&S.winner)?'opp':'me'):'opp';render();window.scrollTo(0,0);break;
  case'join':sheet(`<h3>Per QR beitreten</h3><p class="small">Halte die Kamera auf den Einladungs-Code deines Gegenübers.</p><div id="scanbox" class="scanbox"></div><div id="vres"></div><div class="row"><button class="btn grow" data-act="close">Abbrechen</button></div>`);startScan(onJoinQR);break;
  case'joinok':if(ui.joinOpts){const o=ui.joinOpts;ui.joinOpts=null;startGame('duo',o);toast('Beigetreten – leg jetzt deine Kristalle')}break;
  case'invite':sheet(`<h3>Gegenüber einladen</h3><p class="small">Dein Gegenüber tippt auf dem Startbildschirm auf „Per QR beitreten“ und scannt diesen Code.</p><div class="qr">${qrSVG(optsPayload(S.opts))}</div><p class="small center"><b>${presetName(S.opts)}</b> · ${STONES.length} ${plural(STONES.length,'Stein','Steine')} · ${RULES.filter(([k])=>ruleOn(S.opts,k)).map(r=>r[1]).join(', ')||'Originalregeln'}</p><div class="row"><button class="btn primary grow" data-act="close">Fertig</button></div>`);break;
@@ -1168,6 +1300,8 @@ document.addEventListener('click',ev=>{
  case'turnask':sheet(`<h3>Wer fängt an?</h3><div class="row"><button class="btn grow" data-act="turnset" data-v="me">Ich</button><button class="btn grow" data-act="turnset" data-v="opp">Gegenüber</button></div>`);break;
  case'turnset':S.turn=t.dataset.v;save();close();render();break;
  case'daily':startDaily();break;
+ case'dayopen':dayHistorySheet(t.dataset.d);break;
+ case'dayplay':startDaily(t.dataset.d,t.dataset.m||'auto');break;
  case'share':shareDaily();break;
  case'showres':sheet(`<h3>Meine Ergebnisse</h3><p>Dein Gegenüber scannt diesen Code im Verlauf mit „QR scannen“.</p><div class="qr">${qrSVG(resPayload())}</div><div class="row"><button class="btn primary grow" data-act="close">Fertig</button></div>`);break;
  case'scanres':sheet(`<h3>Ergebnisse scannen</h3><div id="scanbox" class="scanbox"></div><div id="vres"></div><div class="row"><button class="btn grow" data-act="close">Schließen</button></div>`);startScan(onResQR);break;
@@ -1206,16 +1340,38 @@ function doVerify(){const G=decode($('#code').value);const el=$('#vres');
  const ok=same(G,S.me.pieces);el.innerHTML=ok?'<div class="verdict ok">Stimmt! Dein Gegenüber hat gewonnen.</div>':'<div class="verdict bad">Stimmt nicht. Nach Originalregel hat dein Gegenüber damit verloren.</div>'}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stopScan()});
 
+/* ---------- Computer-Gegner (Steuerung) ---------- */
+let cpuW=null,cpuT0=0,cpuBusy=false;
+function cpuWorker(){if(cpuW!==null)return cpuW;
+ try{cpuW=new Worker(URL.createObjectURL(new Blob([LOGIC_SRC,'\n',SOLVER_SRC,'\nonmessage=e=>postMessage(cpuThink(e.data));'],{type:'text/javascript'})));cpuW.onmessage=e=>cpuGot(e.data);cpuW.onerror=()=>{cpuW=false;cpuBusy=false;cpuTurn()}}
+ catch(e){cpuW=false}return cpuW}
+function cpuTurn(){if(!isCpu()||S.winner||!S.me.locked)return;S.turn='cpu';save();render();if(cpuBusy)return;cpuBusy=true;cpuT0=Date.now();
+ const data={opts:S.opts,log:S.cpu.log,level:S.level,gid:S.gid};const w=cpuWorker();
+ if(w)w.postMessage(data);else setTimeout(()=>{const r=cpuThink(data);applyOpts(S.opts);cpuGot(r)},30)} // Ersatz ohne Worker
+function cpuGot(m){const wait=Math.max(0,900-(Date.now()-cpuT0));setTimeout(()=>{cpuBusy=false;cpuApply(m)},wait)}
+function cpuApply(m){if(!isCpu()||S.winner||S.turn!=='cpu')return;
+ if(m.type==='guess'){const ok=same(m.P,S.me.pieces);S.cpu.guess=m.P;S.winner=ok?'cpu':'me';S.winReason=ok?'cpu-solved':'cpu-wrong';S.turn=null;S.opp.revealed=true;ui.tab='me';save();render();cpuResult();return}
+ const q=m.q;let e;if(q.scan)e={scan:q.scan,val:scanCell(S.me.pieces,...q.scan)};else{const r=trace(boardOf(S.me.pieces),q.n);e={n:q.n,out:r.out,colors:r.colors}}
+ S.cpu.log.push(e);S.turn='me';ui.anim=ui.tab==='me';save();render();
+ toast(`Computer: ${q.scan?'Feld '+cellName(...q.scan):lab(q.n)} → ${q.scan?VALNAME[e.val]:e.out===0?'absorbiert':lab(e.out)+' · '+colorText(e.colors)}`)}
+function cpuResult(){const w=S.winner==='me',R=S.winReason;
+ const why={'me-solved':`Du hast sein Feld mit ${S.opp.log.length} ${plural(S.opp.log.length,'Frage','Fragen')} gelöst.`,'me-wrong':'Deine Lösung war falsch. Nach Originalregel ist das Spiel damit verloren.',
+  'cpu-solved':`Der Computer hat dein Feld mit ${S.cpu.log.length} ${plural(S.cpu.log.length,'Frage','Fragen')} gelöst.`,'cpu-wrong':'Der Computer hat falsch geraten.','giveup':'Du hast aufgegeben.'}[R]||'';
+ sheet(`<h3 class="win">${w?'Gewonnen!':'Verloren'}</h3><p>${why}</p><p class="small">Du: ${S.opp.log.length} · Computer: ${S.cpu.log.length} Fragen · ${CPU_NAME[S.level]}</p>
+ <div class="row"><button class="btn" data-act="close">Ansehen</button><button class="btn primary grow" data-act="rematch">Revanche</button></div>`)}
+
 /* ---------- Tagesrätsel ---------- */
-function startDaily(){const d=today();
- if(S.mode==='daily'&&S.date===d){close();ui.tab='opp';render();return}
+// Tagesrätsel: heute zählt (einmal), frühere Tage und Wiederholungen sind Übung ohne Wertung
+function startDaily(day=today(),mode='auto'){const d=day,r=dailyData().mine[d];
+ const practice=mode==='practice'||(mode==='auto'&&d!==today()&&!r),view=mode==='view'||(mode==='auto'&&!!r);
+ if(S.mode==='daily'&&S.date===d&&!!S.practice===practice&&!!S.replay===view){close();ui.tab='opp';render();return}
  const busy=S.mode&&(S.opp.log.length||S.me.answered.length)&&!(isSolo()&&(S.opp.solved||S.opp.revealed));
- const go=()=>{S=fresh('daily',dailyOpts(d));const r=dailyData().mine[d];if(r){S.replay=true;S.opp.revealed=true;S.opp.solved=r.st==='solved'}
+ const go=()=>{S=fresh('daily',dailyOpts(d),d);S.practice=practice;if(view){S.replay=true;S.opp.revealed=true;S.opp.solved=!!r&&r.st==='solved'}
   Object.assign(ui,{tab:'opp',sel:null,tool:'piece',hl:null,reveal:false,last:null,po:{me:{},opp:{}}});save();close();render();window.scrollTo(0,0);
-  if(r)toast('Heute schon gespielt – hier ist die Lösung')};
- if(busy&&!startDaily.ok){sheet(`<h3>Zum Tagesrätsel wechseln?</h3><p>Das laufende Spiel wird beendet.</p><div class="row"><button class="btn" data-act="close">Abbrechen</button><button class="btn primary grow" data-act="dailyok">Ja, wechseln</button></div>`);return}
+  if(view&&r)toast('Schon gespielt – hier ist die Lösung');else if(practice)toast('Übung – zählt nicht für die Wertung')};
+ if(busy&&!startDaily.ok){startDaily.pend=[day,mode];sheet(`<h3>Zum Tagesrätsel wechseln?</h3><p>Das laufende Spiel wird beendet.</p><div class="row"><button class="btn" data-act="close">Abbrechen</button><button class="btn primary grow" data-act="dailyok">Ja, wechseln</button></div>`);return}
  go()}
-document.addEventListener('click',e=>{if(e.target.closest('[data-act="dailyok"]')){startDaily.ok=true;startDaily();startDaily.ok=false}});
+document.addEventListener('click',e=>{if(e.target.closest('[data-act="dailyok"]')){startDaily.ok=true;startDaily(...(startDaily.pend||[]));startDaily.ok=false;startDaily.pend=null}});
 function resultText(r){return r?(r.st==='solved'?`${r.q} ${plural(r.q,'Frage','Fragen')}${r.f?` +${r.f}✗`:''}`:'aufgegeben'):'–'}
 function score(r){return r&&r.st==='solved'?r.q+2*r.f:null} // Fehlversuche zählen doppelt
 function streak(mine){let n=0;const d=new Date();for(;;){const k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -1229,19 +1385,28 @@ function onResQR(txt){const m=/^KED1\|([\d:,]*)$/.exec(txt);const st=$('#scansta
  stopScan();const d=dailyData();let n=0;
  for(const it of m[1].split(',').filter(Boolean)){const [k,q,f,s]=it.split(':');const key=k.slice(0,4)+'-'+k.slice(4,6)+'-'+k.slice(6,8);d.partner[key]={q:+q,f:+f,st:s==='1'?'solved':'gaveup'};n++}
  d.partnerAt=Date.now();saveDaily(d);close();render();toast(`${n} ${plural(n,'Ergebnis','Ergebnisse')} übernommen`)}
+function dayHistorySheet(d){const dd=dailyData(),r=dd.mine[d],p=dd.partner[d],isT=d===today();const o={...dailyOpts(d)};o.scan=!o.noscan;
+ const btn=(m,l,pri)=>`<button class="btn${pri?' primary':''} grow" data-act="dayplay" data-d="${d}" data-m="${m}">${l}</button>`;
+ const acts=isT&&!r?btn('auto','Jetzt spielen',1):r?btn('view','Lösung zeigen',0)+btn('practice','Nochmal üben',1):btn('view','Lösung zeigen',0)+btn('practice','Nachholen',1);
+ sheet(`<h3>Tagesrätsel ${fmtDate(d,true)}${isT?' · heute':''}</h3>
+ <p class="small">${optSummary(o)}</p>
+ <div class="stack"><div class="opt static"><span><b>Ich</b><small>${r?resultText(r):isT?'noch offen':'nicht gespielt'}</small></span></div>${p?`<div class="opt static"><span><b>Gegenüber</b><small>${resultText(p)}</small></span></div>`:''}</div>
+ ${!isT||r?'<p class="small">Übungsrunden zählen nicht für Serie, Bestwert und Vergleich.</p>':''}
+ <div class="row">${acts}</div>`)}
 function viewDays(){const d=dailyData(),mine=d.mine,par=d.partner;
- const keys=[...new Set([...Object.keys(mine),...Object.keys(par)])].sort().reverse().slice(0,30);
+ const past=Array.from({length:21},(_,i)=>{const x=new Date();x.setDate(x.getDate()-i);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')});
+ const keys=[...new Set([...past,...Object.keys(mine),...Object.keys(par)])].sort().reverse().slice(0,40);
  const solved=Object.values(mine).filter(r=>r.st==='solved');const avg=solved.length?(solved.reduce((s,r)=>s+r.q,0)/solved.length).toFixed(1).replace('.',','):'–';
  const best=solved.length?Math.min(...solved.map(r=>r.q)):'–';
  let wm=0,wp=0;for(const k of keys){const a=score(mine[k]),b=score(par[k]);if(a!=null&&b!=null){if(a<b)wm++;else if(b<a)wp++}else if(a!=null&&par[k])wm++;else if(b!=null&&mine[k])wp++}
  const hasP=Object.keys(par).length>0;const t=mine[today()];
  const rows=keys.map(k=>{const a=score(mine[k]),b=score(par[k]);const win=a!=null&&(b==null||a<b)&&par[k]?'me':b!=null&&(a==null||b<a)&&mine[k]?'p':'';
-  return`<tr><td>${fmtDate(k)}</td><td class="${win==='me'?'best':''}">${resultText(mine[k])}</td>${hasP?`<td class="${win==='p'?'best':''}">${resultText(par[k])}</td>`:''}</tr>`}).join('');
+  return`<tr data-act="dayopen" data-d="${k}"><td>${fmtDate(k)}${k===today()?' <i class="tag">heute</i>':''}</td><td class="${win==='me'?'best':''}">${mine[k]?resultText(mine[k]):k===today()?'offen':'<span class="muted">–</span>'}</td>${hasP?`<td class="${win==='p'?'best':''}">${resultText(par[k])}</td>`:''}<td class="chv">${CHEV_R}</td></tr>`}).join('');
  return`<h2 class="dh">Tagesrätsel</h2><p class="hint small">Heute: ${optSummary(applyDailyPreview())}</p>
  <div class="stats"><div><b>${solved.length}</b><span>gelöst</span></div><div><b>${streak(mine)}</b><span>Serie</span></div><div><b>${avg}</b><span>Ø Fragen</span></div><div><b>${best}</b><span>Bestwert</span></div></div>
  <div class="row"><button class="btn primary grow" data-act="daily">${t?'Heutige Lösung ansehen':'Heutiges Rätsel spielen'}</button>${t?'<button class="btn" data-act="share">Teilen</button>':''}</div>
- <h3>Vergleich${hasP?`: Ich ${wm} – ${wp} Gegenüber`:''}</h3>
- ${keys.length?`<div class="tablewrap"><table class="days"><thead><tr><th>Tag</th><th>Ich</th>${hasP?'<th>Gegenüber</th>':''}</tr></thead><tbody>${rows}</tbody></table></div>`:'<p class="hint">Noch keine Ergebnisse. Spiel das heutige Rätsel!</p>'}
+ <h3>Archiv${hasP?` · Ich ${wm} – ${wp} Gegenüber`:''}</h3><p class="hint small">Tippe einen Tag an, um ihn nachzuholen oder die Lösung zu sehen. Nachgeholte Rätsel sind Übung und zählen nicht.</p>
+ ${keys.length?`<div class="tablewrap"><table class="days"><thead><tr><th>Tag</th><th>Ich</th>${hasP?'<th>Gegenüber</th>':''}<th></th></tr></thead><tbody>${rows}</tbody></table></div>`:'<p class="hint">Noch keine Ergebnisse. Spiel das heutige Rätsel!</p>'}
  <div class="btngrid"><button class="btn" data-act="showres">Mein QR zeigen</button><button class="btn" data-act="scanres">QR scannen</button></div>
  <p class="hint small">Zum Vergleichen zeigt einer seinen QR-Code, der andere scannt ihn. Weniger Fragen gewinnt, ein Fehlversuch zählt wie zwei Fragen. Die Optionen wechseln täglich, sind aber für alle gleich.</p>
  ${hasP?'<div class="row"><button class="link" data-act="clearpartner">Ergebnisse vom Gegenüber löschen</button></div>':''}`}
@@ -1249,6 +1414,11 @@ function viewDays(){const d=dailyData(),mine=d.mine,par=d.partner;
 /* ---------- Offline ---------- */
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 window.addEventListener('offline',()=>toast('Offline – das Spiel läuft trotzdem weiter'));
+
+/* ---------- Feste Kopfzeile ---------- */
+function syncHeader(){const h=document.querySelector('header');if(h)document.documentElement.style.setProperty('--hh',(h.offsetHeight+10)+'px')}
+window.addEventListener('resize',syncHeader);window.addEventListener('orientationchange',()=>setTimeout(syncHeader,200));
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(syncHeader);
 
 /* ---------- Nie zoomen ---------- */
 ['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false})); // iOS Pinch
@@ -1343,5 +1513,6 @@ document.addEventListener('pointerup',()=>{if(pend&&pend.touch&&pend.moved)retur
 document.addEventListener('pointercancel',()=>{if(pend&&pend.touch&&pend.moved)return;dragEnd(false)});
 
 render();
+if(isCpu()&&S.turn==='cpu'&&!S.winner)setTimeout(()=>{S.turn='me';cpuTurn()},300);
 
 </script></body></html>
